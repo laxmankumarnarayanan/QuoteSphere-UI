@@ -101,7 +101,7 @@ export const DealCreationLayer = (): JSX.Element => {
                 </div>
               </div>
               {/* Customer Selection Results */}
-              <CustomerSelectionSection onCustomerSelect={handleCustomerSelect} />
+              <CustomerSelectionSection onCustomerSelect={handleCustomerSelect} searchValue={searchValue} />
             </div>
             {/* Right Column - Customer Details */}
             <div className="flex-1">

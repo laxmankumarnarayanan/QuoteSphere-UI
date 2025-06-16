@@ -11,10 +11,12 @@ import { customerService, Customer } from "../../../../services/customerService"
 
 interface CustomerSelectionSectionProps {
   onCustomerSelect: (customer: Customer | null) => void;
+  searchValue: string;
 }
 
-export const CustomerSelectionSection = ({ onCustomerSelect }: CustomerSelectionSectionProps): JSX.Element => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+export const CustomerSelectionSection = ({ onCustomerSelect, searchValue }: CustomerSelectionSectionProps): JSX.Element => {
+  const [allCustomers, setAllCustomers] = useState<Customer[]>([]);
+  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export const CustomerSelectionSection = ({ onCustomerSelect }: CustomerSelection
     const fetchCustomers = async () => {
       try {
         const data = await customerService.getAllCustomers();
-        setCustomers(data);
+        setAllCustomers(data);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch customers');
@@ -33,6 +35,16 @@ export const CustomerSelectionSection = ({ onCustomerSelect }: CustomerSelection
 
     fetchCustomers();
   }, []);
+
+  useEffect(() => {
+    const lowerCaseSearchTerm = searchValue.toLowerCase();
+    const filtered = allCustomers.filter(customer =>
+      (customer.customerName && customer.customerName.toLowerCase().includes(lowerCaseSearchTerm)) ||
+      (customer.customerCode && customer.customerCode.toLowerCase().includes(lowerCaseSearchTerm)) ||
+      (customer.industry && customer.industry.toLowerCase().includes(lowerCaseSearchTerm))
+    );
+    setFilteredCustomers(filtered);
+  }, [searchValue, allCustomers]);
 
   const handleSelectCustomer = (customer: Customer) => {
     setSelectedCustomerId(customer.customerCode);
@@ -63,12 +75,12 @@ export const CustomerSelectionSection = ({ onCustomerSelect }: CustomerSelection
     <Card className="w-full max-w-[337px] shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] border-[#ebebea]">
       <CardHeader className="px-4 py-[19px]">
         <CardTitle className="font-semibold text-base text-[#242524] font-['Archivo',Helvetica]">
-          Search Results ({customers.length})
+          Search Results ({filteredCustomers.length})
         </CardTitle>
       </CardHeader>
 
       <div className="overflow-hidden">
-        {customers.map((customer, index) => (
+        {filteredCustomers.map((customer, index) => (
           <div key={customer.id}>
             <CardContent
               className={`px-3 py-[13px] ${selectedCustomerId === customer.customerCode ? "bg-[#636ae81a]" : ""}`}
@@ -96,7 +108,7 @@ export const CustomerSelectionSection = ({ onCustomerSelect }: CustomerSelection
                 </Button>
               </div>
             </CardContent>
-            {index < customers.length - 1 && <Separator className="mx-0" />}
+            {index < filteredCustomers.length - 1 && <Separator className="mx-0" />}
           </div>
         ))}
       </div>
