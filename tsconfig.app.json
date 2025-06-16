@@ -20,7 +20,12 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@template/*": ["src/template components/components/*"],
+      "@sections/*": ["src/screens/DealCreationLayer/sections/*"]
+    }
   },
   "include": [
     "src"

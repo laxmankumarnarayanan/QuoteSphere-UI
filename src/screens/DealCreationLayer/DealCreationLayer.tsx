@@ -1,11 +1,11 @@
 import { BellIcon, SearchIcon } from "lucide-react";
 import React from "react";
-import TextInput from "../../template components/components/form/TextInput";
-import PrimaryButton from "../../template components/components/elements/PrimaryButton";
-import SecondaryButton from "../../template components/components/elements/SecondaryButton";
-import { CustomerDetailsSection } from "./sections/CustomerDetailsSection/CustomerDetailsSection";
-import { CustomerSelectionSection } from "./sections/CustomerSelectionSection";
-import { DealCreationSection } from "./sections/DealCreationSection/DealCreationSection";
+import TextInput from "@template/form/TextInput";
+import PrimaryButton from "@template/elements/PrimaryButton";
+import SecondaryButton from "@template/elements/SecondaryButton";
+import { CustomerDetailsSection } from "@sections/CustomerDetailsSection/CustomerDetailsSection";
+import { CustomerSelectionSection } from "@sections/CustomerSelectionSection/CustomerSelectionSection";
+import { DealCreationSection } from "@sections/DealCreationSection/DealCreationSection";
 
 // Step data for the progress stepper
 const stepsData = [
