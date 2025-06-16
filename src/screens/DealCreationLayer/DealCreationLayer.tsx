@@ -1,11 +1,12 @@
 import { BellIcon, SearchIcon } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import TextInput from "@template/form/TextInput";
 import PrimaryButton from "@template/elements/PrimaryButton";
 import SecondaryButton from "@template/elements/SecondaryButton";
-import { CustomerDetailsSection } from "@sections/CustomerDetailsSection/CustomerDetailsSection";
-import { CustomerSelectionSection } from "@sections/CustomerSelectionSection/CustomerSelectionSection";
+import { CustomerDetailsSection } from "./sections/CustomerDetailsSection/CustomerDetailsSection";
+import { CustomerSelectionSection } from "./sections/CustomerSelectionSection/CustomerSelectionSection";
 import { DealCreationSection } from "@sections/DealCreationSection/DealCreationSection";
+import { Customer } from "../../services/customerService";
 
 // Step data for the progress stepper
 const stepsData = [
@@ -18,7 +19,8 @@ const stepsData = [
 
 export const DealCreationLayer = (): JSX.Element => {
   const [searchValue, setSearchValue] = React.useState("");
-  const [currentStep, setCurrentStep] = React.useState(1);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
   const handleNext = () => {
     setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length));
@@ -26,6 +28,10 @@ export const DealCreationLayer = (): JSX.Element => {
 
   const handleBack = () => {
     setCurrentStep((prevStep) => Math.max(prevStep - 1, 1));
+  };
+
+  const handleCustomerSelect = (customer: Customer | null) => {
+    setSelectedCustomer(customer);
   };
 
   return (
@@ -95,11 +101,11 @@ export const DealCreationLayer = (): JSX.Element => {
                 </div>
               </div>
               {/* Customer Selection Results */}
-              <CustomerSelectionSection />
+              <CustomerSelectionSection onCustomerSelect={handleCustomerSelect} />
             </div>
             {/* Right Column - Customer Details */}
             <div className="flex-1">
-              <DealCreationSection />
+              <CustomerDetailsSection selectedCustomer={selectedCustomer} />
             </div>
           </div>
         )}
@@ -116,11 +122,6 @@ export const DealCreationLayer = (): JSX.Element => {
         {currentStep === 5 && (
           <div>Special Conditions Section Goes Here (Placeholder)</div>
         )}
-
-        {/* Additional Sections - CustomerDetailsSection is assumed to be always visible for now */}
-        <div className="mt-8">
-          <CustomerDetailsSection />
-        </div>
       </main>
 
       {/* Navigation Buttons */}

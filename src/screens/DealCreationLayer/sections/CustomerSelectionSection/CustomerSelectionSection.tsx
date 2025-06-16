@@ -9,11 +9,15 @@ import {
 import { Separator } from "../../../../components/ui/separator";
 import { customerService, Customer } from "../../../../services/customerService";
 
-export const CustomerSelectionSection = (): JSX.Element => {
+interface CustomerSelectionSectionProps {
+  onCustomerSelect: (customer: Customer | null) => void;
+}
+
+export const CustomerSelectionSection = ({ onCustomerSelect }: CustomerSelectionSectionProps): JSX.Element => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -30,8 +34,9 @@ export const CustomerSelectionSection = (): JSX.Element => {
     fetchCustomers();
   }, []);
 
-  const handleSelectCustomer = (customerId: number) => {
-    setSelectedCustomerId(customerId);
+  const handleSelectCustomer = (customer: Customer) => {
+    setSelectedCustomerId(customer.customerCode);
+    onCustomerSelect(customer);
   };
 
   if (loading) {
@@ -66,7 +71,7 @@ export const CustomerSelectionSection = (): JSX.Element => {
         {customers.map((customer, index) => (
           <div key={customer.id}>
             <CardContent
-              className={`px-3 py-[13px] ${selectedCustomerId === customer.id ? "bg-[#636ae81a]" : ""}`}
+              className={`px-3 py-[13px] ${selectedCustomerId === customer.customerCode ? "bg-[#636ae81a]" : ""}`}
             >
               <div className="flex justify-between items-center">
                 <div>
@@ -74,23 +79,20 @@ export const CustomerSelectionSection = (): JSX.Element => {
                     {customer.customerName}
                   </div>
                   <div className="font-normal text-xs text-[#8c8d8b] font-['Inter',Helvetica] leading-4 mt-1">
-                    Customer ID: {customer.customerCode}
+                    CustomerID: {customer.customerCode}
                   </div>
                   <div className="font-normal text-xs text-[#8c8d8b] font-['Inter',Helvetica] leading-4 mt-1">
                     Industry: {customer.industry}
-                  </div>
-                  <div className="font-normal text-xs text-[#8c8d8b] font-['Inter',Helvetica] leading-4 mt-1">
-                    Region: {customer.region}
                   </div>
                 </div>
 
                 <Button
                   variant="outline"
                   size="sm"
-                  className={`h-9 ${selectedCustomerId === customer.id ? "w-[85px]" : "w-[68px]"} rounded-md text-sm font-normal text-[#242524] font-['Inter',Helvetica]`}
-                  onClick={() => handleSelectCustomer(customer.id)}
+                  className={`h-9 ${selectedCustomerId === customer.customerCode ? "w-[85px]" : "w-[68px]"} rounded-md text-sm font-normal text-[#242524] font-['Inter',Helvetica]`}
+                  onClick={() => handleSelectCustomer(customer)}
                 >
-                  {selectedCustomerId === customer.id ? "Selected" : "Select"}
+                  {selectedCustomerId === customer.customerCode ? "Selected" : "Select"}
                 </Button>
               </div>
             </CardContent>
