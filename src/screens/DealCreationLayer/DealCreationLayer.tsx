@@ -106,6 +106,15 @@ export const DealCreationLayer = (): JSX.Element => {
             {/* Right Column - Customer Details */}
             <div className="flex-1">
               <CustomerDetailsSection selectedCustomer={selectedCustomer} />
+              {/* Navigation Buttons */}
+              <div className="flex justify-end gap-4 mt-8">
+                <SecondaryButton onClick={handleBack} disabled={currentStep === 1}>
+                  Back
+                </SecondaryButton>
+                <PrimaryButton onClick={handleNext} disabled={currentStep === stepsData.length}>
+                  Next
+                </PrimaryButton>
+              </div>
             </div>
           </div>
         )}
@@ -123,16 +132,6 @@ export const DealCreationLayer = (): JSX.Element => {
           <div>Special Conditions Section Goes Here (Placeholder)</div>
         )}
       </main>
-
-      {/* Navigation Buttons */}
-      <div className="flex justify-end gap-4 mt-8 px-8 pb-8">
-        <SecondaryButton onClick={handleBack} disabled={currentStep === 1}>
-          Back
-        </SecondaryButton>
-        <PrimaryButton onClick={handleNext} disabled={currentStep === stepsData.length}>
-          Next
-        </PrimaryButton>
-      </div>
     </div>
   );
 };
