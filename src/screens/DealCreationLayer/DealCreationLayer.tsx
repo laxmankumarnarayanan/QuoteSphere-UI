@@ -6,7 +6,7 @@ import SecondaryButton from "@template/elements/SecondaryButton";
 import { CustomerDetailsSection } from "./sections/CustomerDetailsSection/CustomerDetailsSection";
 import { CustomerSelectionSection } from "./sections/CustomerSelectionSection/CustomerSelectionSection";
 import { DealCreationSection } from "@sections/DealCreationSection/DealCreationSection";
-import { Customer } from "../../services/customerService";
+import { Customer, CustomerDetails } from "../../services/customerService";
 
 // Step data for the progress stepper
 const stepsData = [
@@ -20,7 +20,7 @@ const stepsData = [
 export const DealCreationLayer = (): JSX.Element => {
   const [searchValue, setSearchValue] = React.useState("");
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerDetails | null>(null);
 
   const handleNext = () => {
     setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length));
@@ -30,7 +30,7 @@ export const DealCreationLayer = (): JSX.Element => {
     setCurrentStep((prevStep) => Math.max(prevStep - 1, 1));
   };
 
-  const handleCustomerSelect = (customer: Customer | null) => {
+  const handleCustomerSelect = (customer: CustomerDetails | null) => {
     setSelectedCustomer(customer);
   };
 

@@ -7,10 +7,10 @@ import {
   CardTitle,
 } from "../../../../components/ui/card";
 import { Separator } from "../../../../components/ui/separator";
-import { customerService, Customer } from "../../../../services/customerService";
+import { customerService, Customer, CustomerDetails } from "../../../../services/customerService";
 
 interface CustomerSelectionSectionProps {
-  onCustomerSelect: (customer: Customer | null) => void;
+  onCustomerSelect: (customer: CustomerDetails | null) => void;
   searchValue: string;
 }
 
@@ -46,9 +46,23 @@ export const CustomerSelectionSection = ({ onCustomerSelect, searchValue }: Cust
     setFilteredCustomers(filtered);
   }, [searchValue, allCustomers]);
 
-  const handleSelectCustomer = (customer: Customer) => {
-    setSelectedCustomerId(customer.customerCode);
-    onCustomerSelect(customer);
+  const handleSelectCustomer = async (customer: Customer) => {
+    if (selectedCustomerId === customer.customerCode) {
+      // Deselect customer
+      setSelectedCustomerId(null);
+      onCustomerSelect(null);
+    } else {
+      try {
+        setLoading(true);
+        const customerDetails = await customerService.getCustomerDetails(customer.customerID);
+        setSelectedCustomerId(customer.customerCode);
+        onCustomerSelect(customerDetails);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch customer details');
+        setLoading(false);
+      }
+    }
   };
 
   if (loading) {
@@ -81,7 +95,7 @@ export const CustomerSelectionSection = ({ onCustomerSelect, searchValue }: Cust
 
       <div className="overflow-hidden">
         {filteredCustomers.map((customer, index) => (
-          <div key={customer.id}>
+          <div key={customer.customerID}>
             <CardContent
               className={`px-3 py-[13px] ${selectedCustomerId === customer.customerCode ? "bg-[#636ae81a]" : ""}`}
             >
