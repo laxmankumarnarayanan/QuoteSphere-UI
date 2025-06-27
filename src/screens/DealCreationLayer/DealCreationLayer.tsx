@@ -8,6 +8,7 @@ import { CustomerSelectionSection } from "./sections/CustomerSelectionSection/Cu
 import { DealCreationSection } from "@sections/DealCreationSection/DealCreationSection";
 import { Customer, CustomerDetails } from "../../services/customerService";
 import { dealService, Deal } from '../../services/dealService';
+import { ProductSelectionDropdowns } from "./ProductSelectionDropdowns";
 
 // Step data for the progress stepper
 const stepsData = [
@@ -137,7 +138,7 @@ export const DealCreationLayer = (): JSX.Element => {
         )}
 
         {currentStep === 2 && (
-          <div>Product Selection Section Goes Here (Placeholder)</div>
+          <ProductSelectionDropdowns />
         )}
         {currentStep === 3 && (
           <div>Collateral & Documentation Section Goes Here (Placeholder)</div>
