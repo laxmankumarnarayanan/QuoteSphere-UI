@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { productSelectionService, Entity } from "../../services/productSelectionService";
 
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
 export const ProductSelectionDropdowns: React.FC = () => {
   const [businessDomains, setBusinessDomains] = useState<Entity[]>([]);
   const [productCategories, setProductCategories] = useState<Entity[]>([]);
@@ -8,6 +13,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
   const [products, setProducts] = useState<Entity[]>([]);
   const [subProducts, setSubProducts] = useState<Entity[]>([]);
 
+  // All selected* state variables are UUID strings
   const [selectedBusinessDomain, setSelectedBusinessDomain] = useState<string>("");
   const [selectedProductCategory, setSelectedProductCategory] = useState<string>("");
   const [selectedProductSubCategory, setSelectedProductSubCategory] = useState<string>("");
@@ -21,7 +27,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
 
   // Fetch product categories when business domain changes
   useEffect(() => {
-    if (selectedBusinessDomain) {
+    if (isValidUUID(selectedBusinessDomain)) {
       productSelectionService.getProductCategories(selectedBusinessDomain).then(setProductCategories);
       setProductSubCategories([]);
       setProducts([]);
@@ -35,7 +41,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
 
   // Fetch product subcategories when product category changes
   useEffect(() => {
-    if (selectedProductCategory) {
+    if (isValidUUID(selectedProductCategory)) {
       productSelectionService.getProductSubCategories(selectedProductCategory).then(setProductSubCategories);
       setProducts([]);
       setSubProducts([]);
@@ -47,7 +53,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
 
   // Fetch products when product subcategory changes
   useEffect(() => {
-    if (selectedProductSubCategory) {
+    if (isValidUUID(selectedProductSubCategory)) {
       productSelectionService.getProducts(selectedProductSubCategory).then(setProducts);
       setSubProducts([]);
       setSelectedProduct("");
@@ -57,7 +63,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
 
   // Fetch subproducts when product changes
   useEffect(() => {
-    if (selectedProduct) {
+    if (isValidUUID(selectedProduct)) {
       productSelectionService.getSubProducts(selectedProduct).then(setSubProducts);
       setSelectedSubProduct("");
     }
@@ -65,7 +71,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Business Domain Dropdown */}
+      {/* Business Domain Dropdown (UUID) */}
       <select
         value={selectedBusinessDomain}
         onChange={e => setSelectedBusinessDomain(e.target.value)}
@@ -78,11 +84,11 @@ export const ProductSelectionDropdowns: React.FC = () => {
         ))}
       </select>
 
-      {/* Product Category Dropdown */}
+      {/* Product Category Dropdown (UUID) */}
       <select
         value={selectedProductCategory}
         onChange={e => setSelectedProductCategory(e.target.value)}
-        disabled={!selectedBusinessDomain}
+        disabled={!isValidUUID(selectedBusinessDomain)}
       >
         <option value="">Select Product Category</option>
         {productCategories.map(pc => (
@@ -92,11 +98,11 @@ export const ProductSelectionDropdowns: React.FC = () => {
         ))}
       </select>
 
-      {/* Product SubCategory Dropdown */}
+      {/* Product SubCategory Dropdown (UUID) */}
       <select
         value={selectedProductSubCategory}
         onChange={e => setSelectedProductSubCategory(e.target.value)}
-        disabled={!selectedProductCategory}
+        disabled={!isValidUUID(selectedProductCategory)}
       >
         <option value="">Select Product SubCategory</option>
         {productSubCategories.map(psc => (
@@ -106,11 +112,11 @@ export const ProductSelectionDropdowns: React.FC = () => {
         ))}
       </select>
 
-      {/* Product Dropdown */}
+      {/* Product Dropdown (UUID) */}
       <select
         value={selectedProduct}
         onChange={e => setSelectedProduct(e.target.value)}
-        disabled={!selectedProductSubCategory}
+        disabled={!isValidUUID(selectedProductSubCategory)}
       >
         <option value="">Select Product</option>
         {products.map(p => (
@@ -120,11 +126,11 @@ export const ProductSelectionDropdowns: React.FC = () => {
         ))}
       </select>
 
-      {/* SubProduct Dropdown */}
+      {/* SubProduct Dropdown (UUID) */}
       <select
         value={selectedSubProduct}
         onChange={e => setSelectedSubProduct(e.target.value)}
-        disabled={!selectedProduct}
+        disabled={!isValidUUID(selectedProduct)}
       >
         <option value="">Select SubProduct</option>
         {subProducts.map(sp => (
