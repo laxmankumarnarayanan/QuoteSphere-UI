@@ -6,16 +6,6 @@ function isValidUUID(uuid: string): boolean {
   return uuidRegex.test(uuid);
 }
 
-export interface Entity {
-  id?: string; // UUID string from backend
-  businessDomainId?: string; // legacy, not used by backend
-  productCategoryId?: string; // legacy, not used by backend
-  productSubCategoryId?: string; // legacy, not used by backend
-  productId?: string; // legacy, not used by backend
-  subProductId?: string; // legacy, not used by backend
-  description: string;
-}
-
 export const ProductSelectionDropdowns: React.FC = () => {
   const [businessDomains, setBusinessDomains] = useState<Entity[]>([]);
   const [productCategories, setProductCategories] = useState<Entity[]>([]);
