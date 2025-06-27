@@ -7,6 +7,7 @@ import { CustomerDetailsSection } from "./sections/CustomerDetailsSection/Custom
 import { CustomerSelectionSection } from "./sections/CustomerSelectionSection/CustomerSelectionSection";
 import { DealCreationSection } from "@sections/DealCreationSection/DealCreationSection";
 import { Customer, CustomerDetails } from "../../services/customerService";
+import { dealService, Deal } from '../../services/dealService';
 
 // Step data for the progress stepper
 const stepsData = [
@@ -21,9 +22,25 @@ export const DealCreationLayer = (): JSX.Element => {
   const [searchValue, setSearchValue] = React.useState("");
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerDetails | null>(null);
+  const [createdDeal, setCreatedDeal] = useState<Deal | null>(null);
 
-  const handleNext = () => {
-    setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length));
+  const handleNext = async () => {
+    if (currentStep === 1 && selectedCustomer) {
+      try {
+        const deal = await dealService.createDraftDeal(
+          selectedCustomer.customer.customerID,
+          selectedCustomer.customer.customerName,
+          'initiator' // Replace with actual initiator (e.g., logged-in user)
+        );
+        setCreatedDeal(deal);
+        setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length));
+      } catch (error) {
+        // Optionally handle error (show notification, etc.)
+        console.error('Failed to create deal:', error);
+      }
+    } else {
+      setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length));
+    }
   };
 
   const handleBack = () => {
