@@ -3,11 +3,12 @@ import axios from "axios";
 const API_BASE_URL = "https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/product-selection";
 
 export interface Entity {
-  businessDomainId?: string; // UUID string
-  productCategoryId?: string; // UUID string
-  productSubCategoryId?: string; // UUID string
-  productId?: string; // UUID string
-  subProductId?: string; // UUID string
+  id?: string; // UUID string from backend
+  businessDomainId?: string; // legacy, not used by backend
+  productCategoryId?: string; // legacy, not used by backend
+  productSubCategoryId?: string; // legacy, not used by backend
+  productId?: string; // legacy, not used by backend
+  subProductId?: string; // legacy, not used by backend
   description: string;
 }
 
