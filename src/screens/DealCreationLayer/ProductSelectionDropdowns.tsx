@@ -28,6 +28,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
   // Fetch product categories when business domain changes
   useEffect(() => {
     if (isValidUUID(selectedBusinessDomain)) {
+      console.log('Selected BusinessDomainID:', selectedBusinessDomain);
       productSelectionService.getProductCategories(selectedBusinessDomain).then(setProductCategories);
       setProductSubCategories([]);
       setProducts([]);
