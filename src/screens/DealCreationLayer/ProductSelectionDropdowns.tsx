@@ -80,6 +80,16 @@ export const ProductSelectionDropdowns: React.FC = () => {
     console.log('selectedProductCategory changed:', selectedProductCategory);
   }, [selectedProductCategory]);
 
+  // Log selectedProduct every time it changes
+  useEffect(() => {
+    console.log('selectedProduct changed:', selectedProduct);
+  }, [selectedProduct]);
+
+  // Log selectedSubProduct every time it changes
+  useEffect(() => {
+    console.log('selectedSubProduct changed:', selectedSubProduct);
+  }, [selectedSubProduct]);
+
   return (
     <div className="flex flex-col gap-4">
       {/* Business Domain Dropdown (UUID) */}
