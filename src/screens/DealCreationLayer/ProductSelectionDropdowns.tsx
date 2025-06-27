@@ -6,6 +6,16 @@ function isValidUUID(uuid: string): boolean {
   return uuidRegex.test(uuid);
 }
 
+export interface Entity {
+  id?: string; // UUID string from backend
+  businessDomainId?: string; // legacy, not used by backend
+  productCategoryId?: string; // legacy, not used by backend
+  productSubCategoryId?: string; // legacy, not used by backend
+  productId?: string; // legacy, not used by backend
+  subProductId?: string; // legacy, not used by backend
+  description: string;
+}
+
 export const ProductSelectionDropdowns: React.FC = () => {
   const [businessDomains, setBusinessDomains] = useState<Entity[]>([]);
   const [productCategories, setProductCategories] = useState<Entity[]>([]);
@@ -89,7 +99,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
       >
         <option value="">Select Business Domain</option>
         {businessDomains.map(bd => (
-          <option key={bd.id} value={bd.id}>
+          <option key={bd.id ?? bd.businessDomainId} value={bd.id ?? bd.businessDomainId}>
             {bd.description}
           </option>
         ))}
@@ -103,7 +113,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
       >
         <option value="">Select Product Category</option>
         {productCategories.map(pc => (
-          <option key={pc.id} value={pc.id}>
+          <option key={pc.id ?? pc.productCategoryId} value={pc.id ?? pc.productCategoryId}>
             {pc.description}
           </option>
         ))}
@@ -117,7 +127,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
       >
         <option value="">Select Product SubCategory</option>
         {productSubCategories.map(psc => (
-          <option key={psc.id} value={psc.id}>
+          <option key={psc.id ?? psc.productSubCategoryId} value={psc.id ?? psc.productSubCategoryId}>
             {psc.description}
           </option>
         ))}
@@ -131,7 +141,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
       >
         <option value="">Select Product</option>
         {products.map(p => (
-          <option key={p.id} value={p.id}>
+          <option key={p.id ?? p.productId} value={p.id ?? p.productId}>
             {p.description}
           </option>
         ))}
@@ -145,7 +155,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
       >
         <option value="">Select SubProduct</option>
         {subProducts.map(sp => (
-          <option key={sp.id} value={sp.id}>
+          <option key={sp.id ?? sp.subProductId} value={sp.id ?? sp.subProductId}>
             {sp.description}
           </option>
         ))}
