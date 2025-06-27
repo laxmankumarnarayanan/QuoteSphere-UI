@@ -111,7 +111,7 @@ export const DealCreationLayer = (): JSX.Element => {
                 <SecondaryButton onClick={handleBack} disabled={currentStep === 1}>
                   Back
                 </SecondaryButton>
-                <PrimaryButton onClick={handleNext} disabled={currentStep === stepsData.length}>
+                <PrimaryButton onClick={handleNext} disabled={!selectedCustomer || currentStep === stepsData.length}>
                   Next
                 </PrimaryButton>
               </div>
