@@ -84,7 +84,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
       >
         <option value="">Select Business Domain</option>
         {businessDomains.map(bd => (
-          <option key={bd.businessDomainId} value={bd.businessDomainId}>
+          <option key={bd.id} value={bd.id}>
             {bd.description}
           </option>
         ))}
@@ -98,7 +98,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
       >
         <option value="">Select Product Category</option>
         {productCategories.map(pc => (
-          <option key={pc.productCategoryId} value={pc.productCategoryId}>
+          <option key={pc.id} value={pc.id}>
             {pc.description}
           </option>
         ))}
@@ -112,7 +112,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
       >
         <option value="">Select Product SubCategory</option>
         {productSubCategories.map(psc => (
-          <option key={psc.productSubCategoryId} value={psc.productSubCategoryId}>
+          <option key={psc.id} value={psc.id}>
             {psc.description}
           </option>
         ))}
@@ -126,7 +126,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
       >
         <option value="">Select Product</option>
         {products.map(p => (
-          <option key={p.productId} value={p.productId}>
+          <option key={p.id} value={p.id}>
             {p.description}
           </option>
         ))}
@@ -140,7 +140,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
       >
         <option value="">Select SubProduct</option>
         {subProducts.map(sp => (
-          <option key={sp.subProductId} value={sp.subProductId}>
+          <option key={sp.id} value={sp.id}>
             {sp.description}
           </option>
         ))}
