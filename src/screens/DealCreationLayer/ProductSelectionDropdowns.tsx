@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { productSelectionService, Entity } from "../../services/productSelectionService";
+import SecondaryButton from "../../template components/components/elements/SecondaryButton";
 
 function isValidUUID(uuid: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -139,6 +140,19 @@ export const ProductSelectionDropdowns: React.FC = () => {
           </option>
         ))}
       </select>
+
+      {/* Add Button */}
+      <div className="mt-4">
+        <SecondaryButton
+          onClick={() => {
+            // Handle add functionality here
+            console.log("Add button clicked");
+          }}
+          disabled={!isValidUUID(selectedSubProduct)}
+        >
+          Add
+        </SecondaryButton>
+      </div>
     </div>
   );
 }; 
