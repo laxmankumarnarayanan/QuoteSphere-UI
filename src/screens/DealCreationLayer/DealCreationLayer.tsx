@@ -137,8 +137,8 @@ export const DealCreationLayer = (): JSX.Element => {
           </div>
         )}
 
-        {currentStep === 2 && (
-          <ProductSelectionDropdowns />
+        {currentStep === 2 && createdDeal && createdDeal.dealId && (
+          <ProductSelectionDropdowns dealId={createdDeal.dealId} />
         )}
         {currentStep === 3 && (
           <div>Collateral & Documentation Section Goes Here (Placeholder)</div>

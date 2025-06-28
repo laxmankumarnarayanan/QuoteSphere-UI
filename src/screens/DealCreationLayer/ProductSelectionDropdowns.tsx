@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { productSelectionService, Entity } from "../../services/productSelectionService";
 import SecondaryButton from "../../template components/components/elements/SecondaryButton";
+import { addDealProduct, addDealSubProduct } from "../../services/dealProductApi";
 
 function isValidUUID(uuid: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
 }
 
-export const ProductSelectionDropdowns: React.FC = () => {
+interface ProductSelectionDropdownsProps {
+  dealId: string;
+}
+
+export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId }) => {
   const [businessDomains, setBusinessDomains] = useState<Entity[]>([]);
   const [productCategories, setProductCategories] = useState<Entity[]>([]);
   const [productSubCategories, setProductSubCategories] = useState<Entity[]>([]);
@@ -20,6 +25,7 @@ export const ProductSelectionDropdowns: React.FC = () => {
   const [selectedProductSubCategory, setSelectedProductSubCategory] = useState<string>("");
   const [selectedProduct, setSelectedProduct] = useState<string>("");
   const [selectedSubProduct, setSelectedSubProduct] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
   // Fetch business domains on mount
   useEffect(() => {
@@ -69,6 +75,38 @@ export const ProductSelectionDropdowns: React.FC = () => {
       setSelectedSubProduct("");
     }
   }, [selectedProduct]);
+
+  const handleAdd = async () => {
+    if (!isValidUUID(dealId) || !isValidUUID(selectedProduct) || !isValidUUID(selectedSubProduct)) return;
+    setLoading(true);
+    try {
+      // Save to DealProduct
+      await addDealProduct({
+        dealId,
+        productId: selectedProduct,
+        accountNumber: "", // Fill as needed
+        createdBy: "", // Fill as needed
+        createdDateTime: new Date().toISOString(),
+        lastUpdatedBy: "",
+        lastUpdatedDateTime: new Date().toISOString(),
+      });
+      // Save to DealSubProduct
+      await addDealSubProduct({
+        dealId,
+        productId: selectedProduct,
+        subProductId: selectedSubProduct,
+        createdBy: "",
+        createdDateTime: new Date().toISOString(),
+        lastUpdatedBy: "",
+        lastUpdatedDateTime: new Date().toISOString(),
+      });
+      alert("Added successfully!");
+    } catch (error: any) {
+      alert("Failed to add: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -144,13 +182,10 @@ export const ProductSelectionDropdowns: React.FC = () => {
       {/* Add Button */}
       <div className="mt-4">
         <SecondaryButton
-          onClick={() => {
-            // Handle add functionality here
-            console.log("Add button clicked");
-          }}
-          disabled={!isValidUUID(selectedSubProduct)}
+          onClick={handleAdd}
+          disabled={!isValidUUID(selectedSubProduct) || loading}
         >
-          Add
+          {loading ? "Adding..." : "Add"}
         </SecondaryButton>
       </div>
     </div>
