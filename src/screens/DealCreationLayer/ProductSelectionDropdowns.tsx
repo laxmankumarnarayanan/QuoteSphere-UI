@@ -30,6 +30,13 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   const [selectedSubProduct, setSelectedSubProduct] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [added, setAdded] = useState(false);
+  const [addedCombinations, setAddedCombinations] = useState<{
+    productId: string;
+    subProductId: string;
+    productLabel: string;
+    subProductLabel: string;
+  }[]>([]);
+  const [addError, setAddError] = useState<string | null>(null);
 
   // Fetch business domains on mount
   useEffect(() => {
@@ -82,6 +89,14 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
 
   const handleAdd = async () => {
     if (!isValidUUID(dealId) || !isValidUUID(selectedProduct) || !isValidUUID(selectedSubProduct)) return;
+    setAddError(null);
+    // Prevent duplicate
+    if (addedCombinations.some(
+      c => c.productId === selectedProduct && c.subProductId === selectedSubProduct
+    )) {
+      setAddError("This product-subproduct combination has already been added.");
+      return;
+    }
     setLoading(true);
     try {
       // Save to DealProduct
@@ -105,6 +120,18 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
         lastUpdatedDateTime: new Date().toISOString(),
       });
       setAdded(true);
+      // Add to local list
+      const productLabel = products.find(p => (String(p.id ?? p.productId ?? "")) === selectedProduct)?.description || selectedProduct;
+      const subProductLabel = subProducts.find(sp => (String(sp.id ?? sp.subProductId ?? "")) === selectedSubProduct)?.description || selectedSubProduct;
+      setAddedCombinations(prev => [
+        ...prev,
+        {
+          productId: selectedProduct,
+          subProductId: selectedSubProduct,
+          productLabel,
+          subProductLabel,
+        },
+      ]);
       alert("Added successfully!");
     } catch (error: any) {
       alert("Failed to add: " + error.message);
@@ -184,6 +211,21 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
           Next
         </PrimaryButton>
       </div>
+      {addError && <div className="text-red-600 text-sm mt-1">{addError}</div>}
+      {/* Added combinations list */}
+      {addedCombinations.length > 0 && (
+        <div className="mt-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
+          <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
+          <ul className="space-y-2">
+            {addedCombinations.map((combo, idx) => (
+              <li key={combo.productId + '-' + combo.subProductId} className="flex gap-6 items-center">
+                <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }; 
