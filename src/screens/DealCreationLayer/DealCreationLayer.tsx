@@ -10,6 +10,7 @@ import { Customer, CustomerDetails } from "../../services/customerService";
 import { dealService, Deal } from '../../services/dealService';
 import { ProductSelectionDropdowns } from "./ProductSelectionDropdowns";
 import { CustomerInfoBanner } from "./CustomerInfoBanner";
+import DealCollateralForm from "../../components/DealCollateralForm";
 
 // Step data for the progress stepper
 const stepsData = [
@@ -171,7 +172,7 @@ export const DealCreationLayer = (): JSX.Element => {
                 </ul>
               </div>
             )}
-            <div>Collateral & Documentation Section Goes Here (Placeholder)</div>
+            <DealCollateralForm />
           </>
         )}
         {currentStep === 4 && (
