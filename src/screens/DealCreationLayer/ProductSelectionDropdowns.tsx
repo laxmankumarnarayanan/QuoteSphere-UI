@@ -138,9 +138,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
           subProductLabel,
         },
       ]);
-      alert("Added successfully!");
     } catch (error: any) {
-      alert("Failed to add: " + error.message);
     } finally {
       setLoading(false);
     }
