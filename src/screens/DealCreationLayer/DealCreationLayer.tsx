@@ -11,6 +11,7 @@ import { dealService, Deal } from '../../services/dealService';
 import { ProductSelectionDropdowns } from "./ProductSelectionDropdowns";
 import { CustomerInfoBanner } from "./CustomerInfoBanner";
 import DealCollateralForm from "../../components/DealCollateralForm";
+import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card";
 
 // Step data for the progress stepper
 const stepsData = [
@@ -20,6 +21,39 @@ const stepsData = [
   { number: 4, title: "Pricing and Fees" },
   { number: 5, title: "Special Conditions" },
 ];
+
+function DealDetailsContainer({ deal }: { deal: Deal | null }) {
+  if (!deal) return null;
+  return (
+    <Card className="w-full shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] border-[#ebebea] mb-6">
+      <CardHeader className="px-4 py-[19px]">
+        <CardTitle className="font-semibold text-base text-[#242524] font-['Archivo',Helvetica]">
+          Deal Details
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="px-4 py-4">
+        <dl className="divide-y divide-gray-200">
+          <div className="py-2 sm:grid sm:grid-cols-3 sm:gap-4">
+            <dt className="text-sm font-medium text-gray-500">Deal ID</dt>
+            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{deal.dealId}</dd>
+          </div>
+          <div className="py-2 sm:grid sm:grid-cols-3 sm:gap-4">
+            <dt className="text-sm font-medium text-gray-500">Deal Status</dt>
+            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{deal.dealStatus}</dd>
+          </div>
+          <div className="py-2 sm:grid sm:grid-cols-3 sm:gap-4">
+            <dt className="text-sm font-medium text-gray-500">Created DateTime</dt>
+            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{deal.createdDateTime ? new Date(deal.createdDateTime).toLocaleString() : "-"}</dd>
+          </div>
+          <div className="py-2 sm:grid sm:grid-cols-3 sm:gap-4">
+            <dt className="text-sm font-medium text-gray-500">Created By</dt>
+            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{deal.createdBy || deal.initiator || "-"}</dd>
+          </div>
+        </dl>
+      </CardContent>
+    </Card>
+  );
+}
 
 export const DealCreationLayer = (): JSX.Element => {
   const [searchValue, setSearchValue] = React.useState("");
@@ -149,15 +183,19 @@ export const DealCreationLayer = (): JSX.Element => {
         {currentStep > 1 && selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
 
         {currentStep === 2 && createdDeal && createdDeal.dealId && (
-          <ProductSelectionDropdowns 
-            dealId={createdDeal.dealId} 
-            onNext={() => setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length))}
-            addedCombinations={addedCombinations}
-            setAddedCombinations={setAddedCombinations}
-          />
+          <>
+            <DealDetailsContainer deal={createdDeal} />
+            <ProductSelectionDropdowns 
+              dealId={createdDeal.dealId} 
+              onNext={() => setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length))}
+              addedCombinations={addedCombinations}
+              setAddedCombinations={setAddedCombinations}
+            />
+          </>
         )}
         {currentStep === 3 && (
           <>
+            <DealDetailsContainer deal={createdDeal} />
             {/* Show added product-subproduct combinations */}
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
