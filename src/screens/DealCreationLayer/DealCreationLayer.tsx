@@ -138,7 +138,10 @@ export const DealCreationLayer = (): JSX.Element => {
         )}
 
         {currentStep === 2 && createdDeal && createdDeal.dealId && (
-          <ProductSelectionDropdowns dealId={createdDeal.dealId} />
+          <ProductSelectionDropdowns 
+            dealId={createdDeal.dealId} 
+            onNext={() => setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length))}
+          />
         )}
         {currentStep === 3 && (
           <div>Collateral & Documentation Section Goes Here (Placeholder)</div>

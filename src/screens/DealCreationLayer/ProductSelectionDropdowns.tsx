@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { productSelectionService, Entity } from "../../services/productSelectionService";
 import SecondaryButton from "../../template components/components/elements/SecondaryButton";
+import PrimaryButton from "../../template components/components/elements/PrimaryButton";
 import { addDealProduct, addDealSubProduct } from "../../services/dealProductApi";
 
 function isValidUUID(uuid: string): boolean {
@@ -10,9 +11,10 @@ function isValidUUID(uuid: string): boolean {
 
 interface ProductSelectionDropdownsProps {
   dealId: string;
+  onNext: () => void;
 }
 
-export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId }) => {
+export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, onNext }) => {
   const [businessDomains, setBusinessDomains] = useState<Entity[]>([]);
   const [productCategories, setProductCategories] = useState<Entity[]>([]);
   const [productSubCategories, setProductSubCategories] = useState<Entity[]>([]);
@@ -26,6 +28,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   const [selectedProduct, setSelectedProduct] = useState<string>("");
   const [selectedSubProduct, setSelectedSubProduct] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [added, setAdded] = useState(false);
 
   // Fetch business domains on mount
   useEffect(() => {
@@ -100,6 +103,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
         lastUpdatedBy: "",
         lastUpdatedDateTime: new Date().toISOString(),
       });
+      setAdded(true);
       alert("Added successfully!");
     } catch (error: any) {
       alert("Failed to add: " + error.message);
@@ -180,13 +184,19 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
       </select>
 
       {/* Add Button */}
-      <div className="mt-4">
+      <div className="mt-4 flex gap-4">
         <SecondaryButton
           onClick={handleAdd}
           disabled={!isValidUUID(selectedSubProduct) || loading}
         >
           {loading ? "Adding..." : "Add"}
         </SecondaryButton>
+        <PrimaryButton
+          onClick={onNext}
+          disabled={!added}
+        >
+          Next
+        </PrimaryButton>
       </div>
     </div>
   );
