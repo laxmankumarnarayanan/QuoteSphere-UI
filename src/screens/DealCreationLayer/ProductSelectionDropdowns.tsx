@@ -13,9 +13,21 @@ function isValidUUID(uuid: string): boolean {
 interface ProductSelectionDropdownsProps {
   dealId: string;
   onNext: () => void;
+  addedCombinations: {
+    productId: string;
+    subProductId: string;
+    productLabel: string;
+    subProductLabel: string;
+  }[];
+  setAddedCombinations: React.Dispatch<React.SetStateAction<{
+    productId: string;
+    subProductId: string;
+    productLabel: string;
+    subProductLabel: string;
+  }[]>>;
 }
 
-export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, onNext }) => {
+export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, onNext, addedCombinations, setAddedCombinations }) => {
   const [businessDomains, setBusinessDomains] = useState<Entity[]>([]);
   const [productCategories, setProductCategories] = useState<Entity[]>([]);
   const [productSubCategories, setProductSubCategories] = useState<Entity[]>([]);
@@ -30,12 +42,6 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   const [selectedSubProduct, setSelectedSubProduct] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [added, setAdded] = useState(false);
-  const [addedCombinations, setAddedCombinations] = useState<{
-    productId: string;
-    subProductId: string;
-    productLabel: string;
-    subProductLabel: string;
-  }[]>([]);
   const [addError, setAddError] = useState<string | null>(null);
 
   // Fetch business domains on mount

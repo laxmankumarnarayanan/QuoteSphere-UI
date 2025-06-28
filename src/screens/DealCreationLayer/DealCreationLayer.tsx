@@ -25,6 +25,12 @@ export const DealCreationLayer = (): JSX.Element => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerDetails | null>(null);
   const [createdDeal, setCreatedDeal] = useState<Deal | null>(null);
+  const [addedCombinations, setAddedCombinations] = useState<{
+    productId: string;
+    subProductId: string;
+    productLabel: string;
+    subProductLabel: string;
+  }[]>([]);
 
   const handleNext = async () => {
     if (currentStep === 1 && selectedCustomer) {
@@ -145,10 +151,28 @@ export const DealCreationLayer = (): JSX.Element => {
           <ProductSelectionDropdowns 
             dealId={createdDeal.dealId} 
             onNext={() => setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length))}
+            addedCombinations={addedCombinations}
+            setAddedCombinations={setAddedCombinations}
           />
         )}
         {currentStep === 3 && (
-          <div>Collateral & Documentation Section Goes Here (Placeholder)</div>
+          <>
+            {/* Show added product-subproduct combinations */}
+            {addedCombinations.length > 0 && (
+              <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
+                <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
+                <ul className="space-y-2">
+                  {addedCombinations.map((combo, idx) => (
+                    <li key={combo.productId + '-' + combo.subProductId} className="flex gap-6 items-center">
+                      <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                      <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div>Collateral & Documentation Section Goes Here (Placeholder)</div>
+          </>
         )}
         {currentStep === 4 && (
           <div>Pricing and Fees Section Goes Here (Placeholder)</div>
