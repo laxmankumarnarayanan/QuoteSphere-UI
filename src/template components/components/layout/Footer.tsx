@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
       <div className="flex-1 flex items-center justify-center">
         <span className="text-sm text-gray-600 dark:text-gray-300">Powered by</span>
         <img 
-          src="../../../public/fractalhive-logo.png"
+          src="/fractalhive-logo.png"
           alt="FractalHive"
           className="h-[1.35vh] ml-2"
         />
