@@ -28,7 +28,6 @@ export const ProductSelectionDropdowns: React.FC = () => {
   // Fetch product categories when business domain changes
   useEffect(() => {
     if (isValidUUID(selectedBusinessDomain)) {
-      console.log('Selected BusinessDomainID:', selectedBusinessDomain);
       productSelectionService.getProductCategories(selectedBusinessDomain).then(setProductCategories);
       setProductSubCategories([]);
       setProducts([]);
@@ -69,31 +68,6 @@ export const ProductSelectionDropdowns: React.FC = () => {
       setSelectedSubProduct("");
     }
   }, [selectedProduct]);
-
-  // Log selectedBusinessDomain every time it changes
-  useEffect(() => {
-    console.log('selectedBusinessDomain changed:', selectedBusinessDomain);
-  }, [selectedBusinessDomain]);
-
-  // Log selectedProductCategory every time it changes
-  useEffect(() => {
-    console.log('selectedProductCategory changed:', selectedProductCategory);
-  }, [selectedProductCategory]);
-
-  // Log selectedProduct every time it changes
-  useEffect(() => {
-    console.log('selectedProduct changed:', selectedProduct);
-  }, [selectedProduct]);
-
-  // Log selectedSubProduct every time it changes
-  useEffect(() => {
-    console.log('selectedSubProduct changed:', selectedSubProduct);
-  }, [selectedSubProduct]);
-
-  // Log selectedProductSubCategory every time it changes
-  useEffect(() => {
-    console.log('selectedProductSubCategory changed:', selectedProductSubCategory);
-  }, [selectedProductSubCategory]);
 
   return (
     <div className="flex flex-col gap-4">
