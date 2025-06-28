@@ -1,19 +1,13 @@
+import axios from 'axios';
+
+const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
+
 export async function addDealProduct(data: any) {
-  const response = await fetch('/api/deal-products', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  if (!response.ok) throw new Error('Failed to add DealProduct');
-  return response.json();
+  const response = await axios.post(`${API_BASE_URL}/deal-products`, data);
+  return response.data;
 }
 
 export async function addDealSubProduct(data: any) {
-  const response = await fetch('/api/deal-sub-products', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  if (!response.ok) throw new Error('Failed to add DealSubProduct');
-  return response.json();
+  const response = await axios.post(`${API_BASE_URL}/deal-sub-products`, data);
+  return response.data;
 } 
