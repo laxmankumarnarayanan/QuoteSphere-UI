@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { productSelectionService, Entity } from "../../services/productSelectionService";
 import SecondaryButton from "../../template components/components/elements/SecondaryButton";
 import PrimaryButton from "../../template components/components/elements/PrimaryButton";
+import SelectInput from "../../template components/components/elements/SelectInput";
 import { addDealProduct, addDealSubProduct } from "../../services/dealProductApi";
 
 function isValidUUID(uuid: string): boolean {
@@ -115,73 +116,58 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   return (
     <div className="flex flex-col gap-4">
       {/* Business Domain Dropdown (UUID) */}
-      <select
+      <SelectInput
+        id="business-domain"
+        label="Business Domain"
         value={selectedBusinessDomain}
-        onChange={e => setSelectedBusinessDomain(e.target.value)}
-      >
-        <option value="">Select Business Domain</option>
-        {businessDomains.map(bd => (
-          <option key={bd.id ?? bd.businessDomainId} value={bd.id ?? bd.businessDomainId}>
-            {bd.description}
-          </option>
-        ))}
-      </select>
+        onChange={setSelectedBusinessDomain}
+        options={businessDomains.map(bd => ({ value: String(bd.id ?? bd.businessDomainId ?? ''), label: bd.description }))}
+        placeholder="Select Business Domain"
+      />
 
       {/* Product Category Dropdown (UUID) */}
-      <select
+      <SelectInput
+        id="product-category"
+        label="Product Category"
         value={selectedProductCategory}
-        onChange={e => setSelectedProductCategory(e.target.value)}
+        onChange={setSelectedProductCategory}
+        options={productCategories.map(pc => ({ value: String(pc.id ?? pc.productCategoryId ?? ''), label: pc.description }))}
+        placeholder="Select Product Category"
         disabled={!isValidUUID(selectedBusinessDomain)}
-      >
-        <option value="">Select Product Category</option>
-        {productCategories.map(pc => (
-          <option key={pc.id ?? pc.productCategoryId} value={pc.id ?? pc.productCategoryId}>
-            {pc.description}
-          </option>
-        ))}
-      </select>
+      />
 
       {/* Product SubCategory Dropdown (UUID) */}
-      <select
+      <SelectInput
+        id="product-subcategory"
+        label="Product SubCategory"
         value={selectedProductSubCategory}
-        onChange={e => setSelectedProductSubCategory(e.target.value)}
+        onChange={setSelectedProductSubCategory}
+        options={productSubCategories.map(psc => ({ value: String(psc.id ?? psc.productSubCategoryId ?? ''), label: psc.description }))}
+        placeholder="Select Product SubCategory"
         disabled={!isValidUUID(selectedProductCategory)}
-      >
-        <option value="">Select Product SubCategory</option>
-        {productSubCategories.map(psc => (
-          <option key={psc.id ?? psc.productSubCategoryId} value={psc.id ?? psc.productSubCategoryId}>
-            {psc.description}
-          </option>
-        ))}
-      </select>
+      />
 
       {/* Product Dropdown (UUID) */}
-      <select
+      <SelectInput
+        id="product"
+        label="Product"
         value={selectedProduct}
-        onChange={e => setSelectedProduct(e.target.value)}
+        onChange={setSelectedProduct}
+        options={products.map(p => ({ value: String(p.id ?? p.productId ?? ''), label: p.description }))}
+        placeholder="Select Product"
         disabled={!isValidUUID(selectedProductSubCategory)}
-      >
-        <option value="">Select Product</option>
-        {products.map(p => (
-          <option key={p.id ?? p.productId} value={p.id ?? p.productId}>
-            {p.description}
-          </option>
-        ))}
-      </select>
+      />
 
       {/* SubProduct Dropdown (UUID) */}
-      <select
+      <SelectInput
+        id="subproduct"
+        label="SubProduct"
         value={selectedSubProduct}
-        onChange={e => setSelectedSubProduct(e.target.value)}
+        onChange={setSelectedSubProduct}
+        options={subProducts.map(sp => ({ value: String(sp.id ?? sp.subProductId ?? ''), label: sp.description }))}
+        placeholder="Select SubProduct"
         disabled={!isValidUUID(selectedProduct)}
-      >
-        <option value="">Select SubProduct</option>
-        {subProducts.map(sp => (
-          <option key={sp.id ?? sp.subProductId} value={sp.id ?? sp.subProductId}>
-            {sp.description}
-          </option>
-        ))}
-      </select>
+      />
 
       {/* Add Button */}
       <div className="mt-4 flex gap-4">
