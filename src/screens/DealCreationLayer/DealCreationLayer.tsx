@@ -9,6 +9,7 @@ import { DealCreationSection } from "@sections/DealCreationSection/DealCreationS
 import { Customer, CustomerDetails } from "../../services/customerService";
 import { dealService, Deal } from '../../services/dealService';
 import { ProductSelectionDropdowns } from "./ProductSelectionDropdowns";
+import { CustomerInfoBanner } from "./CustomerInfoBanner";
 
 // Step data for the progress stepper
 const stepsData = [
@@ -136,6 +137,9 @@ export const DealCreationLayer = (): JSX.Element => {
             </div>
           </div>
         )}
+
+        {/* Show customer info banner at the top of steps 2, 3, 4, 5 */}
+        {currentStep > 1 && selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
 
         {currentStep === 2 && createdDeal && createdDeal.dealId && (
           <ProductSelectionDropdowns 
