@@ -179,8 +179,8 @@ export const DealCreationLayer = (): JSX.Element => {
           </div>
         )}
 
-        {/* Show customer info banner at the top of steps 2, 3, 4, 5 */}
-        {currentStep > 1 && selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
+        {/* Show customer info banner at the top of steps 2, 4, 5 */}
+        {currentStep > 1 && currentStep !== 3 && selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
 
         {currentStep === 2 && createdDeal && createdDeal.dealId && (
           <>
