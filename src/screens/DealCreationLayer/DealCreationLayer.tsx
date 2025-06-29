@@ -196,7 +196,6 @@ export const DealCreationLayer = (): JSX.Element => {
         {currentStep === 3 && (
           <>
             <DealDetailsContainer deal={createdDeal} />
-            <CustomerDetailsSection selectedCustomer={selectedCustomer} />
             {/* Show added product-subproduct combinations */}
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
