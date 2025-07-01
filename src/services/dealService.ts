@@ -24,4 +24,9 @@ export const dealService = {
     });
     return response.data;
   },
+  async getDropdownValues(tableName: string, fieldName: string): Promise<string[]> {
+    const response = await axios.get(`${API_BASE_URL}/translate-table/${tableName}/${fieldName}`);
+    // Each entry is a TranslateTable object; fieldValue is in id.fieldValue
+    return response.data.map((entry: any) => entry.id.fieldValue);
+  },
 }; 
