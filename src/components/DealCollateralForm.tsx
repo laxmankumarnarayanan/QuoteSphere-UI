@@ -22,25 +22,19 @@ const DealCollateralForm: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [collateralTypeOptions, setCollateralTypeOptions] = useState<{ value: string; label: string }[]>([]);
   const [collateralTypeLoading, setCollateralTypeLoading] = useState(false);
-<<<<<<< HEAD
   const [currencyOptions, setCurrencyOptions] = useState<{ value: string; label: string }[]>([]);
   const [currencyLoading, setCurrencyLoading] = useState(false);
-=======
->>>>>>> 054f7bdb779565324de38ae5aac0beb45cc6305f
 
   useEffect(() => {
     setCollateralTypeLoading(true);
     dealService.getDropdownValues("DealCollateral", "CollateralType")
       .then(values => setCollateralTypeOptions(values.map(v => ({ value: v, label: v }))))
       .finally(() => setCollateralTypeLoading(false));
-<<<<<<< HEAD
 
     setCurrencyLoading(true);
     dealService.getDropdownValues("DealCollateral", "Currency")
       .then(values => setCurrencyOptions(values.map(v => ({ value: v, label: v }))))
       .finally(() => setCurrencyLoading(false));
-=======
->>>>>>> 054f7bdb779565324de38ae5aac0beb45cc6305f
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
