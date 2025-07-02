@@ -4,7 +4,6 @@ import SelectInput from "../template components/components/form/SelectInput";
 import { dealService } from "../services/dealService";
 import TextInput from "../template components/components/form/TextInput";
 import SecondaryButton from "../template components/components/elements/SecondaryButton";
-import { v4 as uuidv4 } from "uuid";
 
 interface DealCollateralFormProps {
   dealId: string;
@@ -29,6 +28,15 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
   const [currencyLoading, setCurrencyLoading] = useState(false);
   const [nextCollateralId, setNextCollateralId] = useState<number>(1);
   const [addedCollaterals, setAddedCollaterals] = useState<any[]>([]);
+  const [documentCategory, setDocumentCategory] = useState("");
+  const [documentType, setDocumentType] = useState("");
+  const [documentCategoryOptions, setDocumentCategoryOptions] = useState<{ value: string; label: string }[]>([]);
+  const [documentTypeOptions, setDocumentTypeOptions] = useState<{ value: string; label: string }[]>([]);
+  const [docLoading, setDocLoading] = useState(false);
+  const [docSuccess, setDocSuccess] = useState(false);
+  const [docError, setDocError] = useState<string | null>(null);
+  const [nextDocumentId, setNextDocumentId] = useState<number>(1);
+  const [addedDocuments, setAddedDocuments] = useState<any[]>([]);
 
   useEffect(() => {
     setCollateralTypeLoading(true);
@@ -40,6 +48,11 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
     dealService.getDropdownValues("DealCollateral", "Currency")
       .then(values => setCurrencyOptions(values.map(v => ({ value: v, label: v }))))
       .finally(() => setCurrencyLoading(false));
+
+    dealService.getDropdownValues("DealDocument", "DocumentCategory")
+      .then(values => setDocumentCategoryOptions(values.map(v => ({ value: v, label: v }))));
+    dealService.getDropdownValues("DealDocument", "DocumentType")
+      .then(values => setDocumentTypeOptions(values.map(v => ({ value: v, label: v }))));
   }, []);
 
   // Fetch current collaterals for this deal to determine next CollateralID
@@ -61,6 +74,26 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
     }
     if (dealId) fetchCurrentCollaterals();
   }, [dealId, success]);
+
+  // Fetch current documents for this deal to determine next DocumentID
+  useEffect(() => {
+    async function fetchCurrentDocuments() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/deal-documents/deal/${dealId}`);
+        const data = await res.json();
+        setAddedDocuments(data);
+        const maxId = data.reduce((max: number, d: any) => {
+          const idVal = d.id?.documentID || 0;
+          return idVal > max ? idVal : max;
+        }, 0);
+        setNextDocumentId(maxId + 1);
+      } catch {
+        setNextDocumentId(1);
+        setAddedDocuments([]);
+      }
+    }
+    if (dealId) fetchCurrentDocuments();
+  }, [dealId, docSuccess]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -94,11 +127,48 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
       setSuccess(true);
       setForm(initialState);
       // Explicitly reset each field
-      setForm({ collateralType: "", currency: "", collateralValue: 0 });
+      setForm({ collateralType: "", currency: "", collateralValue: "0" });
     } catch (err: any) {
       setError("Failed to save DealCollateral.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // --- Document save handler ---
+  const handleSaveDocument = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDocLoading(true);
+    setDocError(null);
+    setDocSuccess(false);
+    try {
+      const payload = {
+        id: {
+          dealID: dealId,
+          documentID: nextDocumentId,
+        },
+        documentCategory,
+        documentType,
+        documentName: "", // Placeholder, to be filled when Azure upload is implemented
+        storageFilePath: "", // Placeholder
+        createdBy: "",
+        createdDateTime: new Date().toISOString(),
+        lastUpdatedBy: "",
+        lastUpdatedDateTime: new Date().toISOString(),
+      };
+      const res = await fetch(`${API_BASE_URL}/deal-documents`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Failed to save document");
+      setDocSuccess(true);
+      setDocumentCategory("");
+      setDocumentType("");
+    } catch (err: any) {
+      setDocError("Failed to save document.");
+    } finally {
+      setDocLoading(false);
     }
   };
 
@@ -148,6 +218,38 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
           placeholder="Enter collateral value"
           type="number"
         />
+        <div className="mt-6 mb-2 border-t pt-4">
+          <div className="font-semibold text-violet-800 mb-2">Documentation</div>
+          <SelectInput
+            id="documentCategory"
+            label="Document Category"
+            value={documentCategory}
+            onChange={setDocumentCategory}
+            options={documentCategoryOptions}
+            required
+            placeholder="Select Document Category"
+          />
+          <SelectInput
+            id="documentType"
+            label="Document Type"
+            value={documentType}
+            onChange={setDocumentType}
+            options={documentTypeOptions}
+            required
+            placeholder="Select Document Type"
+          />
+          <SecondaryButton
+            type="button"
+            isLoading={docLoading}
+            size="md"
+            className="mt-4"
+            onClick={handleSaveDocument}
+          >
+            Save Document
+          </SecondaryButton>
+          {docError && <div className="text-red-600">{docError}</div>}
+          {docSuccess && <div className="text-green-600">Document saved successfully!</div>}
+        </div>
         <SecondaryButton type="submit" isLoading={loading} size="md">
           Add
         </SecondaryButton>
