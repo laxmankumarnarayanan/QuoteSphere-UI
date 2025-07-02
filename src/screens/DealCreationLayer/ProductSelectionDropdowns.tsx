@@ -138,6 +138,12 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
           subProductLabel,
         },
       ]);
+      // Flush dropdowns
+      setSelectedBusinessDomain("");
+      setSelectedProductCategory("");
+      setSelectedProductSubCategory("");
+      setSelectedProduct("");
+      setSelectedSubProduct("");
     } catch (error: any) {
     } finally {
       setLoading(false);
@@ -146,6 +152,20 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Added combinations list */}
+      {addedCombinations.length > 0 && (
+        <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
+          <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
+          <ul className="space-y-2">
+            {addedCombinations.map((combo, idx) => (
+              <li key={combo.productId + '-' + combo.subProductId} className="flex gap-6 items-center">
+                <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {/* Business Domain Dropdown (UUID) */}
       <SelectInput
         id="business-domain"
@@ -216,20 +236,6 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
         </PrimaryButton>
       </div>
       {addError && <div className="text-red-600 text-sm mt-1">{addError}</div>}
-      {/* Added combinations list */}
-      {addedCombinations.length > 0 && (
-        <div className="mt-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
-          <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
-          <ul className="space-y-2">
-            {addedCombinations.map((combo, idx) => (
-              <li key={combo.productId + '-' + combo.subProductId} className="flex gap-6 items-center">
-                <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
-                <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }; 
