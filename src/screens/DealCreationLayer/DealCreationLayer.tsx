@@ -187,7 +187,8 @@ export const DealCreationLayer = (): JSX.Element => {
             <DealDetailsContainer deal={createdDeal} />
             <ProductSelectionDropdowns 
               dealId={createdDeal.dealId} 
-              onNext={() => setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length))}
+              onNext={handleNext}
+              onBack={handleBack}
               addedCombinations={addedCombinations}
               setAddedCombinations={setAddedCombinations}
             />
@@ -214,6 +215,15 @@ export const DealCreationLayer = (): JSX.Element => {
             {createdDeal && createdDeal.dealId && (
               <DealCollateralForm dealId={createdDeal.dealId} />
             )}
+            {/* Navigation Buttons for Collateral & Documentation */}
+            <div className="flex justify-end gap-4 mt-8">
+              <SecondaryButton onClick={handleBack}>
+                Back
+              </SecondaryButton>
+              <PrimaryButton onClick={handleNext}>
+                Next
+              </PrimaryButton>
+            </div>
           </>
         )}
         {currentStep === 4 && (

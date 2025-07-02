@@ -13,6 +13,7 @@ function isValidUUID(uuid: string): boolean {
 interface ProductSelectionDropdownsProps {
   dealId: string;
   onNext: () => void;
+  onBack: () => void;
   addedCombinations: {
     productId: string;
     subProductId: string;
@@ -27,7 +28,7 @@ interface ProductSelectionDropdownsProps {
   }[]>>;
 }
 
-export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, onNext, addedCombinations, setAddedCombinations }) => {
+export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, onNext, onBack, addedCombinations, setAddedCombinations }) => {
   const [businessDomains, setBusinessDomains] = useState<Entity[]>([]);
   const [productCategories, setProductCategories] = useState<Entity[]>([]);
   const [productSubCategories, setProductSubCategories] = useState<Entity[]>([]);
@@ -221,17 +222,11 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
       />
 
       {/* Add Button */}
-      <div className="mt-4 flex gap-4">
-        <SecondaryButton
-          onClick={handleAdd}
-          disabled={!isValidUUID(selectedSubProduct) || loading}
-        >
-          {loading ? "Adding..." : "Add"}
+      <div className="mt-4 flex gap-4 justify-end">
+        <SecondaryButton onClick={onBack}>
+          Back
         </SecondaryButton>
-        <PrimaryButton
-          onClick={onNext}
-          disabled={!added}
-        >
+        <PrimaryButton onClick={onNext} disabled={!added}>
           Next
         </PrimaryButton>
       </div>
