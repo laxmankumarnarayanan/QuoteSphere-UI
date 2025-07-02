@@ -228,6 +228,11 @@ export const DealCreationLayer = (): JSX.Element => {
         )}
         {currentStep === 4 && (
           <>
+            <DealDetailsContainer deal={createdDeal} />
+            {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
+            {createdDeal && createdDeal.dealId && (
+              <DealCollateralForm dealId={createdDeal.dealId} />
+            )}
             <div>Pricing and Fees Section Goes Here (Placeholder)</div>
             <div className="flex justify-end gap-4 mt-8">
               <SecondaryButton onClick={handleBack}>
@@ -241,6 +246,11 @@ export const DealCreationLayer = (): JSX.Element => {
         )}
         {currentStep === 5 && (
           <>
+            <DealDetailsContainer deal={createdDeal} />
+            {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
+            {createdDeal && createdDeal.dealId && (
+              <DealCollateralForm dealId={createdDeal.dealId} />
+            )}
             <div>Special Conditions Section Goes Here (Placeholder)</div>
             <div className="flex justify-end gap-4 mt-8">
               <SecondaryButton onClick={handleBack}>
