@@ -16,7 +16,7 @@ const initialState = {
   currency: "",
 };
 
-const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
+const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api'; // Replace with your actual Azure backend URL if different
 
 // Example values (replace with your actual values or get from backend)
 const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage-secondary.blob.core.windows.net/dealdeskdocumentscontainer";
@@ -167,7 +167,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
       }
       // 1. Get SAS token from backend
       const blobName = `${dealId},${nextDocumentId}_${selectedFile.name}`;
-      const sasRes = await fetch(`/api/azure-sas?blobName=${encodeURIComponent(blobName)}`);
+      const sasRes = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
       if (!sasRes.ok) throw new Error("Failed to get SAS token");
       const sasToken = await sasRes.text();
       // 2. Upload to Azure
