@@ -25,6 +25,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
   const [collateralTypeLoading, setCollateralTypeLoading] = useState(false);
   const [currencyOptions, setCurrencyOptions] = useState<{ value: string; label: string }[]>([]);
   const [currencyLoading, setCurrencyLoading] = useState(false);
+  const [nextCollateralId, setNextCollateralId] = useState<number>(1);
 
   useEffect(() => {
     setCollateralTypeLoading(true);
@@ -37,6 +38,24 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
       .then(values => setCurrencyOptions(values.map(v => ({ value: v, label: v }))))
       .finally(() => setCurrencyLoading(false));
   }, []);
+
+  // Fetch current collaterals for this deal to determine next CollateralID
+  useEffect(() => {
+    async function fetchCurrentCollaterals() {
+      try {
+        const res = await fetch(`/api/deal-collaterals/${dealId}`);
+        const data = await res.json();
+        const maxId = data.reduce((max: number, c: any) => {
+          const idVal = c.id?.collateralID || 0;
+          return idVal > max ? idVal : max;
+        }, 0);
+        setNextCollateralId(maxId + 1);
+      } catch {
+        setNextCollateralId(1);
+      }
+    }
+    if (dealId) fetchCurrentCollaterals();
+  }, [dealId, success]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,8 +72,10 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
     setSuccess(false);
     try {
       const payload = {
-        dealId,
-        collateralId: uuidv4(),
+        id: {
+          dealID: dealId,
+          collateralID: nextCollateralId,
+        },
         collateralType: form.collateralType,
         collateralValue: Number(form.collateralValue),
         currency: form.currency,
