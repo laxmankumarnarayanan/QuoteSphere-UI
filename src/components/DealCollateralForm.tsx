@@ -26,6 +26,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
   const [currencyOptions, setCurrencyOptions] = useState<{ value: string; label: string }[]>([]);
   const [currencyLoading, setCurrencyLoading] = useState(false);
   const [nextCollateralId, setNextCollateralId] = useState<number>(1);
+  const [addedCollaterals, setAddedCollaterals] = useState<any[]>([]);
 
   useEffect(() => {
     setCollateralTypeLoading(true);
@@ -45,6 +46,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
       try {
         const res = await fetch(`/api/deal-collaterals/${dealId}`);
         const data = await res.json();
+        setAddedCollaterals(data);
         const maxId = data.reduce((max: number, c: any) => {
           const idVal = c.id?.collateralID || 0;
           return idVal > max ? idVal : max;
@@ -52,6 +54,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
         setNextCollateralId(maxId + 1);
       } catch {
         setNextCollateralId(1);
+        setAddedCollaterals([]);
       }
     }
     if (dealId) fetchCurrentCollaterals();
@@ -96,42 +99,58 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded">
-      <SelectInput
-        id="collateralType"
-        label="Collateral Type"
-        value={form.collateralType}
-        onChange={val => setForm(prev => ({ ...prev, collateralType: val }))}
-        options={collateralTypeOptions}
-        required
-        disabled={collateralTypeLoading}
-        placeholder={collateralTypeLoading ? "Loading..." : "Select Collateral Type"}
-      />
-      <SelectInput
-        id="currency"
-        label="Currency"
-        value={form.currency}
-        onChange={val => setForm(prev => ({ ...prev, currency: val }))}
-        options={currencyOptions}
-        required
-        disabled={currencyLoading}
-        placeholder={currencyLoading ? "Loading..." : "Select Currency"}
-      />
-      <TextInput
-        id="collateralValue"
-        label="Collateral Value"
-        value={form.collateralValue}
-        onChange={val => setForm(prev => ({ ...prev, collateralValue: val }))}
-        required
-        placeholder="Enter collateral value"
-        type="number"
-      />
-      <SecondaryButton type="submit" isLoading={loading} size="md">
-        Add
-      </SecondaryButton>
-      {error && <div className="text-red-600">{error}</div>}
-      {success && <div className="text-green-600">Saved successfully!</div>}
-    </form>
+    <div>
+      {addedCollaterals.length > 0 && (
+        <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
+          <div className="font-semibold text-violet-800 mb-2">Added Collaterals:</div>
+          <ul className="space-y-2">
+            {addedCollaterals.map((collateral, idx) => (
+              <li key={collateral.id.dealID + '-' + collateral.id.collateralID} className="flex gap-6 items-center">
+                <span className="text-sm font-medium text-violet-900">Type: <span className="font-normal text-slate-800">{collateral.collateralType}</span></span>
+                <span className="text-sm font-medium text-violet-900">Value: <span className="font-normal text-slate-800">{collateral.collateralValue}</span></span>
+                <span className="text-sm font-medium text-violet-900">Currency: <span className="font-normal text-slate-800">{collateral.currency}</span></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded">
+        <SelectInput
+          id="collateralType"
+          label="Collateral Type"
+          value={form.collateralType}
+          onChange={val => setForm(prev => ({ ...prev, collateralType: val }))}
+          options={collateralTypeOptions}
+          required
+          disabled={collateralTypeLoading}
+          placeholder={collateralTypeLoading ? "Loading..." : "Select Collateral Type"}
+        />
+        <SelectInput
+          id="currency"
+          label="Currency"
+          value={form.currency}
+          onChange={val => setForm(prev => ({ ...prev, currency: val }))}
+          options={currencyOptions}
+          required
+          disabled={currencyLoading}
+          placeholder={currencyLoading ? "Loading..." : "Select Currency"}
+        />
+        <TextInput
+          id="collateralValue"
+          label="Collateral Value"
+          value={form.collateralValue}
+          onChange={val => setForm(prev => ({ ...prev, collateralValue: val }))}
+          required
+          placeholder="Enter collateral value"
+          type="number"
+        />
+        <SecondaryButton type="submit" isLoading={loading} size="md">
+          Add
+        </SecondaryButton>
+        {error && <div className="text-red-600">{error}</div>}
+        {success && <div className="text-green-600">Saved successfully!</div>}
+      </form>
+    </div>
   );
 };
 
