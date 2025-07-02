@@ -16,6 +16,8 @@ const initialState = {
   currency: "",
 };
 
+const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
+
 const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
   const [form, setForm] = useState<typeof initialState>(initialState);
   const [loading, setLoading] = useState(false);
@@ -44,7 +46,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
   useEffect(() => {
     async function fetchCurrentCollaterals() {
       try {
-        const res = await fetch(`/api/deal-collaterals/${dealId}`);
+        const res = await fetch(`${API_BASE_URL}/deal-collaterals/${dealId}`);
         const data = await res.json();
         setAddedCollaterals(data);
         const maxId = data.reduce((max: number, c: any) => {
