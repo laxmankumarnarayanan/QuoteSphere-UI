@@ -226,6 +226,7 @@ export const DealCreationLayer = (): JSX.Element => {
         {currentStep === 4 && (
           <>
             <DealDetailsContainer deal={createdDeal} />
+            {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
@@ -256,6 +257,7 @@ export const DealCreationLayer = (): JSX.Element => {
         {currentStep === 5 && (
           <>
             <DealDetailsContainer deal={createdDeal} />
+            {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
