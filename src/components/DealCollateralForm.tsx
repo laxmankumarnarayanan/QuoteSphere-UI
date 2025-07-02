@@ -4,6 +4,7 @@ import SelectInput from "../template components/components/form/SelectInput";
 import { dealService } from "../services/dealService";
 import TextInput from "../template components/components/form/TextInput";
 import SecondaryButton from "../template components/components/elements/SecondaryButton";
+import { BlobServiceClient } from "@azure/storage-blob";
 
 interface DealCollateralFormProps {
   dealId: string;
@@ -16,6 +17,21 @@ const initialState = {
 };
 
 const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
+
+// Example values (replace with your actual values or get from backend)
+const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage-secondary.blob.core.windows.net/dealdeskdocumentscontainer";
+//const SAS_TOKEN = "<YOUR_SAS_TOKEN>"; // Get this from your backend for each upload
+
+async function uploadFileToAzure(file: File, dealId: string, documentId: number, sasToken: string) {
+  const blobName = `${dealId},${documentId}_${file.name}`;
+  const blobServiceClient = new BlobServiceClient(`${AZURE_CONTAINER_URL}?${sasToken}`);
+  const containerClient = blobServiceClient.getContainerClient("");
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+  await blockBlobClient.uploadBrowserData(file, {
+    blobHTTPHeaders: { blobContentType: file.type }
+  });
+  return `${AZURE_CONTAINER_URL}/${blobName}`;
+}
 
 const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
   const [form, setForm] = useState<typeof initialState>(initialState);
@@ -37,6 +53,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
   const [docError, setDocError] = useState<string | null>(null);
   const [nextDocumentId, setNextDocumentId] = useState<number>(1);
   const [addedDocuments, setAddedDocuments] = useState<any[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     setCollateralTypeLoading(true);
@@ -142,15 +159,26 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
     setDocError(null);
     setDocSuccess(false);
     try {
+      if (!selectedFile) throw new Error("No file selected");
+      if (selectedFile.size > 10 * 1024 * 1024) throw new Error("File too large (max 10MB)");
+      const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/png"];
+      if (!allowedTypes.includes(selectedFile.type)) {
+        throw new Error("Invalid file type. Only PDF, DOCX, PNG allowed.");
+      }
+      // 1. Get SAS token from backend
+      const blobName = `${dealId},${nextDocumentId}_${selectedFile.name}`;
+      const sasRes = await fetch(`/api/azure-sas?blobName=${encodeURIComponent(blobName)}`);
+      if (!sasRes.ok) throw new Error("Failed to get SAS token");
+      const sasToken = await sasRes.text();
+      // 2. Upload to Azure
+      const blobUrl = await uploadFileToAzure(selectedFile, dealId, nextDocumentId, sasToken);
+      // 3. Save metadata to backend
       const payload = {
-        id: {
-          dealID: dealId,
-          documentID: nextDocumentId,
-        },
+        id: { dealID: dealId, documentID: nextDocumentId },
         documentCategory,
         documentType,
-        documentName: "", // Placeholder, to be filled when Azure upload is implemented
-        storageFilePath: "", // Placeholder
+        documentName: selectedFile.name,
+        storageFilePath: blobUrl,
         createdBy: "",
         createdDateTime: new Date().toISOString(),
         lastUpdatedBy: "",
@@ -161,14 +189,21 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Failed to save document");
+      if (!res.ok) throw new Error("Failed to save document metadata");
       setDocSuccess(true);
       setDocumentCategory("");
       setDocumentType("");
+      setSelectedFile(null);
     } catch (err: any) {
-      setDocError("Failed to save document.");
+      setDocError(err.message || "Failed to save document.");
     } finally {
       setDocLoading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
     }
   };
 
@@ -238,6 +273,18 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
             required
             placeholder="Select Document Type"
           />
+          <input
+            type="file"
+            accept=".pdf,.docx,.png"
+            onChange={handleFileChange}
+            required
+            className="block mt-2 mb-2"
+          />
+          {selectedFile && (
+            <div className="text-sm text-slate-700 mb-2">
+              {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+            </div>
+          )}
           <SecondaryButton
             type="button"
             isLoading={docLoading}
