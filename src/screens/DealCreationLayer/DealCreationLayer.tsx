@@ -240,7 +240,17 @@ export const DealCreationLayer = (): JSX.Element => {
           </>
         )}
         {currentStep === 5 && (
-          <div>Special Conditions Section Goes Here (Placeholder)</div>
+          <>
+            <div>Special Conditions Section Goes Here (Placeholder)</div>
+            <div className="flex justify-end gap-4 mt-8">
+              <SecondaryButton onClick={handleBack}>
+                Back
+              </SecondaryButton>
+              <PrimaryButton onClick={handleNext}>
+                Next
+              </PrimaryButton>
+            </div>
+          </>
         )}
       </main>
     </div>
