@@ -185,6 +185,20 @@ export const DealCreationLayer = (): JSX.Element => {
         {currentStep === 2 && createdDeal && createdDeal.dealId && (
           <>
             <DealDetailsContainer deal={createdDeal} />
+            {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
+            {addedCombinations.length > 0 && (
+              <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
+                <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
+                <ul className="space-y-2">
+                  {addedCombinations.map((combo, idx) => (
+                    <li key={combo.productId + '-' + combo.subProductId} className="flex gap-6 items-center">
+                      <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                      <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <ProductSelectionDropdowns 
               dealId={createdDeal.dealId} 
               onNext={handleNext}
@@ -198,7 +212,6 @@ export const DealCreationLayer = (): JSX.Element => {
           <>
             <DealDetailsContainer deal={createdDeal} />
             {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
-            {/* Show added product-subproduct combinations */}
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
@@ -229,7 +242,19 @@ export const DealCreationLayer = (): JSX.Element => {
         {currentStep === 4 && (
           <>
             <DealDetailsContainer deal={createdDeal} />
-            {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
+            {addedCombinations.length > 0 && (
+              <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
+                <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
+                <ul className="space-y-2">
+                  {addedCombinations.map((combo, idx) => (
+                    <li key={combo.productId + '-' + combo.subProductId} className="flex gap-6 items-center">
+                      <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                      <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             {createdDeal && createdDeal.dealId && (
               <DealCollateralForm dealId={createdDeal.dealId} showForms={false} />
             )}
@@ -247,7 +272,19 @@ export const DealCreationLayer = (): JSX.Element => {
         {currentStep === 5 && (
           <>
             <DealDetailsContainer deal={createdDeal} />
-            {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
+            {addedCombinations.length > 0 && (
+              <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
+                <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
+                <ul className="space-y-2">
+                  {addedCombinations.map((combo, idx) => (
+                    <li key={combo.productId + '-' + combo.subProductId} className="flex gap-6 items-center">
+                      <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                      <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             {createdDeal && createdDeal.dealId && (
               <DealCollateralForm dealId={createdDeal.dealId} showForms={false} />
             )}
