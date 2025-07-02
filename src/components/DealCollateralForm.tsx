@@ -93,6 +93,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
       await saveDealCollateral(payload);
       setSuccess(true);
       setForm(initialState);
+      // Explicitly reset each field
+      setForm({ collateralType: "", currency: "", collateralValue: "" });
     } catch (err: any) {
       setError("Failed to save DealCollateral.");
     } finally {
