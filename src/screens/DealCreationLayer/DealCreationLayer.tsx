@@ -211,7 +211,9 @@ export const DealCreationLayer = (): JSX.Element => {
                 </ul>
               </div>
             )}
-            <DealCollateralForm />
+            {createdDeal && createdDeal.dealId && (
+              <DealCollateralForm dealId={createdDeal.dealId} />
+            )}
           </>
         )}
         {currentStep === 4 && (
