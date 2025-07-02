@@ -59,9 +59,9 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
         collateralValue: Number(form.collateralValue),
         currency: form.currency,
         createdBy: "",
-        createdDateTime: "",
+        createdDateTime: new Date().toISOString(),
         lastUpdatedBy: "",
-        lastUpdatedDateTime: "",
+        lastUpdatedDateTime: new Date().toISOString(),
       };
       console.log("Saving DealCollateral payload:", payload);
       await saveDealCollateral(payload);
