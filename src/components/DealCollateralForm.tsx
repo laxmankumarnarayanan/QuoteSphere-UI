@@ -98,6 +98,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
     }
   };
 
+  console.log("addedCollaterals:", addedCollaterals);
+
   return (
     <div>
       {addedCollaterals.length > 0 && (
