@@ -33,6 +33,18 @@ async function uploadFileToAzure(file: File, dealId: string, documentId: number,
   return `${AZURE_CONTAINER_URL}/${blobName}`;
 }
 
+async function getViewUrl(blobName: string) {
+  const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
+  const sasToken = await res.text();
+  return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
+}
+
+const handleViewDocument = async (doc: any) => {
+  const blobName = `${doc.id.dealID},${doc.id.documentID}_${doc.documentName}`;
+  const url = await getViewUrl(blobName);
+  window.open(url, "_blank", "noopener,noreferrer");
+};
+
 const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
   const [form, setForm] = useState<typeof initialState>(initialState);
   const [loading, setLoading] = useState(false);
@@ -234,7 +246,15 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
                 <span className="text-sm font-medium text-violet-900">Category: <span className="font-normal text-slate-800">{doc.documentCategory}</span></span>
                 <span className="text-sm font-medium text-violet-900">Type: <span className="font-normal text-slate-800">{doc.documentType}</span></span>
                 <span className="text-sm font-medium text-violet-900">Name: <span className="font-normal text-slate-800">{doc.documentName}</span></span>
-                <span className="text-sm font-medium text-violet-900"> <a href={doc.storageFilePath} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View</a></span>
+                <span className="text-sm font-medium text-violet-900">
+                  <button
+                    className="text-blue-600 underline"
+                    onClick={() => handleViewDocument(doc)}
+                    type="button"
+                  >
+                    View
+                  </button>
+                </span>
               </li>
             ))}
           </ul>
