@@ -46,7 +46,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
   useEffect(() => {
     async function fetchCurrentCollaterals() {
       try {
-        const res = await fetch(`${API_BASE_URL}/deal-collaterals/${dealId}`);
+        const res = await fetch(`${API_BASE_URL}/deal-collaterals/deal/${dealId}`);
         const data = await res.json();
         setAddedCollaterals(data);
         const maxId = data.reduce((max: number, c: any) => {
