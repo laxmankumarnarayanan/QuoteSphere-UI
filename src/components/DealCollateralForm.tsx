@@ -8,6 +8,7 @@ import { BlobServiceClient } from "@azure/storage-blob";
 
 interface DealCollateralFormProps {
   dealId: string;
+  showForms?: boolean;
 }
 
 const initialState = {
@@ -45,7 +46,7 @@ const handleViewDocument = async (doc: any) => {
   window.open(url, "_blank", "noopener,noreferrer");
 };
 
-const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
+const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showForms }) => {
   const [form, setForm] = useState<typeof initialState>(initialState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -260,92 +261,97 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
           </ul>
         </div>
       )}
-      {/* Collateral Section */}
-      <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded mb-8">
-        <div className="font-semibold text-violet-800 mb-2">Collateral</div>
-        <SelectInput
-          id="collateralType"
-          label="Collateral Type"
-          value={form.collateralType}
-          onChange={val => setForm(prev => ({ ...prev, collateralType: val }))}
-          options={collateralTypeOptions}
-          required
-          disabled={collateralTypeLoading}
-          placeholder={collateralTypeLoading ? "Loading..." : "Select Collateral Type"}
-        />
-        <SelectInput
-          id="currency"
-          label="Currency"
-          value={form.currency}
-          onChange={val => setForm(prev => ({ ...prev, currency: val }))}
-          options={currencyOptions}
-          required
-          disabled={currencyLoading}
-          placeholder={currencyLoading ? "Loading..." : "Select Currency"}
-        />
-        <TextInput
-          id="collateralValue"
-          label="Collateral Value"
-          value={form.collateralValue}
-          onChange={val => setForm(prev => ({ ...prev, collateralValue: val }))}
-          required
-          placeholder="Enter collateral value"
-          type="number"
-        />
-        <div className="flex gap-4 justify-end">
-          <SecondaryButton type="submit" isLoading={loading} size="md">
-            Add
-          </SecondaryButton>
-        </div>
-        {error && <div className="text-red-600">{error}</div>}
-        {success && <div className="text-green-600">Saved successfully!</div>}
-      </form>
-      {/* Documentation Section */}
-      <form onSubmit={handleSaveDocument} className="space-y-4 p-4 border rounded">
-        <div className="font-semibold text-violet-800 mb-2">Documentation</div>
-        <SelectInput
-          id="documentCategory"
-          label="Document Category"
-          value={documentCategory}
-          onChange={setDocumentCategory}
-          options={documentCategoryOptions}
-          required
-          placeholder="Select Document Category"
-        />
-        <SelectInput
-          id="documentType"
-          label="Document Type"
-          value={documentType}
-          onChange={setDocumentType}
-          options={documentTypeOptions}
-          required
-          placeholder="Select Document Type"
-        />
-        <input
-          type="file"
-          accept=".pdf,.docx,.png"
-          onChange={handleFileChange}
-          required
-          className="block mt-2 mb-2"
-        />
-        {selectedFile && (
-          <div className="text-sm text-slate-700 mb-2">
-            {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
-          </div>
-        )}
-        <div className="flex gap-4 justify-end">
-          <SecondaryButton
-            type="submit"
-            isLoading={docLoading}
-            size="md"
-            className="mt-4"
-          >
-            Save Document
-          </SecondaryButton>
-        </div>
-        {docError && <div className="text-red-600">{docError}</div>}
-        {docSuccess && <div className="text-green-600">Document saved successfully!</div>}
-      </form>
+      {/* Collateral and Documentation Forms (conditionally rendered) */}
+      {showForms !== false && (
+        <>
+          {/* Collateral Section */}
+          <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded mb-8">
+            <div className="font-semibold text-violet-800 mb-2">Collateral</div>
+            <SelectInput
+              id="collateralType"
+              label="Collateral Type"
+              value={form.collateralType}
+              onChange={val => setForm(prev => ({ ...prev, collateralType: val }))}
+              options={collateralTypeOptions}
+              required
+              disabled={collateralTypeLoading}
+              placeholder={collateralTypeLoading ? "Loading..." : "Select Collateral Type"}
+            />
+            <SelectInput
+              id="currency"
+              label="Currency"
+              value={form.currency}
+              onChange={val => setForm(prev => ({ ...prev, currency: val }))}
+              options={currencyOptions}
+              required
+              disabled={currencyLoading}
+              placeholder={currencyLoading ? "Loading..." : "Select Currency"}
+            />
+            <TextInput
+              id="collateralValue"
+              label="Collateral Value"
+              value={form.collateralValue}
+              onChange={val => setForm(prev => ({ ...prev, collateralValue: val }))}
+              required
+              placeholder="Enter collateral value"
+              type="number"
+            />
+            <div className="flex gap-4 justify-end">
+              <SecondaryButton type="submit" isLoading={loading} size="md">
+                Add
+              </SecondaryButton>
+            </div>
+            {error && <div className="text-red-600">{error}</div>}
+            {success && <div className="text-green-600">Saved successfully!</div>}
+          </form>
+          {/* Documentation Section */}
+          <form onSubmit={handleSaveDocument} className="space-y-4 p-4 border rounded">
+            <div className="font-semibold text-violet-800 mb-2">Documentation</div>
+            <SelectInput
+              id="documentCategory"
+              label="Document Category"
+              value={documentCategory}
+              onChange={setDocumentCategory}
+              options={documentCategoryOptions}
+              required
+              placeholder="Select Document Category"
+            />
+            <SelectInput
+              id="documentType"
+              label="Document Type"
+              value={documentType}
+              onChange={setDocumentType}
+              options={documentTypeOptions}
+              required
+              placeholder="Select Document Type"
+            />
+            <input
+              type="file"
+              accept=".pdf,.docx,.png"
+              onChange={handleFileChange}
+              required
+              className="block mt-2 mb-2"
+            />
+            {selectedFile && (
+              <div className="text-sm text-slate-700 mb-2">
+                {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+              </div>
+            )}
+            <div className="flex gap-4 justify-end">
+              <SecondaryButton
+                type="submit"
+                isLoading={docLoading}
+                size="md"
+                className="mt-4"
+              >
+                Save Document
+              </SecondaryButton>
+            </div>
+            {docError && <div className="text-red-600">{docError}</div>}
+            {docSuccess && <div className="text-green-600">Document saved successfully!</div>}
+          </form>
+        </>
+      )}
     </div>
   );
 };
