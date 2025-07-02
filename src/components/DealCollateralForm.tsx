@@ -209,6 +209,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
 
   return (
     <div>
+      {/* Added Collaterals Section */}
       {addedCollaterals.length > 0 && (
         <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
           <div className="font-semibold text-violet-800 mb-2">Added Collaterals:</div>
@@ -223,7 +224,25 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
           </ul>
         </div>
       )}
-      <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded">
+      {/* Added Documents Section */}
+      {addedDocuments.length > 0 && (
+        <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
+          <div className="font-semibold text-violet-800 mb-2">Added Documents:</div>
+          <ul className="space-y-2">
+            {addedDocuments.map((doc, idx) => (
+              <li key={doc.id.dealID + '-' + doc.id.documentID} className="flex gap-6 items-center">
+                <span className="text-sm font-medium text-violet-900">Category: <span className="font-normal text-slate-800">{doc.documentCategory}</span></span>
+                <span className="text-sm font-medium text-violet-900">Type: <span className="font-normal text-slate-800">{doc.documentType}</span></span>
+                <span className="text-sm font-medium text-violet-900">Name: <span className="font-normal text-slate-800">{doc.documentName}</span></span>
+                <span className="text-sm font-medium text-violet-900"> <a href={doc.storageFilePath} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View</a></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {/* Collateral Section */}
+      <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded mb-8">
+        <div className="font-semibold text-violet-800 mb-2">Collateral</div>
         <SelectInput
           id="collateralType"
           label="Collateral Type"
@@ -253,55 +272,55 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
           placeholder="Enter collateral value"
           type="number"
         />
-        <div className="mt-6 mb-2 border-t pt-4">
-          <div className="font-semibold text-violet-800 mb-2">Documentation</div>
-          <SelectInput
-            id="documentCategory"
-            label="Document Category"
-            value={documentCategory}
-            onChange={setDocumentCategory}
-            options={documentCategoryOptions}
-            required
-            placeholder="Select Document Category"
-          />
-          <SelectInput
-            id="documentType"
-            label="Document Type"
-            value={documentType}
-            onChange={setDocumentType}
-            options={documentTypeOptions}
-            required
-            placeholder="Select Document Type"
-          />
-          <input
-            type="file"
-            accept=".pdf,.docx,.png"
-            onChange={handleFileChange}
-            required
-            className="block mt-2 mb-2"
-          />
-          {selectedFile && (
-            <div className="text-sm text-slate-700 mb-2">
-              {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
-            </div>
-          )}
-          <SecondaryButton
-            type="button"
-            isLoading={docLoading}
-            size="md"
-            className="mt-4"
-            onClick={handleSaveDocument}
-          >
-            Save Document
-          </SecondaryButton>
-          {docError && <div className="text-red-600">{docError}</div>}
-          {docSuccess && <div className="text-green-600">Document saved successfully!</div>}
-        </div>
         <SecondaryButton type="submit" isLoading={loading} size="md">
           Add
         </SecondaryButton>
         {error && <div className="text-red-600">{error}</div>}
         {success && <div className="text-green-600">Saved successfully!</div>}
+      </form>
+      {/* Documentation Section */}
+      <form onSubmit={handleSaveDocument} className="space-y-4 p-4 border rounded">
+        <div className="font-semibold text-violet-800 mb-2">Documentation</div>
+        <SelectInput
+          id="documentCategory"
+          label="Document Category"
+          value={documentCategory}
+          onChange={setDocumentCategory}
+          options={documentCategoryOptions}
+          required
+          placeholder="Select Document Category"
+        />
+        <SelectInput
+          id="documentType"
+          label="Document Type"
+          value={documentType}
+          onChange={setDocumentType}
+          options={documentTypeOptions}
+          required
+          placeholder="Select Document Type"
+        />
+        <input
+          type="file"
+          accept=".pdf,.docx,.png"
+          onChange={handleFileChange}
+          required
+          className="block mt-2 mb-2"
+        />
+        {selectedFile && (
+          <div className="text-sm text-slate-700 mb-2">
+            {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+          </div>
+        )}
+        <SecondaryButton
+          type="submit"
+          isLoading={docLoading}
+          size="md"
+          className="mt-4"
+        >
+          Save Document
+        </SecondaryButton>
+        {docError && <div className="text-red-600">{docError}</div>}
+        {docSuccess && <div className="text-green-600">Document saved successfully!</div>}
       </form>
     </div>
   );
