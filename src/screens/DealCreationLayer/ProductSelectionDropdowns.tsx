@@ -221,7 +221,16 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
         disabled={!isValidUUID(selectedProduct)}
       />
 
-      {/* Add Button */}
+      {/* Add Button for product-subproduct combination */}
+      <div className="flex gap-4 justify-end">
+        <SecondaryButton
+          onClick={handleAdd}
+          disabled={!isValidUUID(selectedSubProduct) || loading}
+        >
+          {loading ? "Adding..." : "Add"}
+        </SecondaryButton>
+      </div>
+      {/* Navigation Buttons */}
       <div className="mt-4 flex gap-4 justify-end">
         <SecondaryButton onClick={onBack}>
           Back
