@@ -51,7 +51,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
 
     dealService.getDropdownValues("DealDocument", "DocumentCategory")
       .then(values => setDocumentCategoryOptions(values.map(v => ({ value: v, label: v }))));
-    dealService.getDropdownValues("DealDocument", "DocumentType")
+    dealService.getDropdownValues("DealDocuments", "DocumentType")
       .then(values => setDocumentTypeOptions(values.map(v => ({ value: v, label: v }))));
   }, []);
 
