@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { saveDealCollateral, DealCollateral } from "../services/dealCollateralService";
 import SelectInput from "../template components/components/form/SelectInput";
 import { dealService } from "../services/dealService";
-import TextInput from "../template components/components/form/TextInput";
-import SecondaryButton from "../template components/components/elements/SecondaryButton";
+import TextareaInput from "../template components/components/form/TextareaInput";
 
 const initialState = {
   dealId: "",
@@ -65,6 +64,7 @@ const DealCollateralForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded">
+      <input name="collateralId" type="number" value={form.collateralId} onChange={handleChange} placeholder="Collateral ID" required className="input" />
       <SelectInput
         id="collateralType"
         label="Collateral Type"
@@ -74,6 +74,15 @@ const DealCollateralForm: React.FC = () => {
         required
         disabled={collateralTypeLoading}
         placeholder={collateralTypeLoading ? "Loading..." : "Select Collateral Type"}
+      />
+      <TextareaInput
+        id="collateralValue"
+        label="Collateral Value"
+        value={form.collateralValue}
+        onChange={val => setForm(prev => ({ ...prev, collateralValue: val }))}
+        required
+        placeholder="Enter collateral value"
+        rows={2}
       />
       <SelectInput
         id="currency"
@@ -85,18 +94,11 @@ const DealCollateralForm: React.FC = () => {
         disabled={currencyLoading}
         placeholder={currencyLoading ? "Loading..." : "Select Currency"}
       />
-      <TextInput
-        id="collateralValue"
-        label="Collateral Value"
-        value={form.collateralValue}
-        onChange={val => setForm(prev => ({ ...prev, collateralValue: val }))}
-        required
-        placeholder="Enter collateral value"
-        type="number"
-      />
-      <SecondaryButton type="submit" isLoading={loading} size="md">
-        Add
-      </SecondaryButton>
+      <input name="createdDateTime" type="datetime-local" value={form.createdDateTime} onChange={handleChange} placeholder="Created DateTime" className="input" />
+      <input name="lastUpdatedDateTime" type="datetime-local" value={form.lastUpdatedDateTime} onChange={handleChange} placeholder="Last Updated DateTime" className="input" />
+      <button type="submit" disabled={loading} className="btn btn-primary">
+        {loading ? "Saving..." : "Save"}
+      </button>
       {error && <div className="text-red-600">{error}</div>}
       {success && <div className="text-green-600">Saved successfully!</div>}
     </form>
