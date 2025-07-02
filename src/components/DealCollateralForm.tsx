@@ -19,7 +19,7 @@ const initialState = {
 const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api'; // Replace with your actual Azure backend URL if different
 
 // Example values (replace with your actual values or get from backend)
-const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage-secondary.blob.core.windows.net/dealdeskdocumentscontainer";
+const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer";
 //const SAS_TOKEN = "<YOUR_SAS_TOKEN>"; // Get this from your backend for each upload
 
 async function uploadFileToAzure(file: File, dealId: string, documentId: number, sasToken: string) {
