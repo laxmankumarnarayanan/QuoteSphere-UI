@@ -292,9 +292,11 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
           placeholder="Enter collateral value"
           type="number"
         />
-        <SecondaryButton type="submit" isLoading={loading} size="md">
-          Add
-        </SecondaryButton>
+        <div className="flex gap-4 justify-end">
+          <SecondaryButton type="submit" isLoading={loading} size="md">
+            Add
+          </SecondaryButton>
+        </div>
         {error && <div className="text-red-600">{error}</div>}
         {success && <div className="text-green-600">Saved successfully!</div>}
       </form>
@@ -331,14 +333,16 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId }) => {
             {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
           </div>
         )}
-        <SecondaryButton
-          type="submit"
-          isLoading={docLoading}
-          size="md"
-          className="mt-4"
-        >
-          Save Document
-        </SecondaryButton>
+        <div className="flex gap-4 justify-end">
+          <SecondaryButton
+            type="submit"
+            isLoading={docLoading}
+            size="md"
+            className="mt-4"
+          >
+            Save Document
+          </SecondaryButton>
+        </div>
         {docError && <div className="text-red-600">{docError}</div>}
         {docSuccess && <div className="text-green-600">Document saved successfully!</div>}
       </form>
