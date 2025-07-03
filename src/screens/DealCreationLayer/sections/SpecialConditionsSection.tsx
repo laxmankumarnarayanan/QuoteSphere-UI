@@ -51,7 +51,7 @@ const SpecialConditionsSection: React.FC<SpecialConditionsSectionProps> = ({ dea
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto border border-violet-200 rounded-lg bg-violet-50 p-6 mt-6 relative">
+    <div className="w-full border border-violet-200 rounded-lg bg-violet-50 p-6 mt-0">
       <div className="font-semibold text-violet-800 mb-4">Special Conditions</div>
       {specialConditions.length > 0 && (
         <div className="mb-6">

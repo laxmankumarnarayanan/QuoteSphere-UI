@@ -152,7 +152,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         lastUpdatedBy: "",
         lastUpdatedDateTime: new Date().toISOString(),
       };
-      console.log("Saving DealCollateral payload:", payload);
+     
       await saveDealCollateral(payload);
       setSuccess(true);
       setForm(initialState);
