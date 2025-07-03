@@ -12,6 +12,7 @@ import { ProductSelectionDropdowns } from "./ProductSelectionDropdowns";
 import { CustomerInfoBanner } from "./CustomerInfoBanner";
 import DealCollateralForm from "../../components/DealCollateralForm";
 import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card";
+import SpecialConditionsSection from "./sections/SpecialConditionsSection";
 
 // Step data for the progress stepper
 const stepsData = [
@@ -274,7 +275,9 @@ export const DealCreationLayer = (): JSX.Element => {
             {createdDeal && createdDeal.dealId && (
               <DealCollateralForm dealId={createdDeal.dealId} showForms={false} />
             )}
-            <div>Special Conditions Section Goes Here (Placeholder)</div>
+            {createdDeal && createdDeal.dealId && (
+              <SpecialConditionsSection dealId={createdDeal.dealId} />
+            )}
             <div className="flex justify-end gap-4 mt-8">
               <SecondaryButton onClick={handleBack}>
                 Back

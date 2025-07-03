@@ -29,4 +29,16 @@ export const dealService = {
     // Each entry is a TranslateTable object; fieldValue is in id.fieldValue
     return response.data.map((entry: any) => entry.id.fieldValue);
   },
+  async addSpecialCondition(specialCondition: {
+    dealID: string;
+    conditionNumber: number;
+    description: string;
+    createdBy?: string;
+    createdDateTime?: string;
+    lastUpdatedBy?: string;
+    lastUpdatedDateTime?: string;
+  }) {
+    const response = await axios.post(`${API_BASE_URL}/deal-special-conditions`, specialCondition);
+    return response.data;
+  },
 }; 
