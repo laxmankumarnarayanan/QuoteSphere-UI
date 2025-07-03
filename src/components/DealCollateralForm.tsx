@@ -62,11 +62,11 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   const [documentCategoryOptions, setDocumentCategoryOptions] = useState<{ value: string; label: string }[]>([]);
   const [documentTypeOptions, setDocumentTypeOptions] = useState<{ value: string; label: string }[]>([]);
   const [docLoading, setDocLoading] = useState(false);
-  const [docSuccess, setDocSuccess] = useState(false);
   const [docError, setDocError] = useState<string | null>(null);
   const [nextDocumentId, setNextDocumentId] = useState<number>(1);
   const [addedDocuments, setAddedDocuments] = useState<any[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [docSuccess, setDocSuccess] = useState(false);
 
   useEffect(() => {
     setCollateralTypeLoading(true);
@@ -302,7 +302,6 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
               </SecondaryButton>
             </div>
             {error && <div className="text-red-600">{error}</div>}
-            {success && <div className="text-green-600">Saved successfully!</div>}
           </form>
           {/* Documentation Section */}
           <form onSubmit={handleSaveDocument} className="space-y-4 p-4 border rounded">
@@ -348,7 +347,6 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
               </SecondaryButton>
             </div>
             {docError && <div className="text-red-600">{docError}</div>}
-            {docSuccess && <div className="text-green-600">Document saved successfully!</div>}
           </form>
         </>
       )}
