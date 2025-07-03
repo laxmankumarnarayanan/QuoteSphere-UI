@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TextInput from "../../../template components/components/elements/TextInput";
 import SecondaryButton from "../../../template components/components/elements/SecondaryButton";
 import { dealService } from "../../../services/dealService";
@@ -22,6 +22,14 @@ const SpecialConditionsSection: React.FC<SpecialConditionsSectionProps> = ({ dea
   const [specialConditions, setSpecialConditions] = useState<SpecialCondition[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (dealId) {
+      dealService.getSpecialConditionsByDealId(dealId).then((data) => {
+        setSpecialConditions(data);
+      });
+    }
+  }, [dealId]);
 
   const handleAdd = async () => {
     if (!description.trim()) {
@@ -50,6 +58,8 @@ const SpecialConditionsSection: React.FC<SpecialConditionsSectionProps> = ({ dea
     }
   };
 
+  const nextConditionNumber = specialConditions.length + 1;
+
   return (
     <div className="w-full border border-violet-200 rounded-lg bg-violet-50 p-6 mt-0">
       <div className="font-semibold text-violet-800 mb-4">Special Conditions</div>
@@ -68,7 +78,7 @@ const SpecialConditionsSection: React.FC<SpecialConditionsSectionProps> = ({ dea
       )}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
-          <span className="text-sm font-medium text-[#636ae8]">Condition Number: {specialConditions.length + 1}</span>
+          <span className="text-sm font-medium text-[#636ae8]">Condition Number: {nextConditionNumber}</span>
           <div className="flex-1">
             <TextInput
               id="special-condition-description"

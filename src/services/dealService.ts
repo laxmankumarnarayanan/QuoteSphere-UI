@@ -41,4 +41,8 @@ export const dealService = {
     const response = await axios.post(`${API_BASE_URL}/deal-special-conditions`, specialCondition);
     return response.data;
   },
+  async getSpecialConditionsByDealId(dealId: string) {
+    const response = await axios.get(`${API_BASE_URL}/deal-special-conditions/deal/${dealId}`);
+    return response.data;
+  },
 }; 
