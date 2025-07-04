@@ -51,6 +51,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   const [loading, setLoading] = useState(false);
   const [added, setAdded] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
+  const [nextCommitmentNumber, setNextCommitmentNumber] = useState(1);
 
   // Fetch business domains on mount
   useEffect(() => {
@@ -187,7 +188,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
               </div>
               {/* DealCommitment form for Trade Finance */}
               {combo.domainType === 'Trade Finance' && (
-                <DealCommitmentForm dealId={dealId} />
+                <DealCommitmentForm dealId={dealId} commitmentNumber={nextCommitmentNumber} onSave={() => setNextCommitmentNumber(n => n + 1)} />
               )}
               {/* Placeholder for additional form fields for this section */}
               <div className="text-slate-700 text-sm italic">(Additional form fields go here for this DomainType/Product/SubProduct)</div>
@@ -272,7 +273,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   );
 };
 
-const DealCommitmentForm: React.FC<{ dealId: string }> = ({ dealId }) => {
+const DealCommitmentForm: React.FC<{ dealId: string; commitmentNumber: number; onSave: () => void }> = ({ dealId, commitmentNumber, onSave }) => {
   const [currency, setCurrency] = useState('');
   const [commitmentAmount, setCommitmentAmount] = useState('');
   const [tenure, setTenure] = useState('');
@@ -295,6 +296,7 @@ const DealCommitmentForm: React.FC<{ dealId: string }> = ({ dealId }) => {
     try {
       await saveDealCommitment({
         dealID: dealId,
+        commitmentNumber,
         currency,
         commitmentAmount: Number(commitmentAmount),
         tenure: Number(tenure),
@@ -307,6 +309,7 @@ const DealCommitmentForm: React.FC<{ dealId: string }> = ({ dealId }) => {
       setCurrency('');
       setCommitmentAmount('');
       setTenure('');
+      onSave();
     } catch (err: any) {
       setError('Failed to save Deal Commitment.');
     } finally {
