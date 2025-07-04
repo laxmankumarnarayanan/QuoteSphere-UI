@@ -4,6 +4,9 @@ import SecondaryButton from "../../template components/components/elements/Secon
 import PrimaryButton from "../../template components/components/elements/PrimaryButton";
 import SelectInput from "../../template components/components/elements/SelectInput";
 import { addDealProduct, addDealSubProduct } from "../../services/dealProductApi";
+import { saveDealCommitment, DealCommitment } from '../../services/dealCommitmentService';
+import { translateFieldService } from '../../services/translateFieldService';
+import TextInput from '../../template components/components/form/TextInput';
 
 function isValidUUID(uuid: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -182,6 +185,10 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
               <div className="font-semibold text-violet-800 mb-2">
                 {combo.domainType || "Domain"} | - | {combo.productLabel} | - | {combo.subProductLabel}
               </div>
+              {/* DealCommitment form for Trade Finance */}
+              {combo.domainType === 'Trade Finance' && (
+                <DealCommitmentForm dealId={dealId} />
+              )}
               {/* Placeholder for additional form fields for this section */}
               <div className="text-slate-700 text-sm italic">(Additional form fields go here for this DomainType/Product/SubProduct)</div>
             </div>
@@ -262,5 +269,88 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
       </div>
       {addError && <div className="text-red-600 text-sm mt-1">{addError}</div>}
     </div>
+  );
+};
+
+const DealCommitmentForm: React.FC<{ dealId: string }> = ({ dealId }) => {
+  const [currency, setCurrency] = useState('');
+  const [commitmentAmount, setCommitmentAmount] = useState('');
+  const [tenure, setTenure] = useState('');
+  const [currencyOptions, setCurrencyOptions] = useState<{ value: string; label: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    translateFieldService.getDropdownValues('Currency')
+      .then(values => setCurrencyOptions(values.map(v => ({ value: v, label: v }))))
+      .catch(() => setCurrencyOptions([]));
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+    try {
+      await saveDealCommitment({
+        dealID: dealId,
+        currency,
+        commitmentAmount: Number(commitmentAmount),
+        tenure: Number(tenure),
+        createdBy: '',
+        createdDateTime: new Date().toISOString(),
+        lastUpdatedBy: '',
+        lastUpdatedDateTime: new Date().toISOString(),
+      });
+      setSuccess(true);
+      setCurrency('');
+      setCommitmentAmount('');
+      setTenure('');
+    } catch (err: any) {
+      setError('Failed to save Deal Commitment.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded mb-4 bg-white">
+      <div className="font-semibold text-violet-700 mb-2">Deal Commitment</div>
+      <SelectInput
+        id="currency"
+        label="Currency"
+        value={currency}
+        onChange={setCurrency}
+        options={currencyOptions}
+        required
+        placeholder="Select Currency"
+      />
+      <TextInput
+        id="commitmentAmount"
+        label="Commitment Amount"
+        value={commitmentAmount}
+        onChange={setCommitmentAmount}
+        required
+        placeholder="Enter commitment amount"
+        type="number"
+      />
+      <TextInput
+        id="tenure"
+        label="Tenure"
+        value={tenure}
+        onChange={setTenure}
+        required
+        placeholder="Enter tenure"
+        type="number"
+      />
+      <div className="flex gap-4 justify-end">
+        <SecondaryButton type="submit" isLoading={loading} size="md">
+          Save
+        </SecondaryButton>
+      </div>
+      {success && <div className="text-green-600">Deal Commitment saved successfully!</div>}
+      {error && <div className="text-red-600">{error}</div>}
+    </form>
   );
 }; 
