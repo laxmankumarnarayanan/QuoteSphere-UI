@@ -161,6 +161,19 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   // Store commitments for each combo: { [comboKey]: DealCommitment[] }
   const [commitmentsByCombo, setCommitmentsByCombo] = useState<Record<string, DealCommitment[]>>({});
 
+  // State for company-wide financial statuses
+  const [financialStatuses, setFinancialStatuses] = React.useState<DealFinancialStatus[]>([]);
+  const [fsLoading, setFsLoading] = React.useState(false);
+  const [fsError, setFsError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    setFsLoading(true);
+    getDealFinancialStatusesByDealId(dealId)
+      .then(setFinancialStatuses)
+      .catch(() => setFinancialStatuses([]))
+      .finally(() => setFsLoading(false));
+  }, [dealId]);
+
   // Fetch business domains on mount
   useEffect(() => {
     productSelectionService.getBusinessDomains().then(setBusinessDomains);
@@ -286,6 +299,30 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
           </ul>
         </div>
       )}
+      {/* Financial Status section for the company as a whole */}
+      <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
+        <div className="font-semibold text-violet-700 mb-2">Deal Financial Status</div>
+        {financialStatuses.length > 0 && (
+          <div className="mb-4">
+            <div className="font-semibold text-violet-700 mb-1">Added Financial Statuses:</div>
+            <ul className="space-y-1">
+              {financialStatuses.map((fs, i) => (
+                <li key={fs.year + '-' + i} className="flex gap-6 items-center text-sm text-slate-800">
+                  <span>Year: <span className="font-medium">{fs.year}</span></span>
+                  <span>Description: <span className="font-medium">{fs.description}</span></span>
+                  {fs.storagePath && (
+                    <button type="button" className="text-violet-700 underline" onClick={() => window.open(fs.storagePath, '_blank')}>View Attachment</button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <DealFinancialStatusForm
+          dealId={dealId}
+          onSave={fs => setFinancialStatuses(prev => [...prev, fs])}
+        />
+      </div>
       {/* New: DomainType containers for each added combination */}
       {addedCombinations.length > 0 && (
         <div className="mb-6 flex flex-col gap-4">
