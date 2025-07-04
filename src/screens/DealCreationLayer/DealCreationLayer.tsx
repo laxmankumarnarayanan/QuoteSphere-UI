@@ -180,12 +180,13 @@ export const DealCreationLayer = (): JSX.Element => {
           </div>
         )}
 
-        {currentStep === 2 && createdDeal && createdDeal.dealId && (
+        {currentStep === 2 && createdDeal && createdDeal.dealId && selectedCustomer && selectedCustomer.customer && selectedCustomer.customer.customerID && (
           <>
             <DealDetailsContainer deal={createdDeal} />
-            {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
+            <CustomerInfoBanner customer={selectedCustomer} />
             <ProductSelectionDropdowns 
               dealId={createdDeal.dealId} 
+              customerId={selectedCustomer.customer.customerID}
               onNext={handleNext}
               onBack={handleBack}
               addedCombinations={addedCombinations}

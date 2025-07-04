@@ -4,6 +4,7 @@ const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.
 
 export interface DealFinancialStatus {
   dealID: string;
+  customerID: string;
   year: string;
   description: string;
   storagePath: string;
@@ -18,7 +19,7 @@ export async function saveDealFinancialStatus(data: DealFinancialStatus) {
   return response.data;
 }
 
-export async function getDealFinancialStatusesByDealId(dealId: string): Promise<DealFinancialStatus[]> {
-  const response = await axios.get(`${API_BASE_URL}/deal-financial-statuses/deal/${dealId}`);
+export async function getDealFinancialStatusesByDealId(dealId: string, customerId: string): Promise<DealFinancialStatus[]> {
+  const response = await axios.get(`${API_BASE_URL}/deal-financial-statuses/deal/${dealId}/customer/${customerId}`);
   return response.data;
 } 

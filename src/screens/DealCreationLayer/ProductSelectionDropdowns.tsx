@@ -17,6 +17,7 @@ function isValidUUID(uuid: string): boolean {
 
 interface ProductSelectionDropdownsProps {
   dealId: string;
+  customerId: string;
   onNext: () => void;
   onBack: () => void;
   addedCombinations: {
@@ -103,7 +104,7 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
   );
 };
 
-export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, onNext, onBack, addedCombinations, setAddedCombinations }) => {
+export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, customerId, onNext, onBack, addedCombinations, setAddedCombinations }) => {
   const [businessDomains, setBusinessDomains] = useState<Entity[]>([]);
   const [productCategories, setProductCategories] = useState<Entity[]>([]);
   const [productSubCategories, setProductSubCategories] = useState<Entity[]>([]);
@@ -130,11 +131,11 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
 
   React.useEffect(() => {
     setFsLoading(true);
-    getDealFinancialStatusesByDealId(dealId)
+    getDealFinancialStatusesByDealId(dealId, customerId)
       .then(setFinancialStatuses)
       .catch(() => setFinancialStatuses([]))
       .finally(() => setFsLoading(false));
-  }, [dealId]);
+  }, [dealId, customerId]);
 
   // Fetch business domains on mount
   useEffect(() => {
@@ -282,6 +283,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
         )}
         <DealFinancialStatusForm
           dealId={dealId}
+          customerId={customerId}
           onSave={fs => setFinancialStatuses(prev => [...prev, fs])}
         />
       </div>
@@ -469,7 +471,7 @@ const DealCommitmentForm: React.FC<{ dealId: string; commitmentNumber: number; o
   );
 };
 
-const DealFinancialStatusForm: React.FC<{ dealId: string; onSave: (fs: DealFinancialStatus) => void }> = ({ dealId, onSave }) => {
+const DealFinancialStatusForm: React.FC<{ dealId: string; customerId: string; onSave: (fs: DealFinancialStatus) => void }> = ({ dealId, customerId, onSave }) => {
   const [year, setYear] = useState('');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -499,6 +501,7 @@ const DealFinancialStatusForm: React.FC<{ dealId: string; onSave: (fs: DealFinan
       }
       const fs: DealFinancialStatus = {
         dealID: dealId,
+        customerID: customerId,
         year,
         description,
         storagePath,
