@@ -51,6 +51,96 @@ async function uploadFileToAzure(file: File, dealId: string, year: string, sasTo
   return `${AZURE_CONTAINER_URL}/${blobName}`;
 }
 
+interface ProductSubproductSectionProps {
+  combo: {
+    productId: string;
+    subProductId: string;
+    productLabel: string;
+    subProductLabel: string;
+    domainType?: string;
+    businessDomainLabel?: string;
+  };
+  dealId: string;
+  nextCommitmentNumber: number;
+  onCommitmentSave: (comboKey: string, commitment: DealCommitment) => void;
+  commitments: DealCommitment[];
+}
+
+const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ combo, dealId, nextCommitmentNumber, onCommitmentSave, commitments }) => {
+  const comboKey = combo.productId + '-' + combo.subProductId;
+  const [financialStatuses, setFinancialStatuses] = React.useState<DealFinancialStatus[]>([]);
+  const [fsLoading, setFsLoading] = React.useState(false);
+  const [fsError, setFsError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (combo.domainType === 'Trade Finance') {
+      setFsLoading(true);
+      getDealFinancialStatusesByDealId(dealId)
+        .then(setFinancialStatuses)
+        .catch(() => setFinancialStatuses([]))
+        .finally(() => setFsLoading(false));
+    }
+  }, [dealId, combo.domainType]);
+
+  return (
+    <div className="border border-violet-200 rounded-lg bg-violet-50 p-4">
+      <div className="font-semibold text-violet-800 mb-2">
+        {combo.domainType || "Domain"} | - | {combo.productLabel} | - | {combo.subProductLabel}
+      </div>
+      {/* List of added DealCommitments for this combo */}
+      {combo.domainType === 'Trade Finance' && commitments.length > 0 && (
+        <div className="mb-4">
+          <div className="font-semibold text-violet-700 mb-1">Added Commitments:</div>
+          <ul className="space-y-1">
+            {commitments.map((c, i) => (
+              <li key={c.commitmentNumber} className="flex gap-6 items-center text-sm text-slate-800">
+                <span>Commitment #{c.commitmentNumber}:</span>
+                <span>Currency: <span className="font-medium">{c.currency}</span></span>
+                <span>Amount: <span className="font-medium">{c.commitmentAmount}</span></span>
+                <span>Tenure: <span className="font-medium">{c.tenure}</span></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {/* DealCommitment form for Trade Finance */}
+      {combo.domainType === 'Trade Finance' && (
+        <DealCommitmentForm
+          dealId={dealId}
+          commitmentNumber={nextCommitmentNumber}
+          onSave={commitment => onCommitmentSave(comboKey, commitment)}
+        />
+      )}
+      {/* List of added DealFinancialStatus for this combo */}
+      {combo.domainType === 'Trade Finance' && financialStatuses.length > 0 && (
+        <div className="mb-4">
+          <div className="font-semibold text-violet-700 mb-1">Added Financial Statuses:</div>
+          <ul className="space-y-1">
+            {financialStatuses.map((fs, i) => (
+              <li key={fs.year + '-' + i} className="flex gap-6 items-center text-sm text-slate-800">
+                <span>Year: <span className="font-medium">{fs.year}</span></span>
+                <span>Description: <span className="font-medium">{fs.description}</span></span>
+                {fs.storagePath && (
+                  <button type="button" className="text-violet-700 underline" onClick={() => window.open(fs.storagePath, '_blank')}>View Attachment</button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {/* DealFinancialStatus form for Trade Finance */}
+      {combo.domainType === 'Trade Finance' && (
+        <DealFinancialStatusForm
+          dealId={dealId}
+          onSave={fs => setFinancialStatuses(prev => [...prev, fs])}
+        />
+      )}
+      {/* Placeholder for additional form fields for this section */}
+      <div className="text-slate-700 text-sm italic">(Additional form fields go here for this DomainType/Product/SubProduct)</div>
+    </div>
+  );
+};
+
 export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, onNext, onBack, addedCombinations, setAddedCombinations }) => {
   const [businessDomains, setBusinessDomains] = useState<Entity[]>([]);
   const [productCategories, setProductCategories] = useState<Entity[]>([]);
@@ -199,86 +289,22 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
       {/* New: DomainType containers for each added combination */}
       {addedCombinations.length > 0 && (
         <div className="mb-6 flex flex-col gap-4">
-          {addedCombinations.map((combo, idx) => {
-            const comboKey = combo.productId + '-' + combo.subProductId;
-            const commitments = commitmentsByCombo[comboKey] || [];
-            const [financialStatuses, setFinancialStatuses] = React.useState<DealFinancialStatus[]>([]);
-            const [fsLoading, setFsLoading] = React.useState(false);
-            const [fsError, setFsError] = React.useState<string | null>(null);
-            // Fetch statuses for this deal on mount
-            React.useEffect(() => {
-              if (combo.domainType === 'Trade Finance') {
-                setFsLoading(true);
-                getDealFinancialStatusesByDealId(dealId)
-                  .then(setFinancialStatuses)
-                  .catch(() => setFinancialStatuses([]))
-                  .finally(() => setFsLoading(false));
-              }
-            }, [dealId, combo.domainType]);
-            return (
-              <div key={comboKey} className="border border-violet-200 rounded-lg bg-violet-50 p-4">
-                <div className="font-semibold text-violet-800 mb-2">
-                  {combo.domainType || "Domain"} | - | {combo.productLabel} | - | {combo.subProductLabel}
-                </div>
-                {/* List of added DealCommitments for this combo */}
-                {combo.domainType === 'Trade Finance' && commitments.length > 0 && (
-                  <div className="mb-4">
-                    <div className="font-semibold text-violet-700 mb-1">Added Commitments:</div>
-                    <ul className="space-y-1">
-                      {commitments.map((c, i) => (
-                        <li key={c.commitmentNumber} className="flex gap-6 items-center text-sm text-slate-800">
-                          <span>Commitment #{c.commitmentNumber}:</span>
-                          <span>Currency: <span className="font-medium">{c.currency}</span></span>
-                          <span>Amount: <span className="font-medium">{c.commitmentAmount}</span></span>
-                          <span>Tenure: <span className="font-medium">{c.tenure}</span></span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {/* DealCommitment form for Trade Finance */}
-                {combo.domainType === 'Trade Finance' && (
-                  <DealCommitmentForm
-                    dealId={dealId}
-                    commitmentNumber={nextCommitmentNumber}
-                    onSave={commitment => {
-                      setNextCommitmentNumber(n => n + 1);
-                      setCommitmentsByCombo(prev => ({
-                        ...prev,
-                        [comboKey]: [...(prev[comboKey] || []), commitment],
-                      }));
-                    }}
-                  />
-                )}
-                {/* List of added DealFinancialStatus for this combo */}
-                {combo.domainType === 'Trade Finance' && financialStatuses.length > 0 && (
-                  <div className="mb-4">
-                    <div className="font-semibold text-violet-700 mb-1">Added Financial Statuses:</div>
-                    <ul className="space-y-1">
-                      {financialStatuses.map((fs, i) => (
-                        <li key={fs.year + '-' + i} className="flex gap-6 items-center text-sm text-slate-800">
-                          <span>Year: <span className="font-medium">{fs.year}</span></span>
-                          <span>Description: <span className="font-medium">{fs.description}</span></span>
-                          {fs.storagePath && (
-                            <button type="button" className="text-violet-700 underline" onClick={() => window.open(fs.storagePath, '_blank')}>View Attachment</button>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {/* DealFinancialStatus form for Trade Finance */}
-                {combo.domainType === 'Trade Finance' && (
-                  <DealFinancialStatusForm
-                    dealId={dealId}
-                    onSave={fs => setFinancialStatuses(prev => [...prev, fs])}
-                  />
-                )}
-                {/* Placeholder for additional form fields for this section */}
-                <div className="text-slate-700 text-sm italic">(Additional form fields go here for this DomainType/Product/SubProduct)</div>
-              </div>
-            );
-          })}
+          {addedCombinations.map((combo, idx) => (
+            <ProductSubproductSection
+              key={combo.productId + '-' + combo.subProductId}
+              combo={combo}
+              dealId={dealId}
+              nextCommitmentNumber={nextCommitmentNumber}
+              onCommitmentSave={(comboKey, commitment) => {
+                setNextCommitmentNumber(n => n + 1);
+                setCommitmentsByCombo(prev => ({
+                  ...prev,
+                  [comboKey]: [...(prev[comboKey] || []), commitment],
+                }));
+              }}
+              commitments={commitmentsByCombo[combo.productId + '-' + combo.subProductId] || []}
+            />
+          ))}
         </div>
       )}
       {/* Business Domain Dropdown (UUID) */}
