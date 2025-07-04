@@ -10,6 +10,8 @@ export interface Entity {
   productId?: string; // legacy, not used by backend
   subProductId?: string; // legacy, not used by backend
   description: string;
+  domainType?: string;
+  lastUpdatedBy?: string;
 }
 
 function isValidUUID(uuid: string): boolean {
