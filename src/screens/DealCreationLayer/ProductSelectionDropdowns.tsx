@@ -19,12 +19,16 @@ interface ProductSelectionDropdownsProps {
     subProductId: string;
     productLabel: string;
     subProductLabel: string;
+    domainType?: string;
+    businessDomainLabel?: string;
   }[];
   setAddedCombinations: React.Dispatch<React.SetStateAction<{
     productId: string;
     subProductId: string;
     productLabel: string;
     subProductLabel: string;
+    domainType?: string;
+    businessDomainLabel?: string;
   }[]>>;
 }
 
@@ -130,6 +134,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
       // Add to local list
       const productLabel = products.find(p => (String(p.id ?? p.productId ?? "")) === selectedProduct)?.description || selectedProduct;
       const subProductLabel = subProducts.find(sp => (String(sp.id ?? sp.subProductId ?? "")) === selectedSubProduct)?.description || selectedSubProduct;
+      const businessDomain = businessDomains.find(bd => String(bd.id ?? bd.businessDomainId ?? "") === selectedBusinessDomain);
       setAddedCombinations(prev => [
         ...prev,
         {
@@ -137,6 +142,8 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
           subProductId: selectedSubProduct,
           productLabel,
           subProductLabel,
+          domainType: businessDomain?.domainType || "",
+          businessDomainLabel: businessDomain?.description || "",
         },
       ]);
       // Flush dropdowns
@@ -153,8 +160,8 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Added combinations list */}
-      {addedCombinations.length > 0 && (
+      {/* Added combinations list (legacy) */}
+      {false && addedCombinations.length > 0 && (
         <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
           <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
           <ul className="space-y-2">
@@ -165,6 +172,20 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
               </li>
             ))}
           </ul>
+        </div>
+      )}
+      {/* New: DomainType containers for each added combination */}
+      {addedCombinations.length > 0 && (
+        <div className="mb-6 flex flex-col gap-4">
+          {addedCombinations.map((combo, idx) => (
+            <div key={combo.productId + '-' + combo.subProductId} className="border border-violet-200 rounded-lg bg-violet-50 p-4">
+              <div className="font-semibold text-violet-800 mb-2">
+                {combo.domainType || "Domain"} | - | {combo.productLabel} | - | {combo.subProductLabel}
+              </div>
+              {/* Placeholder for additional form fields for this section */}
+              <div className="text-slate-700 text-sm italic">(Additional form fields go here for this DomainType/Product/SubProduct)</div>
+            </div>
+          ))}
         </div>
       )}
       {/* Business Domain Dropdown (UUID) */}
