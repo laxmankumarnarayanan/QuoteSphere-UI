@@ -489,6 +489,10 @@ const DealFinancialStatusForm: React.FC<{ dealId: string; customerId: string; on
     return await uploadFileToAzure(file, dealId, year, sasToken);
   }
 
+  React.useEffect(() => {
+    console.log('DealFinancialStatusForm received customerId:', customerId);
+  }, [customerId]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setUploading(true);
@@ -510,6 +514,7 @@ const DealFinancialStatusForm: React.FC<{ dealId: string; customerId: string; on
         lastUpdatedBy: '',
         lastUpdatedDateTime: new Date().toISOString(),
       };
+      console.log('Saving DealFinancialStatus:', fs);
       await saveDealFinancialStatus(fs);
       setSuccess(true);
       setYear('');
