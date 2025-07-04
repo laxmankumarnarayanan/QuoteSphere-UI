@@ -68,20 +68,6 @@ interface ProductSubproductSectionProps {
 
 const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ combo, dealId, nextCommitmentNumber, onCommitmentSave, commitments }) => {
   const comboKey = combo.productId + '-' + combo.subProductId;
-  const [financialStatuses, setFinancialStatuses] = React.useState<DealFinancialStatus[]>([]);
-  const [fsLoading, setFsLoading] = React.useState(false);
-  const [fsError, setFsError] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    if (combo.domainType === 'Trade Finance') {
-      setFsLoading(true);
-      getDealFinancialStatusesByDealId(dealId)
-        .then(setFinancialStatuses)
-        .catch(() => setFinancialStatuses([]))
-        .finally(() => setFsLoading(false));
-    }
-  }, [dealId, combo.domainType]);
-
   return (
     <div className="border border-violet-200 rounded-lg bg-violet-50 p-4">
       <div className="font-semibold text-violet-800 mb-2">
@@ -109,30 +95,6 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
           dealId={dealId}
           commitmentNumber={nextCommitmentNumber}
           onSave={commitment => onCommitmentSave(comboKey, commitment)}
-        />
-      )}
-      {/* List of added DealFinancialStatus for this combo */}
-      {combo.domainType === 'Trade Finance' && financialStatuses.length > 0 && (
-        <div className="mb-4">
-          <div className="font-semibold text-violet-700 mb-1">Added Financial Statuses:</div>
-          <ul className="space-y-1">
-            {financialStatuses.map((fs, i) => (
-              <li key={fs.year + '-' + i} className="flex gap-6 items-center text-sm text-slate-800">
-                <span>Year: <span className="font-medium">{fs.year}</span></span>
-                <span>Description: <span className="font-medium">{fs.description}</span></span>
-                {fs.storagePath && (
-                  <button type="button" className="text-violet-700 underline" onClick={() => window.open(fs.storagePath, '_blank')}>View Attachment</button>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {/* DealFinancialStatus form for Trade Finance */}
-      {combo.domainType === 'Trade Finance' && (
-        <DealFinancialStatusForm
-          dealId={dealId}
-          onSave={fs => setFinancialStatuses(prev => [...prev, fs])}
         />
       )}
       {/* Placeholder for additional form fields for this section */}
