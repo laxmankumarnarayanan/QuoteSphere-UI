@@ -7,6 +7,8 @@ import { addDealProduct, addDealSubProduct } from "../../services/dealProductApi
 import { saveDealCommitment, DealCommitment } from '../../services/dealCommitmentService';
 import { translateFieldService } from '../../services/translateFieldService';
 import TextInput from '../../template components/components/form/TextInput';
+import { saveDealFinancialStatus, getDealFinancialStatusesByDealId, DealFinancialStatus } from '../../services/dealFinancialStatusService';
+import { BlobServiceClient } from "@azure/storage-blob";
 
 function isValidUUID(uuid: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -33,6 +35,20 @@ interface ProductSelectionDropdownsProps {
     domainType?: string;
     businessDomainLabel?: string;
   }[]>>;
+}
+
+const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
+const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer";
+
+async function uploadFileToAzure(file: File, dealId: string, year: string, sasToken: string) {
+  const blobName = `${dealId},${year}_${file.name}`;
+  const blobServiceClient = new BlobServiceClient(`${AZURE_CONTAINER_URL}?${sasToken}`);
+  const containerClient = blobServiceClient.getContainerClient("");
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+  await blockBlobClient.uploadBrowserData(file, {
+    blobHTTPHeaders: { blobContentType: file.type }
+  });
+  return `${AZURE_CONTAINER_URL}/${blobName}`;
 }
 
 export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, onNext, onBack, addedCombinations, setAddedCombinations }) => {
@@ -186,6 +202,19 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
           {addedCombinations.map((combo, idx) => {
             const comboKey = combo.productId + '-' + combo.subProductId;
             const commitments = commitmentsByCombo[comboKey] || [];
+            const [financialStatuses, setFinancialStatuses] = React.useState<DealFinancialStatus[]>([]);
+            const [fsLoading, setFsLoading] = React.useState(false);
+            const [fsError, setFsError] = React.useState<string | null>(null);
+            // Fetch statuses for this deal on mount
+            React.useEffect(() => {
+              if (combo.domainType === 'Trade Finance') {
+                setFsLoading(true);
+                getDealFinancialStatusesByDealId(dealId)
+                  .then(setFinancialStatuses)
+                  .catch(() => setFinancialStatuses([]))
+                  .finally(() => setFsLoading(false));
+              }
+            }, [dealId, combo.domainType]);
             return (
               <div key={comboKey} className="border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">
@@ -219,6 +248,30 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
                         [comboKey]: [...(prev[comboKey] || []), commitment],
                       }));
                     }}
+                  />
+                )}
+                {/* List of added DealFinancialStatus for this combo */}
+                {combo.domainType === 'Trade Finance' && financialStatuses.length > 0 && (
+                  <div className="mb-4">
+                    <div className="font-semibold text-violet-700 mb-1">Added Financial Statuses:</div>
+                    <ul className="space-y-1">
+                      {financialStatuses.map((fs, i) => (
+                        <li key={fs.year + '-' + i} className="flex gap-6 items-center text-sm text-slate-800">
+                          <span>Year: <span className="font-medium">{fs.year}</span></span>
+                          <span>Description: <span className="font-medium">{fs.description}</span></span>
+                          {fs.storagePath && (
+                            <button type="button" className="text-violet-700 underline" onClick={() => window.open(fs.storagePath, '_blank')}>View Attachment</button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {/* DealFinancialStatus form for Trade Finance */}
+                {combo.domainType === 'Trade Finance' && (
+                  <DealFinancialStatusForm
+                    dealId={dealId}
+                    onSave={fs => setFinancialStatuses(prev => [...prev, fs])}
                   />
                 )}
                 {/* Placeholder for additional form fields for this section */}
@@ -386,6 +439,96 @@ const DealCommitmentForm: React.FC<{ dealId: string; commitmentNumber: number; o
         </SecondaryButton>
       </div>
       {success && <div className="text-green-600">Deal Commitment added successfully!</div>}
+      {error && <div className="text-red-600">{error}</div>}
+    </form>
+  );
+};
+
+const DealFinancialStatusForm: React.FC<{ dealId: string; onSave: (fs: DealFinancialStatus) => void }> = ({ dealId, onSave }) => {
+  const [year, setYear] = useState('');
+  const [description, setDescription] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function uploadFile(file: File): Promise<string> {
+    // 1. Get SAS token from backend
+    const blobName = `${dealId},${year}_${file.name}`;
+    const sasRes = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
+    if (!sasRes.ok) throw new Error("Failed to get SAS token");
+    const sasToken = await sasRes.text();
+    // 2. Upload to Azure
+    return await uploadFileToAzure(file, dealId, year, sasToken);
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUploading(true);
+    setError(null);
+    setSuccess(false);
+    try {
+      let storagePath = '';
+      if (file) {
+        storagePath = await uploadFile(file);
+      }
+      const fs: DealFinancialStatus = {
+        dealID: dealId,
+        year,
+        description,
+        storagePath,
+        createdBy: '',
+        createdDateTime: new Date().toISOString(),
+        lastUpdatedBy: '',
+        lastUpdatedDateTime: new Date().toISOString(),
+      };
+      await saveDealFinancialStatus(fs);
+      setSuccess(true);
+      setYear('');
+      setDescription('');
+      setFile(null);
+      onSave(fs);
+    } catch (err: any) {
+      setError('Failed to save Deal Financial Status.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded mb-4 bg-white">
+      <div className="font-semibold text-violet-700 mb-2">Deal Financial Status</div>
+      <TextInput
+        id="year"
+        label="Year"
+        value={year}
+        onChange={setYear}
+        required
+        placeholder="Enter year"
+      />
+      <div className="text-xs text-slate-500 mb-2">Example: 2024-25</div>
+      <TextInput
+        id="description"
+        label="Description"
+        value={description}
+        onChange={setDescription}
+        required
+        placeholder="Enter description"
+      />
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Attachment</label>
+        <input
+          type="file"
+          onChange={e => setFile(e.target.files?.[0] || null)}
+          className="block mt-1"
+        />
+      </div>
+      <div className="flex gap-4 justify-end">
+        <SecondaryButton type="submit" isLoading={uploading} size="md">
+          Add
+        </SecondaryButton>
+      </div>
+      {success && <div className="text-green-600">Deal Financial Status added successfully!</div>}
       {error && <div className="text-red-600">{error}</div>}
     </form>
   );
