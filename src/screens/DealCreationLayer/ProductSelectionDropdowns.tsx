@@ -52,6 +52,8 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   const [added, setAdded] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
   const [nextCommitmentNumber, setNextCommitmentNumber] = useState(1);
+  // Store commitments for each combo: { [comboKey]: DealCommitment[] }
+  const [commitmentsByCombo, setCommitmentsByCombo] = useState<Record<string, DealCommitment[]>>({});
 
   // Fetch business domains on mount
   useEffect(() => {
@@ -181,19 +183,49 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
       {/* New: DomainType containers for each added combination */}
       {addedCombinations.length > 0 && (
         <div className="mb-6 flex flex-col gap-4">
-          {addedCombinations.map((combo, idx) => (
-            <div key={combo.productId + '-' + combo.subProductId} className="border border-violet-200 rounded-lg bg-violet-50 p-4">
-              <div className="font-semibold text-violet-800 mb-2">
-                {combo.domainType || "Domain"} | - | {combo.productLabel} | - | {combo.subProductLabel}
+          {addedCombinations.map((combo, idx) => {
+            const comboKey = combo.productId + '-' + combo.subProductId;
+            const commitments = commitmentsByCombo[comboKey] || [];
+            return (
+              <div key={comboKey} className="border border-violet-200 rounded-lg bg-violet-50 p-4">
+                <div className="font-semibold text-violet-800 mb-2">
+                  {combo.domainType || "Domain"} | - | {combo.productLabel} | - | {combo.subProductLabel}
+                </div>
+                {/* List of added DealCommitments for this combo */}
+                {combo.domainType === 'Trade Finance' && commitments.length > 0 && (
+                  <div className="mb-4">
+                    <div className="font-semibold text-violet-700 mb-1">Added Commitments:</div>
+                    <ul className="space-y-1">
+                      {commitments.map((c, i) => (
+                        <li key={c.commitmentNumber} className="flex gap-6 items-center text-sm text-slate-800">
+                          <span>Commitment #{c.commitmentNumber}:</span>
+                          <span>Currency: <span className="font-medium">{c.currency}</span></span>
+                          <span>Amount: <span className="font-medium">{c.commitmentAmount}</span></span>
+                          <span>Tenure: <span className="font-medium">{c.tenure}</span></span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {/* DealCommitment form for Trade Finance */}
+                {combo.domainType === 'Trade Finance' && (
+                  <DealCommitmentForm
+                    dealId={dealId}
+                    commitmentNumber={nextCommitmentNumber}
+                    onSave={commitment => {
+                      setNextCommitmentNumber(n => n + 1);
+                      setCommitmentsByCombo(prev => ({
+                        ...prev,
+                        [comboKey]: [...(prev[comboKey] || []), commitment],
+                      }));
+                    }}
+                  />
+                )}
+                {/* Placeholder for additional form fields for this section */}
+                <div className="text-slate-700 text-sm italic">(Additional form fields go here for this DomainType/Product/SubProduct)</div>
               </div>
-              {/* DealCommitment form for Trade Finance */}
-              {combo.domainType === 'Trade Finance' && (
-                <DealCommitmentForm dealId={dealId} commitmentNumber={nextCommitmentNumber} onSave={() => setNextCommitmentNumber(n => n + 1)} />
-              )}
-              {/* Placeholder for additional form fields for this section */}
-              <div className="text-slate-700 text-sm italic">(Additional form fields go here for this DomainType/Product/SubProduct)</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
       {/* Business Domain Dropdown (UUID) */}
@@ -273,7 +305,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   );
 };
 
-const DealCommitmentForm: React.FC<{ dealId: string; commitmentNumber: number; onSave: () => void }> = ({ dealId, commitmentNumber, onSave }) => {
+const DealCommitmentForm: React.FC<{ dealId: string; commitmentNumber: number; onSave: (commitment: DealCommitment) => void }> = ({ dealId, commitmentNumber, onSave }) => {
   const [currency, setCurrency] = useState('');
   const [commitmentAmount, setCommitmentAmount] = useState('');
   const [tenure, setTenure] = useState('');
@@ -293,23 +325,24 @@ const DealCommitmentForm: React.FC<{ dealId: string; commitmentNumber: number; o
     setLoading(true);
     setError(null);
     setSuccess(false);
+    const commitment: DealCommitment = {
+      dealID: dealId,
+      commitmentNumber,
+      currency,
+      commitmentAmount: Number(commitmentAmount),
+      tenure: Number(tenure),
+      createdBy: '',
+      createdDateTime: new Date().toISOString(),
+      lastUpdatedBy: '',
+      lastUpdatedDateTime: new Date().toISOString(),
+    };
     try {
-      await saveDealCommitment({
-        dealID: dealId,
-        commitmentNumber,
-        currency,
-        commitmentAmount: Number(commitmentAmount),
-        tenure: Number(tenure),
-        createdBy: '',
-        createdDateTime: new Date().toISOString(),
-        lastUpdatedBy: '',
-        lastUpdatedDateTime: new Date().toISOString(),
-      });
+      await saveDealCommitment(commitment);
       setSuccess(true);
       setCurrency('');
       setCommitmentAmount('');
       setTenure('');
-      onSave();
+      onSave(commitment);
     } catch (err: any) {
       setError('Failed to save Deal Commitment.');
     } finally {
@@ -349,10 +382,10 @@ const DealCommitmentForm: React.FC<{ dealId: string; commitmentNumber: number; o
       />
       <div className="flex gap-4 justify-end">
         <SecondaryButton type="submit" isLoading={loading} size="md">
-          Save
+          Add
         </SecondaryButton>
       </div>
-      {success && <div className="text-green-600">Deal Commitment saved successfully!</div>}
+      {success && <div className="text-green-600">Deal Commitment added successfully!</div>}
       {error && <div className="text-red-600">{error}</div>}
     </form>
   );
