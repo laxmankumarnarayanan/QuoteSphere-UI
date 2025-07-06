@@ -60,6 +60,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   const [addedCollaterals, setAddedCollaterals] = useState<any[]>([]);
   const [documentCategory, setDocumentCategory] = useState("");
   const [documentType, setDocumentType] = useState("");
+  const [documentDescription, setDocumentDescription] = useState("");
   const [documentCategoryOptions, setDocumentCategoryOptions] = useState<{ value: string; label: string }[]>([]);
   const [documentTypeOptions, setDocumentTypeOptions] = useState<{ value: string; label: string }[]>([]);
   const [docLoading, setDocLoading] = useState(false);
@@ -193,6 +194,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         documentCategory,
         documentType,
         documentName: selectedFile.name,
+        description: documentDescription,
         storageFilePath: blobUrl,
         createdBy: "",
         createdDateTime: new Date().toISOString(),
@@ -208,6 +210,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       setDocSuccess(true);
       setDocumentCategory("");
       setDocumentType("");
+      setDocumentDescription("");
       setSelectedFile(null);
     } catch (err: any) {
       setDocError(err.message || "Failed to save document.");
@@ -252,6 +255,9 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
                 <span className="text-sm font-medium text-violet-900">Category: <span className="font-normal text-slate-800">{doc.documentCategory}</span></span>
                 <span className="text-sm font-medium text-violet-900">Type: <span className="font-normal text-slate-800">{doc.documentType}</span></span>
                 <span className="text-sm font-medium text-violet-900">Name: <span className="font-normal text-slate-800">{doc.documentName}</span></span>
+                {doc.description && (
+                  <span className="text-sm font-medium text-violet-900">Description: <span className="font-normal text-slate-800">{doc.description}</span></span>
+                )}
                 <span className="text-sm font-medium text-violet-900">
                   <button
                     className="text-blue-600 underline"
@@ -336,6 +342,13 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
               options={documentTypeOptions}
               required
               placeholder="Select Document Type"
+            />
+            <TextInput
+              id="documentDescription"
+              label="Description"
+              value={documentDescription}
+              onChange={setDocumentDescription}
+              placeholder="Enter document description"
             />
             <input
               type="file"
