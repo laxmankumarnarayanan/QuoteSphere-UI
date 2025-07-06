@@ -85,51 +85,7 @@ function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: De
   );
 }
 
-function CommitmentsDisplay({ commitments, addedCombinations }: { commitments: DealCommitment[], addedCombinations: any[] }) {
-  if (commitments.length === 0) return null;
-  
-  // Group commitments by product-subproduct combination
-  const commitmentsByCombo = commitments.reduce((acc, commitment) => {
-    const key = `${commitment.productID}-${commitment.subProductID}`;
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(commitment);
-    return acc;
-  }, {} as Record<string, DealCommitment[]>);
 
-  return (
-    <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
-      <div className="font-semibold text-violet-800 mb-2">Deal Commitments</div>
-      <div className="space-y-4">
-        {addedCombinations.map((combo) => {
-          const comboKey = `${combo.productId}-${combo.subProductId}`;
-          const comboCommitments = commitmentsByCombo[comboKey] || [];
-          
-          if (comboCommitments.length === 0) return null;
-          
-          return (
-            <div key={comboKey} className="bg-white p-3 rounded border">
-              <div className="font-medium text-violet-700 mb-2">
-                {combo.productLabel} - {combo.subProductLabel}
-              </div>
-              <div className="space-y-2">
-                {comboCommitments.map((commitment, index) => (
-                  <div key={commitment.commitmentNumber} className="flex gap-6 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
-                    <span>Commitment #{commitment.commitmentNumber}:</span>
-                    <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
-                    <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
-                    <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 export const DealCreationLayer = (): JSX.Element => {
   const [searchValue, setSearchValue] = React.useState("");
@@ -302,18 +258,41 @@ export const DealCreationLayer = (): JSX.Element => {
             <DealDetailsContainer deal={createdDeal} />
             {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
             <FinancialStatusesDisplay financialStatuses={financialStatuses} />
-            <CommitmentsDisplay commitments={commitments} addedCombinations={addedCombinations} />
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
-                <ul className="space-y-2">
-                  {addedCombinations.map((combo, idx) => (
-                    <li key={combo.productId + '-' + combo.subProductId} className="flex gap-6 items-center">
-                      <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
-                      <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-4">
+                  {addedCombinations.map((combo, idx) => {
+                    const comboKey = `${combo.productId}-${combo.subProductId}`;
+                    const comboCommitments = commitments.filter(c => 
+                      c.productID === combo.productId && c.subProductID === combo.subProductId
+                    );
+                    
+                    return (
+                      <div key={comboKey} className="bg-white p-3 rounded border">
+                        <div className="flex gap-6 items-center mb-2">
+                          <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                          <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                        </div>
+                        {comboCommitments.length > 0 && (
+                          <div className="mt-3 pl-4 border-l-2 border-violet-200">
+                            <div className="font-medium text-violet-700 mb-1">Deal Commitments:</div>
+                            <div className="space-y-1">
+                              {comboCommitments.map((commitment, index) => (
+                                <div key={commitment.commitmentNumber} className="flex gap-4 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
+                                  <span>Commitment #{commitment.commitmentNumber}:</span>
+                                  <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
+                                  <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
+                                  <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
             {createdDeal && createdDeal.dealId && (
@@ -335,18 +314,41 @@ export const DealCreationLayer = (): JSX.Element => {
             <DealDetailsContainer deal={createdDeal} />
             {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
             <FinancialStatusesDisplay financialStatuses={financialStatuses} />
-            <CommitmentsDisplay commitments={commitments} addedCombinations={addedCombinations} />
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
-                <ul className="space-y-2">
-                  {addedCombinations.map((combo, idx) => (
-                    <li key={combo.productId + '-' + combo.subProductId} className="flex gap-6 items-center">
-                      <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
-                      <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-4">
+                  {addedCombinations.map((combo, idx) => {
+                    const comboKey = `${combo.productId}-${combo.subProductId}`;
+                    const comboCommitments = commitments.filter(c => 
+                      c.productID === combo.productId && c.subProductID === combo.subProductId
+                    );
+                    
+                    return (
+                      <div key={comboKey} className="bg-white p-3 rounded border">
+                        <div className="flex gap-6 items-center mb-2">
+                          <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                          <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                        </div>
+                        {comboCommitments.length > 0 && (
+                          <div className="mt-3 pl-4 border-l-2 border-violet-200">
+                            <div className="font-medium text-violet-700 mb-1">Deal Commitments:</div>
+                            <div className="space-y-1">
+                              {comboCommitments.map((commitment, index) => (
+                                <div key={commitment.commitmentNumber} className="flex gap-4 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
+                                  <span>Commitment #{commitment.commitmentNumber}:</span>
+                                  <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
+                                  <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
+                                  <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
             {createdDeal && createdDeal.dealId && (
@@ -368,18 +370,41 @@ export const DealCreationLayer = (): JSX.Element => {
             <DealDetailsContainer deal={createdDeal} />
             {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
             <FinancialStatusesDisplay financialStatuses={financialStatuses} />
-            <CommitmentsDisplay commitments={commitments} addedCombinations={addedCombinations} />
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
-                <ul className="space-y-2">
-                  {addedCombinations.map((combo, idx) => (
-                    <li key={combo.productId + '-' + combo.subProductId} className="flex gap-6 items-center">
-                      <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
-                      <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-4">
+                  {addedCombinations.map((combo, idx) => {
+                    const comboKey = `${combo.productId}-${combo.subProductId}`;
+                    const comboCommitments = commitments.filter(c => 
+                      c.productID === combo.productId && c.subProductID === combo.subProductId
+                    );
+                    
+                    return (
+                      <div key={comboKey} className="bg-white p-3 rounded border">
+                        <div className="flex gap-6 items-center mb-2">
+                          <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                          <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                        </div>
+                        {comboCommitments.length > 0 && (
+                          <div className="mt-3 pl-4 border-l-2 border-violet-200">
+                            <div className="font-medium text-violet-700 mb-1">Deal Commitments:</div>
+                            <div className="space-y-1">
+                              {comboCommitments.map((commitment, index) => (
+                                <div key={commitment.commitmentNumber} className="flex gap-4 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
+                                  <span>Commitment #{commitment.commitmentNumber}:</span>
+                                  <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
+                                  <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
+                                  <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
             {createdDeal && createdDeal.dealId && (
