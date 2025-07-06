@@ -478,6 +478,7 @@ const DealFinancialStatusForm: React.FC<{ dealId: string; customerId: string; on
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   async function uploadFile(file: File): Promise<string> {
     // 1. Get SAS token from backend
@@ -520,7 +521,12 @@ const DealFinancialStatusForm: React.FC<{ dealId: string; customerId: string; on
       setYear('');
       setDescription('');
       setFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       onSave(fs);
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(false), 3000);
     } catch (err: any) {
       setError('Failed to save Deal Financial Status.');
     } finally {
@@ -551,6 +557,7 @@ const DealFinancialStatusForm: React.FC<{ dealId: string; customerId: string; on
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">Attachment</label>
         <input
+          ref={fileInputRef}
           type="file"
           onChange={e => setFile(e.target.files?.[0] || null)}
           className="block mt-1"
