@@ -15,6 +15,7 @@ const initialState = {
   collateralType: "",
   collateralValue: "",
   currency: "",
+  description: "",
 };
 
 const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api'; // Replace with your actual Azure backend URL if different
@@ -147,6 +148,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         collateralType: form.collateralType,
         collateralValue: Number(form.collateralValue),
         currency: form.currency,
+        description: form.description,
         createdBy: "",
         createdDateTime: new Date().toISOString(),
         lastUpdatedBy: "",
@@ -157,7 +159,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       setSuccess(true);
       setForm(initialState);
       // Explicitly reset each field
-      setForm({ collateralType: "", currency: "", collateralValue: "0" });
+      setForm({ collateralType: "", currency: "", collateralValue: "0", description: "" });
     } catch (err: any) {
       setError("Failed to save DealCollateral.");
     } finally {
@@ -232,6 +234,9 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
                 <span className="text-sm font-medium text-violet-900">Type: <span className="font-normal text-slate-800">{collateral.collateralType}</span></span>
                 <span className="text-sm font-medium text-violet-900">Value: <span className="font-normal text-slate-800">{collateral.collateralValue}</span></span>
                 <span className="text-sm font-medium text-violet-900">Currency: <span className="font-normal text-slate-800">{collateral.currency}</span></span>
+                {collateral.description && (
+                  <span className="text-sm font-medium text-violet-900">Description: <span className="font-normal text-slate-800">{collateral.description}</span></span>
+                )}
               </li>
             ))}
           </ul>
@@ -295,6 +300,14 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
               required
               placeholder="Enter collateral value"
               type="number"
+            />
+            <TextInput
+              id="description"
+              label="Description"
+              value={form.description}
+              onChange={val => setForm(prev => ({ ...prev, description: val }))}
+              required
+              placeholder="Enter description"
             />
             <div className="flex gap-4 justify-end">
               <SecondaryButton type="submit" isLoading={loading} size="md">

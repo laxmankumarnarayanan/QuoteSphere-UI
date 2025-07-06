@@ -10,6 +10,7 @@ export interface DealCollateral {
   collateralType: string;
   collateralValue: number;
   currency: string;
+  description: string;
   createdBy: string;
   createdDateTime: string;
   lastUpdatedBy: string;
