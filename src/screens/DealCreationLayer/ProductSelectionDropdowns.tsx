@@ -389,7 +389,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
         <SecondaryButton onClick={onBack}>
           Back
         </SecondaryButton>
-        <PrimaryButton onClick={onNext} disabled={!added}>
+        <PrimaryButton onClick={onNext} disabled={addedCombinations.length === 0}>
           Next
         </PrimaryButton>
       </div>
