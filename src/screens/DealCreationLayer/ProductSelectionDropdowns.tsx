@@ -36,6 +36,8 @@ interface ProductSelectionDropdownsProps {
     domainType?: string;
     businessDomainLabel?: string;
   }[]>>;
+  financialStatuses: DealFinancialStatus[];
+  setFinancialStatuses: React.Dispatch<React.SetStateAction<DealFinancialStatus[]>>;
 }
 
 const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
@@ -104,7 +106,7 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
   );
 };
 
-export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, customerId, onNext, onBack, addedCombinations, setAddedCombinations }) => {
+export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, customerId, onNext, onBack, addedCombinations, setAddedCombinations, financialStatuses, setFinancialStatuses }) => {
   const [businessDomains, setBusinessDomains] = useState<Entity[]>([]);
   const [productCategories, setProductCategories] = useState<Entity[]>([]);
   const [productSubCategories, setProductSubCategories] = useState<Entity[]>([]);
@@ -124,18 +126,12 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   // Store commitments for each combo: { [comboKey]: DealCommitment[] }
   const [commitmentsByCombo, setCommitmentsByCombo] = useState<Record<string, DealCommitment[]>>({});
 
-  // State for company-wide financial statuses
-  const [financialStatuses, setFinancialStatuses] = React.useState<DealFinancialStatus[]>([]);
-  const [fsLoading, setFsLoading] = React.useState(false);
-  const [fsError, setFsError] = React.useState<string | null>(null);
-
+  // Load financial statuses on mount
   React.useEffect(() => {
-    setFsLoading(true);
     getDealFinancialStatusesByDealId(dealId, customerId)
       .then(setFinancialStatuses)
-      .catch(() => setFinancialStatuses([]))
-      .finally(() => setFsLoading(false));
-  }, [dealId, customerId]);
+      .catch(() => setFinancialStatuses([]));
+  }, [dealId, customerId, setFinancialStatuses]);
 
   // Fetch business domains on mount
   useEffect(() => {

@@ -13,6 +13,7 @@ import { CustomerInfoBanner } from "./CustomerInfoBanner";
 import DealCollateralForm from "../../components/DealCollateralForm";
 import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card";
 import SpecialConditionsSection from "./sections/SpecialConditionsSection";
+import { DealFinancialStatus } from '../../services/dealFinancialStatusService';
 
 // Step data for the progress stepper
 const stepsData = [
@@ -56,6 +57,33 @@ function DealDetailsContainer({ deal }: { deal: Deal | null }) {
   );
 }
 
+function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: DealFinancialStatus[] }) {
+  if (financialStatuses.length === 0) return null;
+  
+  return (
+    <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
+      <div className="font-semibold text-violet-800 mb-2">Deal Financial Status</div>
+      <div className="space-y-2">
+        {financialStatuses.map((fs, i) => (
+          <div key={fs.year + '-' + i} className="flex gap-6 items-center text-sm text-slate-800 bg-white p-3 rounded border">
+            <span>Year: <span className="font-medium">{fs.year}</span></span>
+            <span>Description: <span className="font-medium">{fs.description}</span></span>
+            {fs.storagePath && (
+              <button 
+                type="button" 
+                className="text-violet-700 underline hover:text-violet-900" 
+                onClick={() => window.open(fs.storagePath, '_blank')}
+              >
+                View Attachment
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export const DealCreationLayer = (): JSX.Element => {
   const [searchValue, setSearchValue] = React.useState("");
   const [currentStep, setCurrentStep] = useState(1);
@@ -67,6 +95,7 @@ export const DealCreationLayer = (): JSX.Element => {
     productLabel: string;
     subProductLabel: string;
   }[]>([]);
+  const [financialStatuses, setFinancialStatuses] = useState<DealFinancialStatus[]>([]);
 
   const handleNext = async () => {
     if (currentStep === 1 && selectedCustomer) {
@@ -191,6 +220,8 @@ export const DealCreationLayer = (): JSX.Element => {
               onBack={handleBack}
               addedCombinations={addedCombinations}
               setAddedCombinations={setAddedCombinations}
+              financialStatuses={financialStatuses}
+              setFinancialStatuses={setFinancialStatuses}
             />
           </>
         )}
@@ -198,6 +229,7 @@ export const DealCreationLayer = (): JSX.Element => {
           <>
             <DealDetailsContainer deal={createdDeal} />
             {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
+            <FinancialStatusesDisplay financialStatuses={financialStatuses} />
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
@@ -229,6 +261,7 @@ export const DealCreationLayer = (): JSX.Element => {
           <>
             <DealDetailsContainer deal={createdDeal} />
             {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
+            <FinancialStatusesDisplay financialStatuses={financialStatuses} />
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
@@ -260,6 +293,7 @@ export const DealCreationLayer = (): JSX.Element => {
           <>
             <DealDetailsContainer deal={createdDeal} />
             {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
+            <FinancialStatusesDisplay financialStatuses={financialStatuses} />
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
