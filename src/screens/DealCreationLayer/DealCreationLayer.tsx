@@ -14,6 +14,7 @@ import DealCollateralForm from "../../components/DealCollateralForm";
 import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card";
 import SpecialConditionsSection from "./sections/SpecialConditionsSection";
 import { DealFinancialStatus } from '../../services/dealFinancialStatusService';
+import { DealCommitment, getDealCommitmentsByDealId } from '../../services/dealCommitmentService';
 
 // Step data for the progress stepper
 const stepsData = [
@@ -84,6 +85,52 @@ function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: De
   );
 }
 
+function CommitmentsDisplay({ commitments, addedCombinations }: { commitments: DealCommitment[], addedCombinations: any[] }) {
+  if (commitments.length === 0) return null;
+  
+  // Group commitments by product-subproduct combination
+  const commitmentsByCombo = commitments.reduce((acc, commitment) => {
+    const key = `${commitment.productID}-${commitment.subProductID}`;
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(commitment);
+    return acc;
+  }, {} as Record<string, DealCommitment[]>);
+
+  return (
+    <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
+      <div className="font-semibold text-violet-800 mb-2">Deal Commitments</div>
+      <div className="space-y-4">
+        {addedCombinations.map((combo) => {
+          const comboKey = `${combo.productId}-${combo.subProductId}`;
+          const comboCommitments = commitmentsByCombo[comboKey] || [];
+          
+          if (comboCommitments.length === 0) return null;
+          
+          return (
+            <div key={comboKey} className="bg-white p-3 rounded border">
+              <div className="font-medium text-violet-700 mb-2">
+                {combo.productLabel} - {combo.subProductLabel}
+              </div>
+              <div className="space-y-2">
+                {comboCommitments.map((commitment, index) => (
+                  <div key={commitment.commitmentNumber} className="flex gap-6 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
+                    <span>Commitment #{commitment.commitmentNumber}:</span>
+                    <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
+                    <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
+                    <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export const DealCreationLayer = (): JSX.Element => {
   const [searchValue, setSearchValue] = React.useState("");
   const [currentStep, setCurrentStep] = useState(1);
@@ -96,6 +143,7 @@ export const DealCreationLayer = (): JSX.Element => {
     subProductLabel: string;
   }[]>([]);
   const [financialStatuses, setFinancialStatuses] = useState<DealFinancialStatus[]>([]);
+  const [commitments, setCommitments] = useState<DealCommitment[]>([]);
 
   const handleNext = async () => {
     if (currentStep === 1 && selectedCustomer) {
@@ -106,6 +154,7 @@ export const DealCreationLayer = (): JSX.Element => {
           'initiator' // Replace with actual initiator (e.g., logged-in user)
         );
         setCreatedDeal(deal);
+        await loadCommitments(deal.dealId);
         setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length));
       } catch (error) {
         // Optionally handle error (show notification, etc.)
@@ -122,6 +171,16 @@ export const DealCreationLayer = (): JSX.Element => {
 
   const handleCustomerSelect = (customer: CustomerDetails | null) => {
     setSelectedCustomer(customer);
+  };
+
+  const loadCommitments = async (dealId: string) => {
+    try {
+      const commitmentsData = await getDealCommitmentsByDealId(dealId);
+      setCommitments(commitmentsData);
+    } catch (error) {
+      console.error('Failed to load commitments:', error);
+      setCommitments([]);
+    }
   };
 
   return (
@@ -230,6 +289,7 @@ export const DealCreationLayer = (): JSX.Element => {
             <DealDetailsContainer deal={createdDeal} />
             {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
             <FinancialStatusesDisplay financialStatuses={financialStatuses} />
+            <CommitmentsDisplay commitments={commitments} addedCombinations={addedCombinations} />
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
@@ -262,6 +322,7 @@ export const DealCreationLayer = (): JSX.Element => {
             <DealDetailsContainer deal={createdDeal} />
             {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
             <FinancialStatusesDisplay financialStatuses={financialStatuses} />
+            <CommitmentsDisplay commitments={commitments} addedCombinations={addedCombinations} />
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
@@ -294,6 +355,7 @@ export const DealCreationLayer = (): JSX.Element => {
             <DealDetailsContainer deal={createdDeal} />
             {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
             <FinancialStatusesDisplay financialStatuses={financialStatuses} />
+            <CommitmentsDisplay commitments={commitments} addedCombinations={addedCombinations} />
             {addedCombinations.length > 0 && (
               <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                 <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>

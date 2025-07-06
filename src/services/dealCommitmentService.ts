@@ -19,4 +19,9 @@ export interface DealCommitment {
 export async function saveDealCommitment(data: DealCommitment) {
   const response = await axios.post(`${API_BASE_URL}/deal-commitments`, data);
   return response.data;
+}
+
+export async function getDealCommitmentsByDealId(dealId: string): Promise<DealCommitment[]> {
+  const response = await axios.get(`${API_BASE_URL}/deal-commitments/deal/${dealId}`);
+  return response.data;
 } 
