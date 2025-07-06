@@ -160,6 +160,10 @@ export const DealCreationLayer = (): JSX.Element => {
         // Optionally handle error (show notification, etc.)
         console.error('Failed to create deal:', error);
       }
+    } else if (currentStep === 2 && createdDeal) {
+      // Reload commitments when moving from Product Selection to Collateral & Documentation
+      await loadCommitments(createdDeal.dealId);
+      setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length));
     } else {
       setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length));
     }
@@ -182,6 +186,13 @@ export const DealCreationLayer = (): JSX.Element => {
       setCommitments([]);
     }
   };
+
+  // Reload commitments when deal is created or changes
+  React.useEffect(() => {
+    if (createdDeal?.dealId) {
+      loadCommitments(createdDeal.dealId);
+    }
+  }, [createdDeal?.dealId]);
 
   return (
     <div className="flex-1">
@@ -281,6 +292,8 @@ export const DealCreationLayer = (): JSX.Element => {
               setAddedCombinations={setAddedCombinations}
               financialStatuses={financialStatuses}
               setFinancialStatuses={setFinancialStatuses}
+              commitments={commitments}
+              setCommitments={setCommitments}
             />
           </>
         )}

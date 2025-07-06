@@ -38,6 +38,8 @@ interface ProductSelectionDropdownsProps {
   }[]>>;
   financialStatuses: DealFinancialStatus[];
   setFinancialStatuses: React.Dispatch<React.SetStateAction<DealFinancialStatus[]>>;
+  commitments: DealCommitment[];
+  setCommitments: React.Dispatch<React.SetStateAction<DealCommitment[]>>;
 }
 
 const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
@@ -108,7 +110,7 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
   );
 };
 
-export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, customerId, onNext, onBack, addedCombinations, setAddedCombinations, financialStatuses, setFinancialStatuses }) => {
+export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, customerId, onNext, onBack, addedCombinations, setAddedCombinations, financialStatuses, setFinancialStatuses, commitments, setCommitments }) => {
   const [businessDomains, setBusinessDomains] = useState<Entity[]>([]);
   const [productCategories, setProductCategories] = useState<Entity[]>([]);
   const [productSubCategories, setProductSubCategories] = useState<Entity[]>([]);
@@ -127,6 +129,19 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   const [nextCommitmentNumber, setNextCommitmentNumber] = useState(1);
   // Store commitments for each combo: { [comboKey]: DealCommitment[] }
   const [commitmentsByCombo, setCommitmentsByCombo] = useState<Record<string, DealCommitment[]>>({});
+
+  // Update local commitmentsByCombo when commitments prop changes
+  useEffect(() => {
+    const newCommitmentsByCombo = commitments.reduce((acc, commitment) => {
+      const key = `${commitment.productID}-${commitment.subProductID}`;
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(commitment);
+      return acc;
+    }, {} as Record<string, DealCommitment[]>);
+    setCommitmentsByCombo(newCommitmentsByCombo);
+  }, [commitments]);
 
   // Load financial statuses on mount
   React.useEffect(() => {
@@ -296,10 +311,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
               nextCommitmentNumber={nextCommitmentNumber}
               onCommitmentSave={(comboKey, commitment) => {
                 setNextCommitmentNumber(n => n + 1);
-                setCommitmentsByCombo(prev => ({
-                  ...prev,
-                  [comboKey]: [...(prev[comboKey] || []), commitment],
-                }));
+                setCommitments(prev => [...prev, commitment]);
               }}
               commitments={commitmentsByCombo[combo.productId + '-' + combo.subProductId] || []}
             />
