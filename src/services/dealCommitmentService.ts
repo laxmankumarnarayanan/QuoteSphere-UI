@@ -8,6 +8,8 @@ export interface DealCommitment {
   currency: string;
   commitmentAmount: number;
   tenure: number;
+  productID: string;
+  subProductID: string;
   createdBy?: string;
   createdDateTime?: string;
   lastUpdatedBy?: string;

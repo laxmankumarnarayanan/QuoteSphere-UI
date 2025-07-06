@@ -96,6 +96,8 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
       {combo.domainType === 'Trade Finance' && (
         <DealCommitmentForm
           dealId={dealId}
+          productId={combo.productId}
+          subProductId={combo.subProductId}
           commitmentNumber={nextCommitmentNumber}
           onSave={commitment => onCommitmentSave(comboKey, commitment)}
         />
@@ -381,7 +383,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   );
 };
 
-const DealCommitmentForm: React.FC<{ dealId: string; commitmentNumber: number; onSave: (commitment: DealCommitment) => void }> = ({ dealId, commitmentNumber, onSave }) => {
+const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProductId: string; commitmentNumber: number; onSave: (commitment: DealCommitment) => void }> = ({ dealId, productId, subProductId, commitmentNumber, onSave }) => {
   const [currency, setCurrency] = useState('');
   const [commitmentAmount, setCommitmentAmount] = useState('');
   const [tenure, setTenure] = useState('');
@@ -407,6 +409,8 @@ const DealCommitmentForm: React.FC<{ dealId: string; commitmentNumber: number; o
       currency,
       commitmentAmount: Number(commitmentAmount),
       tenure: Number(tenure),
+      productID: productId,
+      subProductID: subProductId,
       createdBy: '',
       createdDateTime: new Date().toISOString(),
       lastUpdatedBy: '',
