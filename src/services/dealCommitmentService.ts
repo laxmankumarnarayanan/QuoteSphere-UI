@@ -10,6 +10,7 @@ export interface DealCommitment {
   tenure: number;
   productID: string;
   subProductID: string;
+  description: string;
   createdBy?: string;
   createdDateTime?: string;
   lastUpdatedBy?: string;

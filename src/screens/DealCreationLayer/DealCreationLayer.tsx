@@ -284,6 +284,9 @@ export const DealCreationLayer = (): JSX.Element => {
                                   <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
                                   <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
                                   <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
+                                  {commitment.description && (
+                                    <span>Description: <span className="font-medium">{commitment.description}</span></span>
+                                  )}
                                 </div>
                               ))}
                             </div>
@@ -340,6 +343,9 @@ export const DealCreationLayer = (): JSX.Element => {
                                   <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
                                   <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
                                   <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
+                                  {commitment.description && (
+                                    <span>Description: <span className="font-medium">{commitment.description}</span></span>
+                                  )}
                                 </div>
                               ))}
                             </div>
@@ -396,6 +402,9 @@ export const DealCreationLayer = (): JSX.Element => {
                                   <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
                                   <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
                                   <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
+                                  {commitment.description && (
+                                    <span>Description: <span className="font-medium">{commitment.description}</span></span>
+                                  )}
                                 </div>
                               ))}
                             </div>

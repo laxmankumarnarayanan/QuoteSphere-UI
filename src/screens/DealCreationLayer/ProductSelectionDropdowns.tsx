@@ -89,6 +89,9 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
                 <span>Currency: <span className="font-medium">{c.currency}</span></span>
                 <span>Amount: <span className="font-medium">{c.commitmentAmount}</span></span>
                 <span>Tenure: <span className="font-medium">{c.tenure}</span></span>
+                {c.description && (
+                  <span>Description: <span className="font-medium">{c.description}</span></span>
+                )}
               </li>
             ))}
           </ul>
@@ -399,6 +402,7 @@ const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProdu
   const [currency, setCurrency] = useState('');
   const [commitmentAmount, setCommitmentAmount] = useState('');
   const [tenure, setTenure] = useState('');
+  const [description, setDescription] = useState('');
   const [currencyOptions, setCurrencyOptions] = useState<{ value: string; label: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -423,6 +427,7 @@ const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProdu
       tenure: Number(tenure),
       productID: productId,
       subProductID: subProductId,
+      description,
       createdBy: '',
       createdDateTime: new Date().toISOString(),
       lastUpdatedBy: '',
@@ -435,6 +440,7 @@ const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProdu
       setCurrency('');
       setCommitmentAmount('');
       setTenure('');
+      setDescription('');
       onSave(commitment);
     } catch (err: any) {
       setError('Failed to save Deal Commitment.');
@@ -472,6 +478,14 @@ const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProdu
         required
         placeholder="Enter tenure"
         type="number"
+      />
+      <TextInput
+        id="description"
+        label="Description"
+        value={description}
+        onChange={setDescription}
+        required
+        placeholder="Enter description"
       />
       <div className="flex gap-4 justify-end">
         <SecondaryButton type="submit" isLoading={loading} size="md">
