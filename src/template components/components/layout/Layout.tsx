@@ -27,18 +27,18 @@ const Layout: React.FC<LayoutProps> = ({
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 relative">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 relative pb-[2.7vh]">
       <Sidebar onNavigate={handleNavigate} />
       <div 
         className="flex-1 flex flex-col transition-all duration-300 ease-in-out min-w-0 relative"
       >
         <Header />
         <Breadcrumb items={currentBreadcrumb} />
-        <main className="flex-1 p-6 pb-[2.7vh]">
+        <main className="flex-1 p-6">
           {children}
         </main>
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 };
