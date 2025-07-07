@@ -15,6 +15,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/ca
 import SpecialConditionsSection from "./sections/SpecialConditionsSection";
 import { DealFinancialStatus } from '../../services/dealFinancialStatusService';
 import { DealCommitment, getDealCommitmentsByDealId } from '../../services/dealCommitmentService';
+import DealPricingTable from '../../components/DealPricingTable';
 
 // Step data for the progress stepper
 const stepsData = [
@@ -384,7 +385,7 @@ export const DealCreationLayer = (): JSX.Element => {
             {createdDeal && createdDeal.dealId && (
               <DealCollateralForm dealId={createdDeal.dealId} showForms={false} />
             )}
-            <div>Pricing and Fees Section Goes Here (Placeholder)</div>
+            <DealPricingTable dealId={createdDeal?.dealId || ''} />
             <div className="flex justify-end gap-4 mt-8">
               <SecondaryButton onClick={handleBack}>
                 Back
