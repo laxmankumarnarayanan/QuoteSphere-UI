@@ -85,7 +85,7 @@ function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: De
   );
 }
 
-
+const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
 
 export const DealCreationLayer = (): JSX.Element => {
   const [searchValue, setSearchValue] = React.useState("");
@@ -97,12 +97,36 @@ export const DealCreationLayer = (): JSX.Element => {
     subProductId: string;
     productLabel: string;
     subProductLabel: string;
+    businessDomainId?: string;
   }[]>([]);
   const [financialStatuses, setFinancialStatuses] = useState<DealFinancialStatus[]>([]);
   const [commitments, setCommitments] = useState<DealCommitment[]>([]);
 
   const handleNext = async () => {
-    if (currentStep === 1 && selectedCustomer) {
+    if (currentStep === 3 && createdDeal && addedCombinations.length > 0) {
+      try {
+        await Promise.all(
+          addedCombinations.map(async (combo) => {
+            const businessDomainId = combo.businessDomainId;
+            const body = {
+              dealId: createdDeal.dealId,
+              businessDomainId,
+              productId: combo.productId,
+              subProductId: combo.subProductId,
+            };
+            await fetch(`${API_BASE_URL}/deal-pricing/populate`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+          })
+        );
+        setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length));
+      } catch (error) {
+        alert("Failed to populate pricing details. Please try again.");
+        return;
+      }
+    } else if (currentStep === 1 && selectedCustomer) {
       try {
         const deal = await dealService.createDraftDeal(
           selectedCustomer.customer.customerID,

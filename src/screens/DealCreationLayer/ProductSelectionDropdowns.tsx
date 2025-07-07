@@ -27,6 +27,7 @@ interface ProductSelectionDropdownsProps {
     subProductLabel: string;
     domainType?: string;
     businessDomainLabel?: string;
+    businessDomainId?: string;
   }[];
   setAddedCombinations: React.Dispatch<React.SetStateAction<{
     productId: string;
@@ -35,6 +36,7 @@ interface ProductSelectionDropdownsProps {
     subProductLabel: string;
     domainType?: string;
     businessDomainLabel?: string;
+    businessDomainId?: string;
   }[]>>;
   financialStatuses: DealFinancialStatus[];
   setFinancialStatuses: React.Dispatch<React.SetStateAction<DealFinancialStatus[]>>;
@@ -64,6 +66,7 @@ interface ProductSubproductSectionProps {
     subProductLabel: string;
     domainType?: string;
     businessDomainLabel?: string;
+    businessDomainId?: string;
   };
   dealId: string;
   nextCommitmentNumber: number;
@@ -248,6 +251,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
           subProductLabel,
           domainType: businessDomain?.domainType || "",
           businessDomainLabel: businessDomain?.description || "",
+          businessDomainId: String(businessDomain?.id ?? businessDomain?.businessDomainId ?? selectedBusinessDomain),
         },
       ]);
       // Flush dropdowns
