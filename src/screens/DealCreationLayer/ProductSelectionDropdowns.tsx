@@ -48,7 +48,7 @@ const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.
 const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer";
 
 async function uploadFileToAzure(file: File, dealId: string, year: string, sasToken: string) {
-  const blobName = `${dealId},${year}_${file.name}`;
+  const blobName = `${dealId}_${year}_${file.name}`;
   const blobServiceClient = new BlobServiceClient(`${AZURE_CONTAINER_URL}?${sasToken}`);
   const containerClient = blobServiceClient.getContainerClient("");
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
@@ -513,7 +513,7 @@ const DealFinancialStatusForm: React.FC<{ dealId: string; customerId: string; on
 
   async function uploadFile(file: File): Promise<string> {
     // 1. Get SAS token from backend
-    const blobName = `${dealId},${year}_${file.name}`;
+    const blobName = `${dealId}_${year}_${file.name}`;
     const sasRes = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
     if (!sasRes.ok) throw new Error("Failed to get SAS token");
     const sasToken = await sasRes.text();
