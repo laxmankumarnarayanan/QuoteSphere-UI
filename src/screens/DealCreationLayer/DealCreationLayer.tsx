@@ -59,26 +59,24 @@ function DealDetailsContainer({ deal }: { deal: Deal | null }) {
   );
 }
 
+const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
+const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer";
+
+async function getViewUrl(blobName: string) {
+  const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
+  const sasToken = await res.text();
+  return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
+}
+
 function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: DealFinancialStatus[] }) {
   if (financialStatuses.length === 0) return null;
 
-  const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
-  const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer";
-
-  async function getViewUrl(blobName: string) {
-    const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
-    const sasToken = await res.text();
-    return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
-  }
-
   const handleViewAttachment = async (fs: DealFinancialStatus) => {
     if (!fs.storagePath) return;
-    // Extract the blob name from the storagePath (remove any SAS token)
     const parts = fs.storagePath.split("/");
     const blobName = parts[parts.length - 1].split("?")[0];
     const url = await getViewUrl(blobName);
-    console.log('Opening URL:', url);
-    window.open(url, '_blank', 'noopener,noreferrer');
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -104,8 +102,6 @@ function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: De
     </div>
   );
 }
-
-const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
 
 export const DealCreationLayer = (): JSX.Element => {
   const [searchValue, setSearchValue] = React.useState("");
