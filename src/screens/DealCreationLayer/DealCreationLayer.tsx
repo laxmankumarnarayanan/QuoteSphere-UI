@@ -77,6 +77,7 @@ function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: De
     const parts = fs.storagePath.split("/");
     const blobName = parts[parts.length - 1].split("?")[0];
     const url = await getViewUrl(blobName);
+    console.log('Opening URL:', url);
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
