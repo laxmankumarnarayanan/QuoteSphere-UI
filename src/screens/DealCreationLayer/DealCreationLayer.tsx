@@ -72,19 +72,11 @@ function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: De
   }
 
   const handleViewAttachment = async (fs: DealFinancialStatus) => {
-    // The blobName is constructed as dealId_year_filename
-    if (!fs.dealID || !fs.year || !fs.storagePath) return;
-    // Extract the filename from the storagePath
+    if (!fs.storagePath) return;
+    // Extract the blob name from the storagePath (remove any SAS token)
     const parts = fs.storagePath.split("/");
-    const fileName = parts[parts.length - 1];
-    // Remove any SAS token if present
-    const fileNameNoSas = fileName.split("?")[0];
-    // Compose blobName as per upload logic
-    const blobName = `${fs.dealID}_${fs.year}_${fileNameNoSas.split('_').slice(2).join('_')}`;
-    // But if fileName already starts with dealId_year_, just use fileNameNoSas
-    const expectedPrefix = `${fs.dealID}_${fs.year}_`;
-    const finalBlobName = fileNameNoSas.startsWith(expectedPrefix) ? fileNameNoSas : blobName;
-    const url = await getViewUrl(finalBlobName);
+    const blobName = parts[parts.length - 1].split("?")[0];
+    const url = await getViewUrl(blobName);
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
