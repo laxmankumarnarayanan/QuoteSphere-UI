@@ -444,6 +444,10 @@ export const DealCreationLayer = (): JSX.Element => {
             {createdDeal && createdDeal.dealId && (
               <DealCollateralForm dealId={createdDeal.dealId} showForms={false} />
             )}
+            {/* Show Pricing & Fees Details table here as well */}
+            {createdDeal && createdDeal.dealId && (
+              <DealPricingTable dealId={createdDeal.dealId} />
+            )}
             {createdDeal && createdDeal.dealId && (
               <SpecialConditionsSection dealId={createdDeal.dealId} />
             )}
