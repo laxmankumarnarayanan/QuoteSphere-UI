@@ -61,7 +61,33 @@ function DealDetailsContainer({ deal }: { deal: Deal | null }) {
 
 function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: DealFinancialStatus[] }) {
   if (financialStatuses.length === 0) return null;
-  
+
+  const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
+  const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer";
+
+  async function getViewUrl(blobName: string) {
+    const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
+    const sasToken = await res.text();
+    return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
+  }
+
+  const handleViewAttachment = async (fs: DealFinancialStatus) => {
+    // The blobName is constructed as dealId_year_filename
+    if (!fs.dealID || !fs.year || !fs.storagePath) return;
+    // Extract the filename from the storagePath
+    const parts = fs.storagePath.split("/");
+    const fileName = parts[parts.length - 1];
+    // Remove any SAS token if present
+    const fileNameNoSas = fileName.split("?")[0];
+    // Compose blobName as per upload logic
+    const blobName = `${fs.dealID}_${fs.year}_${fileNameNoSas.split('_').slice(2).join('_')}`;
+    // But if fileName already starts with dealId_year_, just use fileNameNoSas
+    const expectedPrefix = `${fs.dealID}_${fs.year}_`;
+    const finalBlobName = fileNameNoSas.startsWith(expectedPrefix) ? fileNameNoSas : blobName;
+    const url = await getViewUrl(finalBlobName);
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
       <div className="font-semibold text-violet-800 mb-2">Deal Financial Status</div>
@@ -74,7 +100,7 @@ function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: De
               <button 
                 type="button" 
                 className="text-violet-700 underline hover:text-violet-900" 
-                onClick={() => window.open(fs.storagePath, '_blank')}
+                onClick={() => handleViewAttachment(fs)}
               >
                 View Attachment
               </button>
