@@ -117,6 +117,32 @@ function FinancialStatusesDisplay({
          </div>
        ))}
      </div>
+     {/* Debug button to generate SAS token */}
+     <div className="mt-4">
+       <button
+         type="button"
+         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+         onClick={async () => {
+           if (financialStatuses.length === 0 || !financialStatuses[0].storagePath) {
+             console.log('No financial status or storage path available');
+             return;
+           }
+           const fs = financialStatuses[0];
+           const parts = fs.storagePath.split("/");
+           const blobName = parts[parts.length - 1].split("?")[0];
+           try {
+             const url = await getViewUrl(blobName);
+             const sasToken = url.split('?')[1];
+             console.log('Generated SAS token:', sasToken);
+             console.log('Full SAS URL:', url);
+           } catch (err) {
+             console.error('Error generating SAS token:', err);
+           }
+         }}
+       >
+         Generate SAS Token
+       </button>
+     </div>
    </div>
  );
 }
