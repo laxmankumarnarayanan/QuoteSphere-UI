@@ -76,6 +76,7 @@ function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: De
   const handleViewAttachment = async (fs: DealFinancialStatus) => {
     if (!fs.storagePath) return;
     // Extract the exact blob name from the stored storagePath
+    console.log('Storage Path:', fs.storagePath);
     const parts = fs.storagePath.split("/");
     const blobName = parts[parts.length - 1].split("?")[0];
     const url = await getViewUrl(blobName);
