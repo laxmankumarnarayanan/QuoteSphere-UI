@@ -103,45 +103,39 @@ function FinancialStatusesDisplay({
            <span>Year: <span className="font-medium">{fs.year}</span></span>
            <span>Description: <span className="font-medium">{fs.description}</span></span>
            {fs.storagePath && (
-             <button 
-               type="button" 
-               className="text-violet-700 underline hover:text-violet-900" 
-               onClick={() => {
-                 console.log('View button clicked for:', fs.storagePath);
-                 handleViewAttachment123(fs);
-               }}
-             >
-               View Document Attachment
-             </button>
+             <>
+               <button 
+                 type="button" 
+                 className="text-violet-700 underline hover:text-violet-900" 
+                 onClick={() => {
+                   console.log('View button clicked for:', fs.storagePath);
+                   handleViewAttachment123(fs);
+                 }}
+               >
+                 View Attachment
+               </button>
+               <button
+                 type="button"
+                 className="ml-4 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                 onClick={async () => {
+                   const parts = fs.storagePath.split("/");
+                   const blobName = parts[parts.length - 1].split("?")[0];
+                   try {
+                     const url = await getViewUrl(blobName);
+                     const sasToken = url.split('?')[1];
+                     console.log('Generated SAS token:', sasToken);
+                     console.log('Full SAS URL:', url);
+                   } catch (err) {
+                     console.error('Error generating SAS token:', err);
+                   }
+                 }}
+               >
+                 Generate SAS Token
+               </button>
+             </>
            )}
          </div>
        ))}
-     </div>
-     {/* Debug button to generate SAS token */}
-     <div className="mt-4">
-       <button
-         type="button"
-         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-         onClick={async () => {
-           if (financialStatuses.length === 0 || !financialStatuses[0].storagePath) {
-             console.log('No financial status or storage path available');
-             return;
-           }
-           const fs = financialStatuses[0];
-           const parts = fs.storagePath.split("/");
-           const blobName = parts[parts.length - 1].split("?")[0];
-           try {
-             const url = await getViewUrl(blobName);
-             const sasToken = url.split('?')[1];
-             console.log('Generated SAS token:', sasToken);
-             console.log('Full SAS URL:', url);
-           } catch (err) {
-             console.error('Error generating SAS token:', err);
-           }
-         }}
-       >
-         Generate SAS Token
-       </button>
      </div>
    </div>
  );
