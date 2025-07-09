@@ -71,8 +71,8 @@ function FinancialStatusesDisplay({
 }) {
  if (financialStatuses.length === 0) return null;
 
- const handleViewAttachment = async (fs: DealFinancialStatus) => {
-   console.log('handleViewAttachment called', fs);
+ const handleViewAttachment123 = async (fs: DealFinancialStatus) => {
+   console.log('handleViewAttachment123 called', fs);
    if (!fs.storagePath) {
      console.log('No storage path found');
      return;
@@ -121,7 +121,7 @@ function FinancialStatusesDisplay({
                className="text-violet-700 underline hover:text-violet-900" 
                onClick={() => {
                  console.log('View button clicked for:', fs.storagePath);
-                 handleViewAttachment(fs);
+                 handleViewAttachment123(fs);
                }}
              >
                View Document Attachment
