@@ -45,16 +45,6 @@ async function getViewUrl(blobName: string) {
   return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
 }
 
-const handleViewDocument = async (doc: any) => {
-  try {
-    const blobName = `${doc.id.dealID},${doc.id.documentID}_${doc.documentName}`;
-    const url = await getViewUrl(blobName);
-    window.open(url, "_blank", "noopener,noreferrer");
-  } catch (error) {
-    console.error("Error viewing document:", error);
-  }
-};
-
 const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showForms }) => {
   const [form, setForm] = useState<typeof initialState>(initialState);
   const [loading, setLoading] = useState(false);
@@ -295,14 +285,26 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     }
   };
 
-  const handleView = async (storagePath: string) => {
+  // Unified view handler for collateral documents
+  const handleViewCollateral = async (storagePath: string) => {
     try {
       const parts = storagePath.split("/");
       const blobName = parts[parts.length - 1].split("?")[0];
       const url = await getViewUrl(blobName);
       window.open(url, '_blank', 'noopener,noreferrer');
     } catch (err) {
-      console.error("Error viewing document:", err);
+      console.error("Error viewing collateral document:", err);
+    }
+  };
+
+  // View handler for deal documents
+  const handleViewDocument = async (doc: any) => {
+    try {
+      const blobName = `${doc.id.dealID},${doc.id.documentID}_${doc.documentName}`;
+      const url = await getViewUrl(blobName);
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.error("Error viewing document:", error);
     }
   };
 
@@ -323,21 +325,13 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
                 )}
                 {collateral.storagePath && (
                   <span className="text-sm font-medium text-violet-900">
-                    <a
-                      href="#"
+                    <button
                       className="text-blue-600 underline"
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        const parts = collateral.storagePath.split("/");
-                        const blobName = parts[parts.length - 1].split("?")[0];
-                        const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
-                        const sasToken = await res.text();
-                        const url = `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
-                        window.open(url, "_blank", "noopener,noreferrer");
-                      }}
+                      onClick={() => handleViewCollateral(collateral.storagePath)}
+                      type="button"
                     >
                       View
-                    </a>
+                    </button>
                   </span>
                 )}
               </li>
