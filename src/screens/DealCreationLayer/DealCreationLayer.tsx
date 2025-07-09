@@ -124,7 +124,7 @@ function FinancialStatusesDisplay({
                  handleViewAttachment(fs);
                }}
              >
-               View Attachment
+               View Document Attachment
              </button>
            )}
          </div>
