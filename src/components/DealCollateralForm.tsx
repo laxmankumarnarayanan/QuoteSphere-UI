@@ -181,29 +181,13 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       
       // Upload file if provided
       if (collateralFile) {
-        console.log("Uploading file:", collateralFile.name);
         const blobName = `${dealId},${nextCollateralId}_${collateralFile.name}`;
         const sasToken = await getSasToken(blobName);
         storagePath = await uploadFileToAzure(collateralFile, blobName, sasToken);
-        console.log("File uploaded to:", storagePath);
       }
       
-      // Try different payload structures to see which one works
-      const payload1 = {
-        dealID: dealId,
-        collateralID: nextCollateralId,
-        collateralType: form.collateralType,
-        collateralValue: Number(form.collateralValue),
-        currency: form.currency,
-        description: form.description,
-        storagePath: storagePath,
-        createdBy: "system",
-        createdDateTime: new Date().toISOString(),
-        lastUpdatedBy: "system",
-        lastUpdatedDateTime: new Date().toISOString(),
-      };
-
-      const payload2 = {
+      // Use the correct payload structure (nested id)
+      const payload = {
         id: {
           dealID: dealId,
           collateralID: nextCollateralId
@@ -219,49 +203,21 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         lastUpdatedDateTime: new Date().toISOString(),
       };
       
-      console.log("Payload 1 (flat structure):", JSON.stringify(payload1, null, 2));
-      console.log("Payload 2 (nested id structure):", JSON.stringify(payload2, null, 2));
-      
-      // Try payload1 first
-      let response = await fetch(`${API_BASE_URL}/deal-collaterals`, {
+      const response = await fetch(`${API_BASE_URL}/deal-collaterals`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
-        body: JSON.stringify(payload1),
+        body: JSON.stringify(payload),
       });
       
-      console.log("Response status with payload1:", response.status);
-      
-      // If payload1 fails, try payload2
       if (!response.ok) {
-        console.log("Payload1 failed, trying payload2...");
-        response = await fetch(`${API_BASE_URL}/deal-collaterals`, {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify(payload2),
-        });
-        console.log("Response status with payload2:", response.status);
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
       
-      const responseText = await response.text();
-      console.log("Raw response:", responseText);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${responseText}`);
-      }
-      
-      let result;
-      try {
-        result = JSON.parse(responseText);
-      } catch {
-        result = responseText;
-      }
-      
+      const result = await response.json();
       console.log("Success response:", result);
       
       setSuccess(true);
@@ -269,7 +225,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       setCollateralFile(null);
       
     } catch (err: any) {
-      console.error("Full error:", err);
+      console.error("Error saving collateral:", err);
       setError(err.message || "Failed to save DealCollateral.");
     } finally {
       setLoading(false);
@@ -311,20 +267,19 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         lastUpdatedDateTime: new Date().toISOString(),
       };
       
-      console.log("Document payload:", JSON.stringify(payload, null, 2));
-      
       const res = await fetch(`${API_BASE_URL}/deal-documents`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       
-      const responseText = await res.text();
-      console.log("Document response:", responseText);
-      
       if (!res.ok) {
-        throw new Error(`Failed to save document metadata: ${responseText}`);
+        const errorText = await res.text();
+        throw new Error(`Failed to save document metadata: ${errorText}`);
       }
+      
+      const result = await res.json();
+      console.log("Document saved successfully:", result);
       
       setDocSuccess(true);
       setDocumentCategory("");
