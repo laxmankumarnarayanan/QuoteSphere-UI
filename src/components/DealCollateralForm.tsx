@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { saveDealCollateral, DealCollateral } from "../services/dealCollateralService";
 import SelectInput from "../template components/components/form/SelectInput";
 import { dealService } from "../services/dealService";
 import TextInput from "../template components/components/form/TextInput";
@@ -21,6 +20,13 @@ const initialState = {
 const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
 const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer";
 
+// Unified SAS token getter
+async function getSasToken(blobName: string) {
+  const res = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
+  if (!res.ok) throw new Error('Failed to get SAS token');
+  return await res.text();
+}
+
 // Unified file upload function
 async function uploadFileToAzure(file: File, blobName: string, sasToken: string) {
   const blobServiceClient = new BlobServiceClient(`${AZURE_CONTAINER_URL}?${sasToken}`);
@@ -32,13 +38,6 @@ async function uploadFileToAzure(file: File, blobName: string, sasToken: string)
   return `${AZURE_CONTAINER_URL}/${blobName}`;
 }
 
-// Unified SAS token getter
-async function getSasToken(blobName: string) {
-  const res = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
-  if (!res.ok) throw new Error('Failed to get SAS token');
-  return await res.text();
-}
-
 async function getViewUrl(blobName: string) {
   const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
   if (!res.ok) throw new Error('Failed to get view SAS token');
@@ -47,9 +46,13 @@ async function getViewUrl(blobName: string) {
 }
 
 const handleViewDocument = async (doc: any) => {
-  const blobName = `${doc.id.dealID},${doc.id.documentID}_${doc.documentName}`;
-  const url = await getViewUrl(blobName);
-  window.open(url, "_blank", "noopener,noreferrer");
+  try {
+    const blobName = `${doc.id.dealID},${doc.id.documentID}_${doc.documentName}`;
+    const url = await getViewUrl(blobName);
+    window.open(url, "_blank", "noopener,noreferrer");
+  } catch (error) {
+    console.error("Error viewing document:", error);
+  }
 };
 
 const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showForms }) => {
@@ -150,6 +153,20 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     }));
   };
 
+  const validateForm = () => {
+    const errors = [];
+    
+    if (!dealId) errors.push("Deal ID is required");
+    if (!form.collateralType) errors.push("Collateral Type is required");
+    if (!form.collateralValue || isNaN(Number(form.collateralValue))) errors.push("Valid Collateral Value is required");
+    if (!form.currency) errors.push("Currency is required");
+    if (!form.description) errors.push("Description is required");
+    
+    if (errors.length > 0) {
+      throw new Error("Validation errors: " + errors.join(", "));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -157,37 +174,102 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     setSuccess(false);
     
     try {
-      let storagePath = undefined;
+      // Validate form first
+      validateForm();
+      
+      let storagePath = null;
       
       // Upload file if provided
       if (collateralFile) {
+        console.log("Uploading file:", collateralFile.name);
         const blobName = `${dealId},${nextCollateralId}_${collateralFile.name}`;
         const sasToken = await getSasToken(blobName);
         storagePath = await uploadFileToAzure(collateralFile, blobName, sasToken);
+        console.log("File uploaded to:", storagePath);
       }
       
-      // Create the payload
-      const payload = {
+      // Try different payload structures to see which one works
+      const payload1 = {
         dealID: dealId,
         collateralID: nextCollateralId,
         collateralType: form.collateralType,
         collateralValue: Number(form.collateralValue),
         currency: form.currency,
         description: form.description,
-        storagePath,
-        createdBy: "", // You might want to get this from user context
+        storagePath: storagePath,
+        createdBy: "system",
         createdDateTime: new Date().toISOString(),
-        lastUpdatedBy: "", // You might want to get this from user context
+        lastUpdatedBy: "system",
         lastUpdatedDateTime: new Date().toISOString(),
       };
-     
-      await saveDealCollateral(payload);
+
+      const payload2 = {
+        id: {
+          dealID: dealId,
+          collateralID: nextCollateralId
+        },
+        collateralType: form.collateralType,
+        collateralValue: Number(form.collateralValue),
+        currency: form.currency,
+        description: form.description,
+        storagePath: storagePath,
+        createdBy: "system",
+        createdDateTime: new Date().toISOString(),
+        lastUpdatedBy: "system",
+        lastUpdatedDateTime: new Date().toISOString(),
+      };
+      
+      console.log("Payload 1 (flat structure):", JSON.stringify(payload1, null, 2));
+      console.log("Payload 2 (nested id structure):", JSON.stringify(payload2, null, 2));
+      
+      // Try payload1 first
+      let response = await fetch(`${API_BASE_URL}/deal-collaterals`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(payload1),
+      });
+      
+      console.log("Response status with payload1:", response.status);
+      
+      // If payload1 fails, try payload2
+      if (!response.ok) {
+        console.log("Payload1 failed, trying payload2...");
+        response = await fetch(`${API_BASE_URL}/deal-collaterals`, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(payload2),
+        });
+        console.log("Response status with payload2:", response.status);
+      }
+      
+      const responseText = await response.text();
+      console.log("Raw response:", responseText);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${responseText}`);
+      }
+      
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        result = responseText;
+      }
+      
+      console.log("Success response:", result);
+      
       setSuccess(true);
       setForm(initialState);
       setCollateralFile(null);
       
     } catch (err: any) {
-      console.error("Error saving collateral:", err);
+      console.error("Full error:", err);
       setError(err.message || "Failed to save DealCollateral.");
     } finally {
       setLoading(false);
@@ -223,11 +305,13 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         documentName: documentFile.name,
         description: documentDescription,
         storageFilePath: blobUrl,
-        createdBy: "",
+        createdBy: "system",
         createdDateTime: new Date().toISOString(),
-        lastUpdatedBy: "",
+        lastUpdatedBy: "system",
         lastUpdatedDateTime: new Date().toISOString(),
       };
+      
+      console.log("Document payload:", JSON.stringify(payload, null, 2));
       
       const res = await fetch(`${API_BASE_URL}/deal-documents`, {
         method: "POST",
@@ -235,9 +319,11 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         body: JSON.stringify(payload),
       });
       
+      const responseText = await res.text();
+      console.log("Document response:", responseText);
+      
       if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Failed to save document metadata: ${errorText}`);
+        throw new Error(`Failed to save document metadata: ${responseText}`);
       }
       
       setDocSuccess(true);
@@ -273,7 +359,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
           <div className="font-semibold text-violet-800 mb-2">Added Collaterals:</div>
           <ul className="space-y-2">
             {addedCollaterals.map((collateral, idx) => (
-              <li key={collateral.id.dealID + '-' + collateral.id.collateralID} className="flex gap-6 items-center">
+              <li key={collateral.id?.dealID + '-' + collateral.id?.collateralID || idx} className="flex gap-6 items-center">
                 <span className="text-sm font-medium text-violet-900">Type: <span className="font-normal text-slate-800">{collateral.collateralType}</span></span>
                 <span className="text-sm font-medium text-violet-900">Value: <span className="font-normal text-slate-800">{collateral.collateralValue}</span></span>
                 <span className="text-sm font-medium text-violet-900">Currency: <span className="font-normal text-slate-800">{collateral.currency}</span></span>
@@ -303,7 +389,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
           <div className="font-semibold text-violet-800 mb-2">Added Documents:</div>
           <ul className="space-y-2">
             {addedDocuments.map((doc, idx) => (
-              <li key={doc.id.dealID + '-' + doc.id.documentID} className="flex gap-6 items-center">
+              <li key={doc.id?.dealID + '-' + doc.id?.documentID || idx} className="flex gap-6 items-center">
                 <span className="text-sm font-medium text-violet-900">Category: <span className="font-normal text-slate-800">{doc.documentCategory}</span></span>
                 <span className="text-sm font-medium text-violet-900">Type: <span className="font-normal text-slate-800">{doc.documentType}</span></span>
                 <span className="text-sm font-medium text-violet-900">Name: <span className="font-normal text-slate-800">{doc.documentName}</span></span>
@@ -378,7 +464,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
                 Add
               </SecondaryButton>
             </div>
-            {error && <div className="text-red-600">{error}</div>}
+            {error && <div className="text-red-600 mt-2">{error}</div>}
+            {success && <div className="text-green-600 mt-2">Collateral added successfully!</div>}
           </form>
 
           {/* Documentation Section */}
@@ -431,7 +518,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
                 Save Document
               </SecondaryButton>
             </div>
-            {docError && <div className="text-red-600">{docError}</div>}
+            {docError && <div className="text-red-600 mt-2">{docError}</div>}
+            {docSuccess && <div className="text-green-600 mt-2">Document saved successfully!</div>}
           </form>
         </>
       )}
