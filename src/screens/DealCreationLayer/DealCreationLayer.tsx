@@ -114,24 +114,6 @@ function FinancialStatusesDisplay({
                >
                  View Attachment
                </button>
-               <button
-                 type="button"
-                 className="ml-4 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                 onClick={async () => {
-                   const parts = fs.storagePath.split("/");
-                   const blobName = parts[parts.length - 1].split("?")[0];
-                   try {
-                     const url = await getViewUrl(blobName);
-                     const sasToken = url.split('?')[1];
-                     console.log('Generated SAS token:', sasToken);
-                     console.log('Full SAS URL:', url);
-                   } catch (err) {
-                     console.error('Error generating SAS token:', err);
-                   }
-                 }}
-               >
-                 Generate SAS Token
-               </button>
              </>
            )}
          </div>
