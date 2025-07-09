@@ -62,6 +62,7 @@ function DealDetailsContainer({ deal }: { deal: Deal | null }) {
 const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
 const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer";
 
+
 async function getViewUrl(blobName: string) {
   const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
   const sasToken = await res.text();
@@ -72,9 +73,12 @@ function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: De
   if (financialStatuses.length === 0) return null;
 
   const handleViewAttachment = async (fs: DealFinancialStatus) => {
-    if (!fs.storagePath) return;
+    if (!fs.dealID || !fs.year || !fs.storagePath) return;
+    // Extract filename from storagePath
     const parts = fs.storagePath.split("/");
-    const blobName = parts[parts.length - 1].split("?")[0];
+    const fileName = parts[parts.length - 1].split("?")[0];
+    // Reconstruct blob name as it was during upload: dealId_year_filename
+    const blobName = `${fs.dealID}_${fs.year}_${fileName.split('_').slice(2).join('_')}`;
     const url = await getViewUrl(blobName);
     window.open(url, "_blank", "noopener,noreferrer");
   };
