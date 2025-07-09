@@ -142,15 +142,22 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     setError(null);
     setSuccess(false);
     try {
+      let storagePath = undefined;
+      if (selectedFile) {
+        const blobName = `${dealId},${nextCollateralId}_${selectedFile.name}`;
+        const sasRes = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
+        if (!sasRes.ok) throw new Error("Failed to get SAS token");
+        const sasToken = await sasRes.text();
+        storagePath = await uploadFileToAzure(selectedFile, blobName, sasToken);
+      }
       const payload = {
-        id: {
-          dealID: dealId,
-          collateralID: nextCollateralId,
-        },
+        dealID: dealId,
+        collateralID: nextCollateralId,
         collateralType: form.collateralType,
         collateralValue: Number(form.collateralValue),
         currency: form.currency,
         description: form.description,
+        storagePath,
         createdBy: "",
         createdDateTime: new Date().toISOString(),
         lastUpdatedBy: "",
@@ -160,8 +167,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       await saveDealCollateral(payload);
       setSuccess(true);
       setForm(initialState);
-      // Explicitly reset each field
-      setForm({ collateralType: "", currency: "", collateralValue: "0", description: "" });
+      setSelectedFile(null);
     } catch (err: any) {
       setError("Failed to save DealCollateral.");
     } finally {
@@ -188,7 +194,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       if (!sasRes.ok) throw new Error("Failed to get SAS token");
       const sasToken = await sasRes.text();
       // 2. Upload to Azure
-      const blobUrl = await uploadFileToAzure(selectedFile, dealId, nextDocumentId, sasToken);
+      const blobUrl = await uploadFileToAzure(selectedFile, blobName, sasToken);
       // 3. Save metadata to backend
       const payload = {
         id: { dealID: dealId, documentID: nextDocumentId },
@@ -218,10 +224,6 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     } finally {
       setDocLoading(false);
     }
-  };
-
-  const handleFileChange = (collateralID: number, file: File | null) => {
-    setSelectedFiles(prev => ({ ...prev, [collateralID]: file }));
   };
 
   async function getSasToken(blobName: string) {
@@ -353,6 +355,11 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
               required
               placeholder="Enter description"
             />
+            <input
+              type="file"
+              onChange={e => setSelectedFile(e.target.files?.[0] || null)}
+              className="block mt-2 mb-2"
+            />
             <div className="flex gap-4 justify-end">
               <SecondaryButton type="submit" isLoading={loading} size="md">
                 Add
@@ -363,12 +370,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
           {success && (
             <div className="mt-4">
               <div className="font-semibold text-violet-800 mb-2">Upload Attachment for Last Added Collateral</div>
-              <input
-                type="file"
-                onChange={e => handleFileChange(nextCollateralId - 1, e.target.files?.[0] || null)}
-                className="block mt-2 mb-2"
-              />
-              {selectedFiles[nextCollateralId - 1] && (
+              {selectedFile && (
                 <button onClick={async () => {
                   const lastCollateral = addedCollaterals.find(c => c.id.collateralID === nextCollateralId - 1);
                   if (lastCollateral) await handleUpload({
@@ -415,7 +417,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
             <input
               type="file"
               accept=".pdf,.docx,.png"
-              onChange={handleFileChange}
+              onChange={e => setSelectedFile(e.target.files?.[0] || null)}
               required
               className="block mt-2 mb-2"
             />
