@@ -69,15 +69,10 @@ function FinancialStatusesDisplay({
  financialStatuses: DealFinancialStatus[];
  getViewUrl: (blobName: string) => Promise<string>;
 }) {
- console.log('FinancialStatusesDisplay rendered with:', financialStatuses);
- 
- if (financialStatuses.length === 0) {
-   console.log('No financial statuses to display');
-   return null;
- }
+ if (financialStatuses.length === 0) return null;
 
  const handleViewAttachment = async (fs: DealFinancialStatus) => {
-   console.log('Button clicked! Storage Path:', fs.storagePath);
+   console.log('handleViewAttachment called', fs);
    if (!fs.storagePath) {
      console.log('No storage path found');
      return;
@@ -89,11 +84,23 @@ function FinancialStatusesDisplay({
      const blobName = parts[parts.length - 1].split("?")[0];
      console.log('Extracted blob name:', blobName);
      
-     // Get the SAS token URL
-     const url = await getViewUrl(blobName);
-     console.log('Final URL with SAS:', url);
+     console.log('About to fetch SAS token for:', blobName);
+     const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
+     console.log('SAS response status:', res.status);
+     if (!res.ok) {
+       throw new Error(`Failed to get SAS token: ${res.status} ${res.statusText}`);
+     }
+     const sasToken = await res.text();
+     console.log('SAS Token received:', sasToken ? 'Yes' : 'No', sasToken.substring(0, 20) + '...');
      
-     window.open(url, "_blank", "noopener,noreferrer");
+     if (!sasToken) {
+       throw new Error('Empty SAS token received');
+     }
+     
+     const finalUrl = `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
+     console.log('Final URL constructed:', finalUrl);
+     
+     window.open(finalUrl, "_blank", "noopener,noreferrer");
    } catch (error) {
      console.error('Error viewing attachment:', error);
      alert('Failed to open document. Please try again.');
@@ -109,19 +116,16 @@ function FinancialStatusesDisplay({
            <span>Year: <span className="font-medium">{fs.year}</span></span>
            <span>Description: <span className="font-medium">{fs.description}</span></span>
            {fs.storagePath && (
-             <>
-               {console.log('Rendering view button for:', fs.storagePath)}
-               <button 
-                 type="button" 
-                 className="text-violet-700 underline hover:text-violet-900" 
-                 onClick={() => {
-                   console.log('View button clicked for:', fs.storagePath);
-                   handleViewAttachment(fs);
-                 }}
-               >
-                 View Attachment
-               </button>
-             </>
+             <button 
+               type="button" 
+               className="text-violet-700 underline hover:text-violet-900" 
+               onClick={() => {
+                 console.log('View button clicked for:', fs.storagePath);
+                 handleViewAttachment(fs);
+               }}
+             >
+               View Attachment
+             </button>
            )}
          </div>
        ))}
@@ -144,11 +148,6 @@ export const DealCreationLayer = (): JSX.Element => {
  }[]>([]);
  const [financialStatuses, setFinancialStatuses] = useState<DealFinancialStatus[]>([]);
  const [commitments, setCommitments] = useState<DealCommitment[]>([]);
-
- // Add console logging to verify financialStatuses state is populated
- React.useEffect(() => {
-   console.log('Financial statuses updated:', financialStatuses);
- }, [financialStatuses]);
 
  // Move getViewUrl function inside the component
  const getViewUrl = async (blobName: string) => {
