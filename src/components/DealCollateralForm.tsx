@@ -69,6 +69,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   const [addedDocuments, setAddedDocuments] = useState<any[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [docSuccess, setDocSuccess] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<Record<number, File | null>>({});
 
   useEffect(() => {
     setCollateralTypeLoading(true);
@@ -219,10 +220,36 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-    }
+  const handleFileChange = (collateralID: number, file: File | null) => {
+    setSelectedFiles(prev => ({ ...prev, [collateralID]: file }));
+  };
+
+  async function getSasToken(blobName: string) {
+    const res = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
+    if (!res.ok) throw new Error('Failed to get SAS token');
+    return await res.text();
+  }
+  async function uploadFileToAzure(file: File, blobName: string, sasToken: string) {
+    const blobServiceClient = new BlobServiceClient(`${AZURE_CONTAINER_URL}?${sasToken}`);
+    const containerClient = blobServiceClient.getContainerClient("");
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    await blockBlobClient.uploadBrowserData(file, { blobHTTPHeaders: { blobContentType: file.type } });
+    return `${AZURE_CONTAINER_URL}/${blobName}`;
+  }
+  const handleUpload = async (collateral: DealCollateral) => {
+    const file = selectedFiles[collateral.collateralID];
+    if (!file) return;
+    const blobName = `${collateral.dealID},${collateral.collateralID}_${file.name}`;
+    const sasToken = await getSasToken(blobName);
+    const storagePath = await uploadFileToAzure(file, blobName, sasToken);
+    // Optionally refresh data here
+  };
+  const handleView = async (storagePath: string) => {
+    const parts = storagePath.split("/");
+    const blobName = parts[parts.length - 1].split("?")[0];
+    const sasToken = await getSasToken(blobName);
+    const url = `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -239,6 +266,25 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
                 <span className="text-sm font-medium text-violet-900">Currency: <span className="font-normal text-slate-800">{collateral.currency}</span></span>
                 {collateral.description && (
                   <span className="text-sm font-medium text-violet-900">Description: <span className="font-normal text-slate-800">{collateral.description}</span></span>
+                )}
+                {collateral.storagePath && (
+                  <span className="text-sm font-medium text-violet-900">
+                    <button
+                      className="text-blue-600 underline"
+                      onClick={() => handleView(collateral.storagePath)}
+                      type="button"
+                    >
+                      View
+                    </button>
+                  </span>
+                )}
+                <input
+                  type="file"
+                  onChange={e => handleFileChange(collateral.collateralID, e.target.files?.[0] || null)}
+                  className="block mt-2 mb-2"
+                />
+                {selectedFiles[collateral.collateralID] && (
+                  <button onClick={() => handleUpload(collateral)}>Upload</button>
                 )}
               </li>
             ))}
