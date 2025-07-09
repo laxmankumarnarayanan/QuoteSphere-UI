@@ -69,6 +69,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   const [addedDocuments, setAddedDocuments] = useState<any[]>([]);
   const [collateralFile, setCollateralFile] = useState<File | null>(null);
   const [documentFile, setDocumentFile] = useState<File | null>(null);
+  const [docSuccess, setDocSuccess] = useState(false);
 
   useEffect(() => {
     setCollateralTypeLoading(true);
