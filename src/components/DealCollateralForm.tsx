@@ -67,9 +67,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   const [docError, setDocError] = useState<string | null>(null);
   const [nextDocumentId, setNextDocumentId] = useState<number>(1);
   const [addedDocuments, setAddedDocuments] = useState<any[]>([]);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [docSuccess, setDocSuccess] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState<Record<number, File | null>>({});
+  const [collateralFile, setCollateralFile] = useState<File | null>(null);
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
 
   useEffect(() => {
     setCollateralTypeLoading(true);
@@ -92,7 +91,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   useEffect(() => {
     async function fetchCurrentCollaterals() {
       try {
-        const res = await fetch(`${API_BASE_URL}/deal-collaterals/deal/${dealId}`);
+        const res = await fetch(`${API_BASE_URL}/deal-collateral/deal/${dealId}`);
         const data = await res.json();
         setAddedCollaterals(data);
         const maxId = data.reduce((max: number, c: any) => {
@@ -143,12 +142,12 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     setSuccess(false);
     try {
       let storagePath = undefined;
-      if (selectedFile) {
-        const blobName = `${dealId},${nextCollateralId}_${selectedFile.name}`;
+      if (collateralFile) {
+        const blobName = `${dealId},${nextCollateralId}_${collateralFile.name}`;
         const sasRes = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
         if (!sasRes.ok) throw new Error("Failed to get SAS token");
         const sasToken = await sasRes.text();
-        storagePath = await uploadFileToAzure(selectedFile, blobName, sasToken);
+        storagePath = await uploadFileToAzure(collateralFile, blobName, sasToken);
       }
       const payload = {
         dealID: dealId,
@@ -167,7 +166,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       await saveDealCollateral(payload);
       setSuccess(true);
       setForm(initialState);
-      setSelectedFile(null);
+      setCollateralFile(null);
     } catch (err: any) {
       setError("Failed to save DealCollateral.");
     } finally {
@@ -182,25 +181,25 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     setDocError(null);
     setDocSuccess(false);
     try {
-      if (!selectedFile) throw new Error("No file selected");
-      if (selectedFile.size > 10 * 1024 * 1024) throw new Error("File too large (max 10MB)");
+      if (!documentFile) throw new Error("No file selected");
+      if (documentFile.size > 10 * 1024 * 1024) throw new Error("File too large (max 10MB)");
       const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/png"];
-      if (!allowedTypes.includes(selectedFile.type)) {
+      if (!allowedTypes.includes(documentFile.type)) {
         throw new Error("Invalid file type. Only PDF, DOCX, PNG allowed.");
       }
       // 1. Get SAS token from backend
-      const blobName = `${dealId},${nextDocumentId}_${selectedFile.name}`;
+      const blobName = `${dealId},${nextDocumentId}_${documentFile.name}`;
       const sasRes = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
       if (!sasRes.ok) throw new Error("Failed to get SAS token");
       const sasToken = await sasRes.text();
       // 2. Upload to Azure
-      const blobUrl = await uploadFileToAzure(selectedFile, blobName, sasToken);
+      const blobUrl = await uploadFileToAzure(documentFile, blobName, sasToken);
       // 3. Save metadata to backend
       const payload = {
         id: { dealID: dealId, documentID: nextDocumentId },
         documentCategory,
         documentType,
-        documentName: selectedFile.name,
+        documentName: documentFile.name,
         description: documentDescription,
         storageFilePath: blobUrl,
         createdBy: "",
@@ -218,7 +217,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       setDocumentCategory("");
       setDocumentType("");
       setDocumentDescription("");
-      setSelectedFile(null);
+      setDocumentFile(null);
     } catch (err: any) {
       setDocError(err.message || "Failed to save document.");
     } finally {
@@ -239,7 +238,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     return `${AZURE_CONTAINER_URL}/${blobName}`;
   }
   const handleUpload = async (collateral: DealCollateral) => {
-    const file = selectedFiles[collateral.collateralID];
+    const file = collateralFile; // Use collateralFile state
     if (!file) return;
     const blobName = `${collateral.dealID},${collateral.collateralID}_${file.name}`;
     const sasToken = await getSasToken(blobName);
@@ -357,7 +356,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
             />
             <input
               type="file"
-              onChange={e => setSelectedFile(e.target.files?.[0] || null)}
+              onChange={e => setCollateralFile(e.target.files?.[0] || null)}
               className="block mt-2 mb-2"
             />
             <div className="flex gap-4 justify-end">
@@ -370,7 +369,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
           {success && (
             <div className="mt-4">
               <div className="font-semibold text-violet-800 mb-2">Upload Attachment for Last Added Collateral</div>
-              {selectedFile && (
+              {collateralFile && (
                 <button onClick={async () => {
                   const lastCollateral = addedCollaterals.find(c => c.id.collateralID === nextCollateralId - 1);
                   if (lastCollateral) await handleUpload({
@@ -417,13 +416,13 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
             <input
               type="file"
               accept=".pdf,.docx,.png"
-              onChange={e => setSelectedFile(e.target.files?.[0] || null)}
+              onChange={e => setDocumentFile(e.target.files?.[0] || null)}
               required
               className="block mt-2 mb-2"
             />
-            {selectedFile && (
+            {documentFile && (
               <div className="text-sm text-slate-700 mb-2">
-                {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                {documentFile.name} ({(documentFile.size / 1024 / 1024).toFixed(2)} MB)
               </div>
             )}
             <div className="flex gap-4 justify-end">
