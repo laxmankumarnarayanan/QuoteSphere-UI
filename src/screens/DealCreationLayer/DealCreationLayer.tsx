@@ -69,7 +69,12 @@ function FinancialStatusesDisplay({
  financialStatuses: DealFinancialStatus[];
  getViewUrl: (blobName: string) => Promise<string>;
 }) {
- if (financialStatuses.length === 0) return null;
+ console.log('FinancialStatusesDisplay rendered with:', financialStatuses);
+ 
+ if (financialStatuses.length === 0) {
+   console.log('No financial statuses to display');
+   return null;
+ }
 
  const handleViewAttachment = async (fs: DealFinancialStatus) => {
    console.log('Button clicked! Storage Path:', fs.storagePath);
@@ -104,16 +109,19 @@ function FinancialStatusesDisplay({
            <span>Year: <span className="font-medium">{fs.year}</span></span>
            <span>Description: <span className="font-medium">{fs.description}</span></span>
            {fs.storagePath && (
-             <button 
-               type="button" 
-               className="text-violet-700 underline hover:text-violet-900" 
-               onClick={() => {
-                 console.log('View button clicked for:', fs.storagePath);
-                 handleViewAttachment(fs);
-               }}
-             >
-               View Attachment
-             </button>
+             <>
+               {console.log('Rendering view button for:', fs.storagePath)}
+               <button 
+                 type="button" 
+                 className="text-violet-700 underline hover:text-violet-900" 
+                 onClick={() => {
+                   console.log('View button clicked for:', fs.storagePath);
+                   handleViewAttachment(fs);
+                 }}
+               >
+                 View Attachment
+               </button>
+             </>
            )}
          </div>
        ))}
@@ -136,6 +144,11 @@ export const DealCreationLayer = (): JSX.Element => {
  }[]>([]);
  const [financialStatuses, setFinancialStatuses] = useState<DealFinancialStatus[]>([]);
  const [commitments, setCommitments] = useState<DealCommitment[]>([]);
+
+ // Add console logging to verify financialStatuses state is populated
+ React.useEffect(() => {
+   console.log('Financial statuses updated:', financialStatuses);
+ }, [financialStatuses]);
 
  // Move getViewUrl function inside the component
  const getViewUrl = async (blobName: string) => {
