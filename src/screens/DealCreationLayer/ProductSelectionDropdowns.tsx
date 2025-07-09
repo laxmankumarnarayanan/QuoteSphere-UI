@@ -58,6 +58,23 @@ async function uploadFileToAzure(file: File, dealId: string, year: string, sasTo
   return `${AZURE_CONTAINER_URL}/${blobName}`;
 }
 
+async function getViewUrl(blobName: string) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
+    if (!res.ok) {
+      throw new Error(`Failed to get SAS token: ${res.status} ${res.statusText}`);
+    }
+    const sasToken = await res.text();
+    if (!sasToken) {
+      throw new Error('Empty SAS token received');
+    }
+    return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
+  } catch (error) {
+    console.error('Error getting SAS token:', error);
+    throw error;
+  }
+}
+
 interface ProductSubproductSectionProps {
   combo: {
     productId: string;
@@ -294,7 +311,23 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
                   <span>Year: <span className="font-medium">{fs.year}</span></span>
                   <span>Description: <span className="font-medium">{fs.description}</span></span>
                   {fs.storagePath && (
-                    <button type="button" className="text-violet-700 underline" onClick={() => window.open(fs.storagePath, '_blank')}>View Attachment</button>
+                    <button
+                      type="button"
+                      className="text-violet-700 underline hover:text-violet-900"
+                      onClick={async () => {
+                        try {
+                          const parts = fs.storagePath.split("/");
+                          const blobName = parts[parts.length - 1].split("?")[0];
+                          const url = await getViewUrl(blobName);
+                          console.log('Opening SAS-protected URL:', url);
+                          window.open(url, '_blank', 'noopener,noreferrer');
+                        } catch (error) {
+                          alert('Failed to open document. See console for details.');
+                        }
+                      }}
+                    >
+                      View Attachment
+                    </button>
                   )}
                 </li>
               ))}
