@@ -84,22 +84,9 @@ function FinancialStatusesDisplay({
      const blobName = parts[parts.length - 1].split("?")[0];
      console.log('Extracted blob name:', blobName);
      
-     console.log('About to fetch SAS token for:', blobName);
-     const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
-     console.log('SAS response status:', res.status);
-     if (!res.ok) {
-       throw new Error(`Failed to get SAS token: ${res.status} ${res.statusText}`);
-     }
-     const sasToken = await res.text();
-     console.log('SAS Token received:', sasToken ? 'Yes' : 'No', sasToken.substring(0, 20) + '...');
-     
-     if (!sasToken) {
-       throw new Error('Empty SAS token received');
-     }
-     
-     const finalUrl = `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
+     // Use the getViewUrl prop to get the final URL with SAS
+     const finalUrl = await getViewUrl(blobName);
      console.log('Final URL constructed:', finalUrl);
-     
      window.open(finalUrl, "_blank", "noopener,noreferrer");
    } catch (error) {
      console.error('Error viewing attachment:', error);
