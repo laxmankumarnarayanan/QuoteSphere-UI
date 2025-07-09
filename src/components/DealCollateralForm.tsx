@@ -278,14 +278,6 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
                     </button>
                   </span>
                 )}
-                <input
-                  type="file"
-                  onChange={e => handleFileChange(collateral.collateralID, e.target.files?.[0] || null)}
-                  className="block mt-2 mb-2"
-                />
-                {selectedFiles[collateral.collateralID] && (
-                  <button onClick={() => handleUpload(collateral)}>Upload</button>
-                )}
               </li>
             ))}
           </ul>
@@ -368,6 +360,30 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
             </div>
             {error && <div className="text-red-600">{error}</div>}
           </form>
+          {success && (
+            <div className="mt-4">
+              <div className="font-semibold text-violet-800 mb-2">Upload Attachment for Last Added Collateral</div>
+              <input
+                type="file"
+                onChange={e => handleFileChange(nextCollateralId - 1, e.target.files?.[0] || null)}
+                className="block mt-2 mb-2"
+              />
+              {selectedFiles[nextCollateralId - 1] && (
+                <button onClick={async () => {
+                  const lastCollateral = addedCollaterals.find(c => c.id.collateralID === nextCollateralId - 1);
+                  if (lastCollateral) await handleUpload({
+                    dealID: lastCollateral.id.dealID,
+                    collateralID: lastCollateral.id.collateralID,
+                    collateralType: lastCollateral.collateralType,
+                    collateralValue: lastCollateral.collateralValue,
+                    currency: lastCollateral.currency,
+                    description: lastCollateral.description,
+                    storagePath: lastCollateral.storagePath,
+                  });
+                }}>Upload</button>
+              )}
+            </div>
+          )}
           {/* Documentation Section */}
           <form onSubmit={handleSaveDocument} className="space-y-4 p-4 border rounded">
             <div className="font-semibold text-violet-800 mb-2">Documentation</div>
