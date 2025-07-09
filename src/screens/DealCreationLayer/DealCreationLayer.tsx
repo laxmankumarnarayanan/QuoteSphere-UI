@@ -64,10 +64,23 @@ const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage.blob.core.windows.n
 
 
 async function getViewUrl(blobName: string) {
-  const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
-  const sasToken = await res.text();
-  console.log('SAS Token:', sasToken);
-  return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
+  try {
+    const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
+    if (!res.ok) {
+      throw new Error(`Failed to get SAS token: ${res.status} ${res.statusText}`);
+    }
+    const sasToken = await res.text();
+    console.log('SAS Token received:', sasToken ? 'Yes' : 'No');
+    
+    if (!sasToken) {
+      throw new Error('Empty SAS token received');
+    }
+    
+    return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
+  } catch (error) {
+    console.error('Error getting SAS token:', error);
+    throw error;
+  }
 }
 
 function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: DealFinancialStatus[] }) {
@@ -75,12 +88,22 @@ function FinancialStatusesDisplay({ financialStatuses }: { financialStatuses: De
 
   const handleViewAttachment = async (fs: DealFinancialStatus) => {
     if (!fs.storagePath) return;
-    // Extract the exact blob name from the stored storagePath
-    console.log('Storage Path:', fs.storagePath);
-    const parts = fs.storagePath.split("/");
-    const blobName = parts[parts.length - 1].split("?")[0];
-    const url = await getViewUrl(blobName);
-    window.open(url, "_blank", "noopener,noreferrer");
+    try {
+      // Extract the exact blob name from the stored storagePath
+      console.log('Storage Path:', fs.storagePath);
+      const parts = fs.storagePath.split("/");
+      const blobName = parts[parts.length - 1].split("?")[0];
+      console.log('Extracted blob name:', blobName);
+      
+      // Get the SAS token URL
+      const url = await getViewUrl(blobName);
+      console.log('Final URL with SAS:', url);
+      
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.error('Error viewing attachment:', error);
+      alert('Failed to open document. Please try again.');
+    }
   };
 
   return (
