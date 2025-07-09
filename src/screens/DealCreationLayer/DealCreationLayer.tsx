@@ -66,6 +66,7 @@ const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage.blob.core.windows.n
 async function getViewUrl(blobName: string) {
   const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
   const sasToken = await res.text();
+  console.log('SAS Token:', sasToken);
   return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
 }
 
