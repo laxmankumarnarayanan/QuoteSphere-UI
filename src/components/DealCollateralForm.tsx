@@ -323,13 +323,21 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
                 )}
                 {collateral.storagePath && (
                   <span className="text-sm font-medium text-violet-900">
-                    <button
+                    <a
+                      href="#"
                       className="text-blue-600 underline"
-                      onClick={() => handleView(collateral.storagePath)}
-                      type="button"
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        const parts = collateral.storagePath.split("/");
+                        const blobName = parts[parts.length - 1].split("?")[0];
+                        const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
+                        const sasToken = await res.text();
+                        const url = `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
+                        window.open(url, "_blank", "noopener,noreferrer");
+                      }}
                     >
                       View
-                    </button>
+                    </a>
                   </span>
                 )}
               </li>
