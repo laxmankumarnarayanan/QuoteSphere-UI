@@ -18,14 +18,11 @@ const initialState = {
   description: "",
 };
 
-const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api'; // Replace with your actual Azure backend URL if different
-
-// Example values (replace with your actual values or get from backend)
+const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
 const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer";
-//const SAS_TOKEN = "<YOUR_SAS_TOKEN>"; // Get this from your backend for each upload
 
-async function uploadFileToAzure(file: File, dealId: string, documentId: number, sasToken: string) {
-  const blobName = `${dealId},${documentId}_${file.name}`;
+// Unified file upload function
+async function uploadFileToAzure(file: File, blobName: string, sasToken: string) {
   const blobServiceClient = new BlobServiceClient(`${AZURE_CONTAINER_URL}?${sasToken}`);
   const containerClient = blobServiceClient.getContainerClient("");
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
@@ -35,8 +32,16 @@ async function uploadFileToAzure(file: File, dealId: string, documentId: number,
   return `${AZURE_CONTAINER_URL}/${blobName}`;
 }
 
+// Unified SAS token getter
+async function getSasToken(blobName: string) {
+  const res = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
+  if (!res.ok) throw new Error('Failed to get SAS token');
+  return await res.text();
+}
+
 async function getViewUrl(blobName: string) {
   const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
+  if (!res.ok) throw new Error('Failed to get view SAS token');
   const sasToken = await res.text();
   return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
 }
@@ -75,17 +80,22 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     setCollateralTypeLoading(true);
     dealService.getDropdownValues("DealCollateral", "CollateralType")
       .then(values => setCollateralTypeOptions(values.map(v => ({ value: v, label: v }))))
+      .catch(err => console.error("Error loading collateral types:", err))
       .finally(() => setCollateralTypeLoading(false));
 
     setCurrencyLoading(true);
     dealService.getDropdownValues("DealCollateral", "Currency")
       .then(values => setCurrencyOptions(values.map(v => ({ value: v, label: v }))))
+      .catch(err => console.error("Error loading currencies:", err))
       .finally(() => setCurrencyLoading(false));
 
     dealService.getDropdownValues("DealDocuments", "DocumentCategory")
-      .then(values => setDocumentCategoryOptions(values.map(v => ({ value: v, label: v }))));
+      .then(values => setDocumentCategoryOptions(values.map(v => ({ value: v, label: v }))))
+      .catch(err => console.error("Error loading document categories:", err));
+      
     dealService.getDropdownValues("DealDocuments", "DocumentType")
-      .then(values => setDocumentTypeOptions(values.map(v => ({ value: v, label: v }))));
+      .then(values => setDocumentTypeOptions(values.map(v => ({ value: v, label: v }))))
+      .catch(err => console.error("Error loading document types:", err));
   }, []);
 
   // Fetch current collaterals for this deal to determine next CollateralID
@@ -93,6 +103,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     async function fetchCurrentCollaterals() {
       try {
         const res = await fetch(`${API_BASE_URL}/deal-collaterals/deal/${dealId}`);
+        if (!res.ok) throw new Error('Failed to fetch collaterals');
         const data = await res.json();
         setAddedCollaterals(data);
         const maxId = data.reduce((max: number, c: any) => {
@@ -100,7 +111,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
           return idVal > max ? idVal : max;
         }, 0);
         setNextCollateralId(maxId + 1);
-      } catch {
+      } catch (err) {
+        console.error("Error fetching collaterals:", err);
         setNextCollateralId(1);
         setAddedCollaterals([]);
       }
@@ -113,6 +125,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     async function fetchCurrentDocuments() {
       try {
         const res = await fetch(`${API_BASE_URL}/deal-documents/deal/${dealId}`);
+        if (!res.ok) throw new Error('Failed to fetch documents');
         const data = await res.json();
         setAddedDocuments(data);
         const maxId = data.reduce((max: number, d: any) => {
@@ -120,7 +133,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
           return idVal > max ? idVal : max;
         }, 0);
         setNextDocumentId(maxId + 1);
-      } catch {
+      } catch (err) {
+        console.error("Error fetching documents:", err);
         setNextDocumentId(1);
         setAddedDocuments([]);
       }
@@ -141,15 +155,18 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     setLoading(true);
     setError(null);
     setSuccess(false);
+    
     try {
       let storagePath = undefined;
+      
+      // Upload file if provided
       if (collateralFile) {
         const blobName = `${dealId},${nextCollateralId}_${collateralFile.name}`;
-        const sasRes = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
-        if (!sasRes.ok) throw new Error("Failed to get SAS token");
-        const sasToken = await sasRes.text();
+        const sasToken = await getSasToken(blobName);
         storagePath = await uploadFileToAzure(collateralFile, blobName, sasToken);
       }
+      
+      // Create the payload
       const payload = {
         dealID: dealId,
         collateralID: nextCollateralId,
@@ -158,9 +175,9 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         currency: form.currency,
         description: form.description,
         storagePath,
-        createdBy: "",
+        createdBy: "", // You might want to get this from user context
         createdDateTime: new Date().toISOString(),
-        lastUpdatedBy: "",
+        lastUpdatedBy: "", // You might want to get this from user context
         lastUpdatedDateTime: new Date().toISOString(),
       };
      
@@ -168,34 +185,37 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       setSuccess(true);
       setForm(initialState);
       setCollateralFile(null);
+      
     } catch (err: any) {
-      setError("Failed to save DealCollateral.");
+      console.error("Error saving collateral:", err);
+      setError(err.message || "Failed to save DealCollateral.");
     } finally {
       setLoading(false);
     }
   };
 
-  // --- Document save handler ---
+  // Document save handler
   const handleSaveDocument = async (e: React.FormEvent) => {
     e.preventDefault();
     setDocLoading(true);
     setDocError(null);
     setDocSuccess(false);
+    
     try {
       if (!documentFile) throw new Error("No file selected");
       if (documentFile.size > 10 * 1024 * 1024) throw new Error("File too large (max 10MB)");
+      
       const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/png"];
       if (!allowedTypes.includes(documentFile.type)) {
         throw new Error("Invalid file type. Only PDF, DOCX, PNG allowed.");
       }
-      // 1. Get SAS token from backend
+      
+      // Get SAS token and upload file
       const blobName = `${dealId},${nextDocumentId}_${documentFile.name}`;
-      const sasRes = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
-      if (!sasRes.ok) throw new Error("Failed to get SAS token");
-      const sasToken = await sasRes.text();
-      // 2. Upload to Azure
+      const sasToken = await getSasToken(blobName);
       const blobUrl = await uploadFileToAzure(documentFile, blobName, sasToken);
-      // 3. Save metadata to backend
+      
+      // Save metadata to backend
       const payload = {
         id: { dealID: dealId, documentID: nextDocumentId },
         documentCategory,
@@ -208,50 +228,41 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         lastUpdatedBy: "",
         lastUpdatedDateTime: new Date().toISOString(),
       };
+      
       const res = await fetch(`${API_BASE_URL}/deal-documents`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Failed to save document metadata");
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Failed to save document metadata: ${errorText}`);
+      }
+      
       setDocSuccess(true);
       setDocumentCategory("");
       setDocumentType("");
       setDocumentDescription("");
       setDocumentFile(null);
+      
     } catch (err: any) {
+      console.error("Error saving document:", err);
       setDocError(err.message || "Failed to save document.");
     } finally {
       setDocLoading(false);
     }
   };
 
-  async function getSasToken(blobName: string) {
-    const res = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
-    if (!res.ok) throw new Error('Failed to get SAS token');
-    return await res.text();
-  }
-  async function uploadFileToAzure(file: File, blobName: string, sasToken: string) {
-    const blobServiceClient = new BlobServiceClient(`${AZURE_CONTAINER_URL}?${sasToken}`);
-    const containerClient = blobServiceClient.getContainerClient("");
-    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-    await blockBlobClient.uploadBrowserData(file, { blobHTTPHeaders: { blobContentType: file.type } });
-    return `${AZURE_CONTAINER_URL}/${blobName}`;
-  }
-  const handleUpload = async (collateral: DealCollateral) => {
-    const file = collateralFile; // Use collateralFile state
-    if (!file) return;
-    const blobName = `${collateral.dealID},${collateral.collateralID}_${file.name}`;
-    const sasToken = await getSasToken(blobName);
-    const storagePath = await uploadFileToAzure(file, blobName, sasToken);
-    // Optionally refresh data here
-  };
   const handleView = async (storagePath: string) => {
-    const parts = storagePath.split("/");
-    const blobName = parts[parts.length - 1].split("?")[0];
-    const sasToken = await getSasToken(blobName);
-    const url = `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    try {
+      const parts = storagePath.split("/");
+      const blobName = parts[parts.length - 1].split("?")[0];
+      const url = await getViewUrl(blobName);
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (err) {
+      console.error("Error viewing document:", err);
+    }
   };
 
   return (
@@ -285,6 +296,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
           </ul>
         </div>
       )}
+
       {/* Added Documents Section */}
       {addedDocuments.length > 0 && (
         <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
@@ -312,7 +324,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
           </ul>
         </div>
       )}
-      {/* Collateral and Documentation Forms (conditionally rendered) */}
+
+      {/* Collateral and Documentation Forms */}
       {showForms !== false && (
         <>
           {/* Collateral Section */}
@@ -367,25 +380,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
             </div>
             {error && <div className="text-red-600">{error}</div>}
           </form>
-          {success && (
-            <div className="mt-4">
-              <div className="font-semibold text-violet-800 mb-2">Upload Attachment for Last Added Collateral</div>
-              {collateralFile && (
-                <button onClick={async () => {
-                  const lastCollateral = addedCollaterals.find(c => c.id.collateralID === nextCollateralId - 1);
-                  if (lastCollateral) await handleUpload({
-                    dealID: lastCollateral.id.dealID,
-                    collateralID: lastCollateral.id.collateralID,
-                    collateralType: lastCollateral.collateralType,
-                    collateralValue: lastCollateral.collateralValue,
-                    currency: lastCollateral.currency,
-                    description: lastCollateral.description,
-                    storagePath: lastCollateral.storagePath,
-                  });
-                }}>Upload</button>
-              )}
-            </div>
-          )}
+
           {/* Documentation Section */}
           <form onSubmit={handleSaveDocument} className="space-y-4 p-4 border rounded">
             <div className="font-semibold text-violet-800 mb-2">Documentation</div>
@@ -444,4 +439,4 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   );
 };
 
-export default DealCollateralForm; 
+export default DealCollateralForm;
