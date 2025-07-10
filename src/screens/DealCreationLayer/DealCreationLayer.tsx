@@ -132,6 +132,10 @@ export const DealCreationLayer = (): JSX.Element => {
  const [financialStatuses, setFinancialStatuses] = useState<DealFinancialStatus[]>([]);
  const [commitments, setCommitments] = useState<DealCommitment[]>([]);
 
+ // Collapsible state for Deal Details and Customer Details
+ const [dealDetailsCollapsed, setDealDetailsCollapsed] = useState(false);
+ const [customerDetailsCollapsed, setCustomerDetailsCollapsed] = useState(false);
+
  // Move getViewUrl function inside the component
  const getViewUrl = async (blobName: string) => {
    try {
@@ -316,8 +320,46 @@ export const DealCreationLayer = (): JSX.Element => {
 
        {currentStep === 2 && createdDeal && createdDeal.dealId && selectedCustomer && selectedCustomer.customer && selectedCustomer.customer.customerID && (
          <>
-           <DealDetailsContainer deal={createdDeal} />
-           <CustomerInfoBanner customer={selectedCustomer} />
+           {/* Collapsible Deal Details */}
+           <div className="mb-4">
+             <div
+               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               onClick={() => setDealDetailsCollapsed((prev) => !prev)}
+             >
+               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+                 Deal Details
+               </div>
+               <div className="flex items-center gap-2">
+                 {dealDetailsCollapsed ? (
+                   <span className="text-sm text-gray-700">Deal ID: <span className="font-semibold">{createdDeal.dealId}</span></span>
+                 ) : null}
+                 <span className={`transition-transform duration-200 ${dealDetailsCollapsed ? 'rotate-90' : ''}`}>▶</span>
+               </div>
+             </div>
+             {!dealDetailsCollapsed && (
+               <DealDetailsContainer deal={createdDeal} />
+             )}
+           </div>
+           {/* Collapsible Customer Details */}
+           <div className="mb-4">
+             <div
+               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               onClick={() => setCustomerDetailsCollapsed((prev) => !prev)}
+             >
+               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+                 Selected Customer Details
+               </div>
+               <div className="flex items-center gap-2">
+                 {customerDetailsCollapsed && selectedCustomer?.customer?.customerName ? (
+                   <span className="text-sm text-gray-700">Customer Name: <span className="font-semibold">{selectedCustomer.customer.customerName}</span></span>
+                 ) : null}
+                 <span className={`transition-transform duration-200 ${customerDetailsCollapsed ? 'rotate-90' : ''}`}>▶</span>
+               </div>
+             </div>
+             {!customerDetailsCollapsed && (
+               <CustomerInfoBanner customer={selectedCustomer} />
+             )}
+           </div>
            <ProductSelectionDropdowns 
              dealId={createdDeal.dealId} 
              customerId={selectedCustomer.customer.customerID}
