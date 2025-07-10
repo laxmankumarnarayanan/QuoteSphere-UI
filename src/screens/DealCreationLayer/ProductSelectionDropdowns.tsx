@@ -122,8 +122,6 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
         commitmentNumber={nextCommitmentNumber}
         onSave={commitment => onCommitmentSave(comboKey, commitment)}
       />
-      {/* Placeholder for additional form fields for this section */}
-      <div className="text-slate-700 text-sm italic">(Additional form fields go here for this DomainType/Product/SubProduct)</div>
     </div>
   );
 };
@@ -479,7 +477,6 @@ const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProdu
           Add
         </SecondaryButton>
       </div>
-      {success && <div className="text-green-600">Deal Commitment added successfully!</div>}
       {error && <div className="text-red-600">{error}</div>}
     </form>
   );
