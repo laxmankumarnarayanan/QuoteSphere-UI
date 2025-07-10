@@ -133,8 +133,8 @@ export const DealCreationLayer = (): JSX.Element => {
  const [commitments, setCommitments] = useState<DealCommitment[]>([]);
 
  // Collapsible state for Deal Details and Customer Details
- const [dealDetailsCollapsed, setDealDetailsCollapsed] = useState(false);
- const [customerDetailsCollapsed, setCustomerDetailsCollapsed] = useState(false);
+ const [dealDetailsCollapsed, setDealDetailsCollapsed] = useState(true);
+ const [customerDetailsCollapsed, setCustomerDetailsCollapsed] = useState(true);
 
  // Move getViewUrl function inside the component
  const getViewUrl = async (blobName: string) => {
