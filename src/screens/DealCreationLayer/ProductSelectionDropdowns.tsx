@@ -96,7 +96,7 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
         {combo.domainType || "Domain"} | - | {combo.productLabel} | - | {combo.subProductLabel}
       </div>
       {/* List of added DealCommitments for this combo */}
-      {combo.domainType === 'Trade Finance' && commitments.length > 0 && (
+      {commitments.length > 0 && (
         <div className="mb-4">
           <div className="font-semibold text-violet-700 mb-1">Added Commitments:</div>
           <ul className="space-y-1">
@@ -114,16 +114,14 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
           </ul>
         </div>
       )}
-      {/* DealCommitment form for Trade Finance */}
-      {combo.domainType === 'Trade Finance' && (
-        <DealCommitmentForm
-          dealId={dealId}
-          productId={combo.productId}
-          subProductId={combo.subProductId}
-          commitmentNumber={nextCommitmentNumber}
-          onSave={commitment => onCommitmentSave(comboKey, commitment)}
-        />
-      )}
+      {/* DealCommitment form for all combinations */}
+      <DealCommitmentForm
+        dealId={dealId}
+        productId={combo.productId}
+        subProductId={combo.subProductId}
+        commitmentNumber={nextCommitmentNumber}
+        onSave={commitment => onCommitmentSave(comboKey, commitment)}
+      />
       {/* Placeholder for additional form fields for this section */}
       <div className="text-slate-700 text-sm italic">(Additional form fields go here for this DomainType/Product/SubProduct)</div>
     </div>
