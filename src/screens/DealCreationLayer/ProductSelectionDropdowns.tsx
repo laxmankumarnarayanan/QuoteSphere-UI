@@ -426,6 +426,11 @@ const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProdu
       setCommitmentAmount('');
       setTenure('');
       setDescription('');
+      // Explicitly reset number fields to empty string to flush the form
+      const commitmentAmountInput = document.getElementById('commitmentAmount') as HTMLInputElement | null;
+      if (commitmentAmountInput) commitmentAmountInput.value = '';
+      const tenureInput = document.getElementById('tenure') as HTMLInputElement | null;
+      if (tenureInput) tenureInput.value = '';
       onSave(commitment);
     } catch (err: any) {
       setError('Failed to save Deal Commitment.');
