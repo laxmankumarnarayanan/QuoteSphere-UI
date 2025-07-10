@@ -166,7 +166,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
         </a>
         {hasSubItems && isExpanded && !isCollapsed && (
           <div className="mt-1">
-            {item.items.map((subItem, index) => (
+            {item.items?.map((subItem, index) => (
               <NavItem key={index} item={subItem} depth={depth + 1} />
             ))}
           </div>
@@ -202,14 +202,21 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
         </button>
 
         <div className="p-4 h-screen overflow-hidden">
-          <div className="flex items-center mb-8">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-orange-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm truncate">A</span>
-            </div>
+          <div className={`p-6 flex items-center ${isCollapsed ? "justify-center" : "gap-4"}`}>
+            <img 
+              className="w-12 h-12 flex-shrink-0" 
+              alt="HDFC Bank Logo" 
+              src="/Logo/HDFC Bank Logo.png" 
+            />
             {!isCollapsed && (
-              <span className="ml-3 text-xl font-semibold text-gray-900 dark:text-white">
-                App
-              </span>
+              <div className="flex flex-col">
+                <h2 className="font-['Archivo',Helvetica] font-bold text-[#171a1f] text-lg leading-7">
+                  Deal Desk
+                </h2>
+                <p className="font-['Inter',Helvetica] font-normal text-[#565e6c] text-xs leading-5">
+                  Nex-Gen Banking
+                </p>
+              </div>
             )}
           </div>
 
