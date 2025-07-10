@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SelectInput from "../template components/components/form/SelectInput";
 import { dealService } from "../services/dealService";
 import TextInput from "../template components/components/form/TextInput";
@@ -68,6 +68,10 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   const [collateralFile, setCollateralFile] = useState<File | null>(null);
   const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [docSuccess, setDocSuccess] = useState(false);
+
+  // Refs for file inputs
+  const collateralFileInputRef = useRef<HTMLInputElement | null>(null);
+  const documentFileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setCollateralTypeLoading(true);
@@ -213,6 +217,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       setSuccess(true);
       setForm(initialState);
       setCollateralFile(null);
+      if (collateralFileInputRef.current) collateralFileInputRef.current.value = "";
       
     } catch (err: any) {
       console.error("Error saving collateral:", err);
@@ -276,6 +281,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       setDocumentType("");
       setDocumentDescription("");
       setDocumentFile(null);
+      if (documentFileInputRef.current) documentFileInputRef.current.value = "";
       
     } catch (err: any) {
       console.error("Error saving document:", err);
@@ -413,6 +419,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
             />
             <input
               type="file"
+              ref={collateralFileInputRef}
               onChange={e => setCollateralFile(e.target.files?.[0] || null)}
               className="block mt-2 mb-2"
             />
@@ -455,6 +462,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
             <input
               type="file"
               accept=".pdf,.docx,.png"
+              ref={documentFileInputRef}
               onChange={e => setDocumentFile(e.target.files?.[0] || null)}
               required
               className="block mt-2 mb-2"
