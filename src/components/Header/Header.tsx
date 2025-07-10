@@ -24,6 +24,7 @@ const Header: React.FC<HeaderProps> = ({
           <span className="text-sm text-gray-600">{employeeId}</span>
           <span className="text-gray-400">|</span>
           <span className="text-sm text-gray-600">{userEmail}</span>
+          <span className="ml-4 text-sm font-semibold text-gray-800">Welcome, Laxman Narayanan</span>
         </div>
       </div>
       <div className="flex items-center space-x-6">
