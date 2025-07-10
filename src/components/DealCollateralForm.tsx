@@ -180,12 +180,10 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         storagePath = await uploadFileToAzure(collateralFile, blobName, sasToken);
       }
       
-      // Use the correct payload structure (nested id)
+      // Use a flat payload structure
       const payload = {
-        id: {
-          dealID: dealId,
-          collateralID: nextCollateralId
-        },
+        dealID: dealId,
+        collateralID: nextCollateralId,
         collateralType: form.collateralType,
         collateralValue: Number(form.collateralValue),
         currency: form.currency,
