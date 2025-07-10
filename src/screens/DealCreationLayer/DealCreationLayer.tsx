@@ -27,36 +27,30 @@ const stepsData = [
 ];
 
 function DealDetailsContainer({ deal }: { deal: Deal | null }) {
- if (!deal) return null;
- return (
-   <Card className="w-full shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] border-[#ebebea] mb-6">
-     <CardHeader className="px-4 py-[19px]">
-       <CardTitle className="font-semibold text-base text-[#242524] font-['Archivo',Helvetica]">
-         Deal Details
-       </CardTitle>
-     </CardHeader>
-     <CardContent className="px-4 py-4">
-       <dl className="divide-y divide-gray-200">
-         <div className="py-2 sm:grid sm:grid-cols-3 sm:gap-4">
-           <dt className="text-sm font-medium text-gray-500">Deal ID</dt>
-           <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{deal.dealId}</dd>
-         </div>
-         <div className="py-2 sm:grid sm:grid-cols-3 sm:gap-4">
-           <dt className="text-sm font-medium text-gray-500">Deal Status</dt>
-           <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{deal.dealStatus}</dd>
-         </div>
-         <div className="py-2 sm:grid sm:grid-cols-3 sm:gap-4">
-           <dt className="text-sm font-medium text-gray-500">Created DateTime</dt>
-           <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{deal.createdDateTime ? new Date(deal.createdDateTime).toLocaleString() : "-"}</dd>
-         </div>
-         <div className="py-2 sm:grid sm:grid-cols-3 sm:gap-4">
-           <dt className="text-sm font-medium text-gray-500">Created By</dt>
-           <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{deal.createdBy || deal.initiator || "-"}</dd>
-         </div>
-       </dl>
-     </CardContent>
-   </Card>
- );
+  if (!deal) return null;
+  return (
+    <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
+      <div className="font-semibold text-violet-800 mb-2 text-base font-['Archivo',Helvetica]">Deal Details</div>
+      <div className="space-y-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+          <span className="text-sm font-medium text-gray-500 w-32">Deal ID</span>
+          <span className="text-sm text-gray-900 font-medium">{deal.dealId}</span>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+          <span className="text-sm font-medium text-gray-500 w-32">Deal Status</span>
+          <span className="text-sm text-gray-900 font-medium">{deal.dealStatus}</span>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+          <span className="text-sm font-medium text-gray-500 w-32">Created DateTime</span>
+          <span className="text-sm text-gray-900 font-medium">{deal.createdDateTime ? new Date(deal.createdDateTime).toLocaleString() : "-"}</span>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+          <span className="text-sm font-medium text-gray-500 w-32">Created By</span>
+          <span className="text-sm text-gray-900 font-medium">{deal.createdBy || deal.initiator || "-"}</span>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
