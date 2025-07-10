@@ -1,107 +1,244 @@
 /**
- * Collapsible Sidebar Component
- * Contains navigation menu with QuoteSphere branding and collapsible functionality
+ * Sidebar.tsx
+ * A collapsible sidebar component with icons for navigation.
  */
-import { ChevronLeftIcon, ChevronRightIcon, LayoutDashboardIcon, SettingsIcon } from "lucide-react";
-import React, { useState } from "react";
-import { Button } from "../ui/button";
-import { Separator } from "../ui/separator";
+import React, { useState } from 'react';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  LayoutDashboard, 
+  Settings, 
+  Users, 
+  FileText, 
+  Folder 
+} from 'lucide-react';
+import { useEffect } from 'react';
 
-// Navigation menu items data
-const navigationItems = [
+interface NavItem {
+  icon: React.ReactNode;
+  label: string;
+  href: string;
+  items?: NavItem[];
+}
+
+const navigation: NavItem[] = [
   {
-    id: "dashboard",
-    label: "Dashboard",
-    icon: <LayoutDashboardIcon size={18} />,
-    active: true,
+    icon: <LayoutDashboard className="w-4 h-4" />,
+    label: 'Dashboard',
+    href: '/dashboard'
   },
   {
-    id: "settings",
-    label: "Settings",
-    icon: <SettingsIcon size={18} />,
-    active: false,
+    icon: <Folder className="w-4 h-4" />,
+    label: 'Projects',
+    href: '/projects',
+    items: [
+      { icon: <FileText className="w-4 h-4" />, label: 'Active', href: '/projects/active' },
+      { icon: <FileText className="w-4 h-4" />, label: 'Archived', href: '/projects/archived' }
+    ]
   },
+  {
+    icon: <Users className="w-4 h-4" />,
+    label: 'Team',
+    href: '/team'
+  },
+  {
+    icon: <Settings className="w-4 h-4" />,
+    label: 'Settings',
+    href: '/settings'
+  }
 ];
 
 interface SidebarProps {
-  className?: string;
+  onNavigate?: (path: { label: string; href: string }[]) => void;
 }
 
-export const Sidebar = ({ className = "" }: SidebarProps): JSX.Element => {
+const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  
+  // Track if we're in mobile/tablet view
+  const [isMobileView, setIsMobileView] = useState(false);
+  
+  // Handle responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setIsCollapsed(true);
+        setIsMobileView(true);
+      } else {
+        setIsMobileView(false);
+      }
+    };
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
+    // Set initial state
+    handleResize();
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Handle click outside to close sidebar on mobile/tablet
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!isMobileView) return;
+      
+      const target = e.target as HTMLElement;
+      const sidebar = document.getElementById('sidebar');
+      const toggleButton = document.getElementById('sidebar-toggle');
+      
+      if (!isCollapsed && 
+          sidebar && 
+          !sidebar.contains(target) && 
+          toggleButton && 
+          !toggleButton.contains(target)) {
+        setIsCollapsed(true);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isCollapsed, isMobileView]);
+
+  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
+
+  const toggleExpand = (label: string) => {
+    setExpandedItems(prev => 
+      prev.includes(label) 
+        ? prev.filter(item => item !== label)
+        : [...prev, label]
+    );
+  };
+
+  const NavItem = ({ item, depth = 0 }: { item: NavItem; depth?: number }) => {
+    const hasSubItems = item.items && item.items.length > 0;
+    const isExpanded = expandedItems.includes(item.label);
+
+    const handleClick = (e: React.MouseEvent) => {
+      e.preventDefault();
+      
+      if (hasSubItems) {
+        toggleExpand(item.label);
+        onNavigate?.([{ label: item.label, href: item.href }]);
+      } else {
+        const parentItem = navigation.find(navItem => 
+          navItem.items?.some(subItem => subItem.href === item.href)
+        );
+        
+        if (parentItem) {
+          onNavigate?.([
+            { label: parentItem.label, href: parentItem.href },
+            { label: item.label, href: item.href }
+          ]);
+        } else {
+          onNavigate?.([{ label: item.label, href: item.href }]);
+        }
+      }
+    };
+
+    return (
+      <>
+        <a
+          href={item.href}
+          className={`group flex items-center px-2 py-2 rounded-lg text-gray-700 dark:text-gray-200
+            hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200
+            ${depth > 0 ? 'ml-4' : ''}
+          `}
+          onClick={handleClick}
+        >
+          <span className="flex items-center min-w-[24px] justify-center">
+            {item.icon}
+            {!isCollapsed && (
+              <>
+                <span className="ml-3">{item.label}</span>
+                {hasSubItems && (
+                  <ChevronRight 
+                    className={`w-4 h-4 ml-auto transition-transform duration-200
+                      ${isExpanded ? 'transform rotate-90' : ''}
+                    `}
+                  />
+                )}
+              </>
+            )}
+          </span>
+        </a>
+        {hasSubItems && isExpanded && !isCollapsed && (
+          <div className="mt-1">
+            {item.items?.map((subItem, index) => (
+              <NavItem key={index} item={subItem} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </>
+    );
   };
 
   return (
-    <aside 
-      className={`fixed left-0 top-0 h-full bg-[#f8f9fa] border-r border-[#e5e7eb] shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] flex flex-col transition-all duration-300 z-50 ${
-        isCollapsed ? "w-16" : "w-[252px]"
-      } ${className}`}
-    >
-      {/* Toggle Button */}
-      <div className="absolute -right-3 top-6 z-10">
-        <Button
+    <>
+      <div 
+        className={`
+          fixed h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-30
+          transition-all duration-300 ease-in-out z-30
+          ${isCollapsed ? 'w-16' : 'w-64'}
+        `}
+        id="sidebar"
+      >
+        <button
           onClick={toggleSidebar}
-          variant="outline"
-          size="icon"
-          className="h-6 w-6 rounded-full bg-white border border-gray-300 shadow-sm hover:bg-gray-50"
+          id="sidebar-toggle"
+          className={`
+            absolute right-0 top-4 translate-x-1/2 p-1 bg-white dark:bg-gray-800 
+            border border-gray-200 dark:border-gray-700 rounded-full shadow-sm
+            ${isCollapsed || !isMobileView ? 'block' : 'hidden'}
+          `}
         >
           {isCollapsed ? (
-            <ChevronRightIcon className="h-3 w-3" />
+            <ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           ) : (
-            <ChevronLeftIcon className="h-3 w-3" />
+            <ChevronLeft className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           )}
-        </Button>
-      </div>
+        </button>
 
-      {/* Logo and Brand */}
-      <div className={`p-6 flex items-center ${isCollapsed ? "justify-center" : "gap-4"}`}>
-        <img 
-          className="w-12 h-12 flex-shrink-0" 
-          alt="HDFC Bank Logo" 
-          src="/Logo/HDFC Bank Logo.png" 
-        />
-        {!isCollapsed && (
-          <div className="flex flex-col">
-            <h2 className="font-['Archivo',Helvetica] font-bold text-[#171a1f] text-lg leading-7">
-              Deal Desk
-            </h2>
-            <p className="font-['Inter',Helvetica] font-normal text-[#565e6c] text-xs leading-5">
-              Nex-Gen Banking
-            </p>
+        <div className="p-4 h-screen overflow-hidden">
+          <div className={`p-6 flex items-center ${isCollapsed ? "justify-center" : "gap-4"}`}>
+            <img 
+              className="w-12 h-12 flex-shrink-0" 
+              alt="HDFC Bank Logo" 
+              src="/Logo/HDFC Bank Logo.png" 
+            />
+            {!isCollapsed && (
+              <div className="flex flex-col">
+                <h2 className="font-['Archivo',Helvetica] font-bold text-[#171a1f] text-lg leading-7">
+                  Deal Desk
+                </h2>
+                <p className="font-['Inter',Helvetica] font-normal text-[#565e6c] text-xs leading-5">
+                  Nex-Gen Banking
+                </p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      {/* Navigation Menu */}
-      <div className={`px-4 mt-4 ${isCollapsed ? "px-2" : ""}`}>
-        <nav className="space-y-2">
-          {navigationItems.map((item) => (
-            <Button
-              key={item.id}
-              variant={item.active ? "default" : "ghost"}
-              className={`w-full ${isCollapsed ? "justify-center px-0" : "justify-start"} rounded-2xl h-10 ${
-                item.active
-                  ? "bg-[#636ae8] text-white font-bold"
-                  : "text-[#565e6c] font-normal"
-              }`}
-              title={isCollapsed ? item.label : undefined}
-            >
-              <span className="w-6 h-6 flex items-center justify-center">
-                {item.icon}
-              </span>
-              {!isCollapsed && (
-                <span className="font-['Inter',Helvetica] text-sm leading-[22px] ml-2">
-                  {item.label}
-                </span>
-              )}
-            </Button>
-          ))}
-        </nav>
-        <Separator className={`my-4 bg-gray-200 ${isCollapsed ? "mx-2" : "mx-4"}`} />
+          <nav className={`space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)] ${isCollapsed ? 'w-8' : ''}`}>
+            {navigation.map((item, index) => (
+              <NavItem key={index} item={item} />
+            ))}
+          </nav>
+        </div>
       </div>
-    </aside>
+      <div className={`flex-shrink-0 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`} />
+      
+      {/* Overlay for mobile/tablet */}
+      {!isCollapsed && isMobileView && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-20"
+          onClick={() => setIsCollapsed(true)}
+        />
+      )}
+    </>
   );
 };
+
+export { Sidebar };
+export default Sidebar;

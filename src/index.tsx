@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { DealCreationLayer } from "./screens/DealCreationLayer/DealCreationLayer";
-import Layout from "./template components/components/layout/Layout";
+import Layout from "./components/Layout/Layout";
 
 // Breadcrumb data for the main layout
 const breadcrumbItems = [
