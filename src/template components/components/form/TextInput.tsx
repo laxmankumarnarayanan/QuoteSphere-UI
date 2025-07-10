@@ -34,8 +34,7 @@ const TextInput: React.FC<TextInputProps> = ({
   ...props
 }) => {
   const [focused, setFocused] = useState(false);
-  const [internalValue, setInternalValue] = useState(value || '');
-  const isActive = focused || internalValue.length > 0;
+  const isActive = focused || value.length > 0;
 
   const handleFocus = () => {
     setFocused(true);
@@ -49,7 +48,6 @@ const TextInput: React.FC<TextInputProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    setInternalValue(newValue);
     onChange?.(newValue);
   };
 
@@ -77,7 +75,7 @@ const TextInput: React.FC<TextInputProps> = ({
             {...props}
             id={id || label}
             type={type}
-            value={internalValue}
+            value={value}
             onChange={handleChange}
             onFocus={handleFocus}
             onBlur={handleBlur}
