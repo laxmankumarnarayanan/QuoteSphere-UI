@@ -60,13 +60,13 @@ export const Sidebar = ({ className = "" }: SidebarProps): JSX.Element => {
       <div className={`p-6 flex items-center ${isCollapsed ? "justify-center" : "gap-4"}`}>
         <img 
           className="w-12 h-12 flex-shrink-0" 
-          alt="QuoteSphere Logo" 
-          src="/image-1.png" 
+          alt="HDFC Bank Logo" 
+          src="/Logo/HDFC Bank Logo.png" 
         />
         {!isCollapsed && (
           <div className="flex flex-col">
             <h2 className="font-['Archivo',Helvetica] font-bold text-[#171a1f] text-lg leading-7">
-              QuoteSphere
+              Deal Desk
             </h2>
             <p className="font-['Inter',Helvetica] font-normal text-[#565e6c] text-xs leading-5">
               Nex-Gen Banking
