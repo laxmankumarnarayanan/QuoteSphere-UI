@@ -478,7 +478,14 @@ const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProdu
         placeholder="Enter description"
       />
       <div className="flex gap-4 justify-end">
-        <SecondaryButton type="submit" isLoading={loading} size="md">
+        <SecondaryButton 
+          type="submit" 
+          isLoading={loading} 
+          size="md"
+          disabled={
+            !currency || !commitmentAmount || !tenure || !description || loading
+          }
+        >
           Add
         </SecondaryButton>
       </div>
