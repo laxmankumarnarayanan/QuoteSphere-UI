@@ -95,25 +95,6 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
       <div className="font-semibold text-violet-800 mb-2">
         {combo.domainType || "Domain"} | - | {combo.productLabel} | - | {combo.subProductLabel}
       </div>
-      {/* List of added DealCommitments for this combo */}
-      {commitments.length > 0 && (
-        <div className="mb-4">
-          <div className="font-semibold text-violet-700 mb-1">Added Commitments:</div>
-          <ul className="space-y-1">
-            {commitments.map((c, i) => (
-              <li key={c.commitmentNumber} className="flex gap-6 items-center text-sm text-slate-800">
-                <span>Commitment #{c.commitmentNumber}:</span>
-                <span>Currency: <span className="font-medium">{c.currency}</span></span>
-                <span>Amount: <span className="font-medium">{c.commitmentAmount}</span></span>
-                <span>Tenure: <span className="font-medium">{c.tenure}</span></span>
-                {c.description && (
-                  <span>Description: <span className="font-medium">{c.description}</span></span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
       {/* DealCommitment form for all combinations */}
       <DealCommitmentForm
         dealId={dealId}
@@ -122,6 +103,25 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
         commitmentNumber={nextCommitmentNumber}
         onSave={commitment => onCommitmentSave(comboKey, commitment)}
       />
+      {/* Replicated Deal Commitments display */}
+      {commitments.length > 0 && (
+        <div className="mt-3 pl-4 border-l-2 border-violet-200">
+          <div className="font-medium text-violet-700 mb-1">Deal Commitments:</div>
+          <div className="space-y-1">
+            {commitments.map((commitment, index) => (
+              <div key={commitment.commitmentNumber} className="flex gap-4 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
+                <span>Commitment #{commitment.commitmentNumber}:</span>
+                <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
+                <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
+                <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
+                {commitment.description && (
+                  <span>Description: <span className="font-medium">{commitment.description}</span></span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
