@@ -5,17 +5,12 @@
 import React, { useState } from 'react';
 import { 
   ChevronLeft, 
-  ChevronRight, 
-  LayoutDashboard, 
-  Settings, 
-  Users, 
-  FileText, 
-  Folder 
+  ChevronRight
 } from 'lucide-react';
 import { useEffect } from 'react';
 
 interface NavItem {
-  icon: React.ReactNode;
+  icon: string;
   label: string;
   href: string;
   items?: NavItem[];
@@ -23,28 +18,39 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   {
-    icon: <LayoutDashboard className="w-4 h-4" />,
-    label: 'Dashboard',
-    href: '/dashboard'
+    icon: '/Handshake.png',
+    label: 'Deal Desk',
+    href: '/deal-desk'
   },
   {
-    icon: <Folder className="w-4 h-4" />,
-    label: 'Projects',
-    href: '/projects',
-    items: [
-      { icon: <FileText className="w-4 h-4" />, label: 'Active', href: '/projects/active' },
-      { icon: <FileText className="w-4 h-4" />, label: 'Archived', href: '/projects/archived' }
-    ]
+    icon: '/Exclusive Product.png',
+    label: 'Product Hub',
+    href: '/product-hub'
   },
   {
-    icon: <Users className="w-4 h-4" />,
-    label: 'Team',
-    href: '/team'
+    icon: '/Omnichannel.png',
+    label: 'Customer Tower',
+    href: '/customer-tower'
   },
   {
-    icon: <Settings className="w-4 h-4" />,
-    label: 'Settings',
-    href: '/settings'
+    icon: '/Group 3.png',
+    label: 'Contract Vault',
+    href: '/contract-vault'
+  },
+  {
+    icon: '/Service.png',
+    label: 'Service Pod',
+    href: '/service-pod'
+  },
+  {
+    icon: '/Web Analytics.png',
+    label: 'Analytics HQ',
+    href: '/analytics-hq'
+  },
+  {
+    icon: '/Group 4.png',
+    label: 'Alert Central',
+    href: '/alert-central'
   }
 ];
 
@@ -54,7 +60,6 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   
   // Track if we're in mobile/tablet view
   const [isMobileView, setIsMobileView] = useState(false);
@@ -104,74 +109,28 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  const toggleExpand = (label: string) => {
-    setExpandedItems(prev => 
-      prev.includes(label) 
-        ? prev.filter(item => item !== label)
-        : [...prev, label]
-    );
-  };
-
   const NavItem = ({ item, depth = 0 }: { item: NavItem; depth?: number }) => {
-    const hasSubItems = item.items && item.items.length > 0;
-    const isExpanded = expandedItems.includes(item.label);
-
     const handleClick = (e: React.MouseEvent) => {
       e.preventDefault();
-      
-      if (hasSubItems) {
-        toggleExpand(item.label);
-        onNavigate?.([{ label: item.label, href: item.href }]);
-      } else {
-        const parentItem = navigation.find(navItem => 
-          navItem.items?.some(subItem => subItem.href === item.href)
-        );
-        
-        if (parentItem) {
-          onNavigate?.([
-            { label: parentItem.label, href: parentItem.href },
-            { label: item.label, href: item.href }
-          ]);
-        } else {
-          onNavigate?.([{ label: item.label, href: item.href }]);
-        }
-      }
+      onNavigate?.([{ label: item.label, href: item.href }]);
     };
 
     return (
-      <>
-        <a
-          href={item.href}
-          className={`group flex items-center px-2 py-2 rounded-lg text-gray-700 dark:text-gray-200
-            hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200
-            ${depth > 0 ? 'ml-4' : ''}
-          `}
-          onClick={handleClick}
-        >
-          <span className="flex items-center min-w-[24px] justify-center">
-            {item.icon}
-            {!isCollapsed && (
-              <>
-                <span className="ml-3">{item.label}</span>
-                {hasSubItems && (
-                  <ChevronRight 
-                    className={`w-4 h-4 ml-auto transition-transform duration-200
-                      ${isExpanded ? 'transform rotate-90' : ''}
-                    `}
-                  />
-                )}
-              </>
-            )}
-          </span>
-        </a>
-        {hasSubItems && isExpanded && !isCollapsed && (
-          <div className="mt-1">
-            {item.items?.map((subItem, index) => (
-              <NavItem key={index} item={subItem} depth={depth + 1} />
-            ))}
-          </div>
-        )}
-      </>
+      <a
+        href={item.href}
+        className={`group flex items-center px-2 py-2 rounded-lg text-gray-700 dark:text-gray-200
+          hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200
+          ${depth > 0 ? 'ml-4' : ''}
+        `}
+        onClick={handleClick}
+      >
+        <span className="flex items-center min-w-[24px] justify-center">
+          <img src={item.icon} alt={item.label} className="w-4 h-4" />
+          {!isCollapsed && (
+            <span className="ml-3">{item.label}</span>
+          )}
+        </span>
+      </a>
     );
   };
 
