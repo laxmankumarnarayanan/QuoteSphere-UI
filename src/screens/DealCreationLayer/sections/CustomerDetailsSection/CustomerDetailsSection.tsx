@@ -76,7 +76,7 @@ export const CustomerDetailsSection = ({ selectedCustomer }: CustomerDetailsSect
           <Section title="Customer Information">
             <DetailItem label="Name" value={customer.customerName} />
             <DetailItem label="Customer ID" value={customer.customerCode} />
-            <DetailItem label="Industry" value={customer.industry} />
+            <DetailItem label="Industry Segment" value={customer.industry} />
             <DetailItem label="Region" value={customer.customerRegion} />
             <DetailItem label="Status" value={customer.customerStatus} />
             <DetailItem label="Risk Rating" value={customer.riskRating} />

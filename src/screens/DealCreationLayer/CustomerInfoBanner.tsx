@@ -19,7 +19,7 @@ export const CustomerInfoBanner: React.FC<CustomerInfoBannerProps> = ({ customer
     <div className="flex flex-wrap gap-6 items-center bg-violet-50 border border-violet-200 rounded-lg px-6 py-3 mb-6">
       <InfoItem label="Customer Name" value={c.customerName} />
       <InfoItem label="Customer ID" value={c.customerCode} />
-      <InfoItem label="Industry" value={c.industry} />
+      <InfoItem label="Industry Segment" value={c.industry} />
       <InfoItem label="Region" value={c.customerRegion} />
       <InfoItem label="Status" value={c.customerStatus} />
       <InfoItem label="Risk Rating" value={c.riskRating} />
