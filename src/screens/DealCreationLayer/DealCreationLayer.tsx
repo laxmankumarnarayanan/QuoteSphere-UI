@@ -168,7 +168,7 @@ export const DealCreationLayer = (): JSX.Element => {
  return (
    <div className="flex-1">
      {/* Progress Stepper */}
-     <div className="sticky top-0 z-10 bg-white border-b border-gray-200 py-4 flex justify-center px-4">
+     <div className="sticky top-16 z-10 bg-white border-b border-gray-200 py-4 flex justify-center px-4">
        {stepsData.map((step, index) => (
          <React.Fragment key={step.number}>
            <div className="flex flex-col items-center">
@@ -206,7 +206,7 @@ export const DealCreationLayer = (): JSX.Element => {
      </div>
 
      {/* Main Content - Conditionally render sections based on currentStep */}
-     <main className="mt-12 px-8">
+     <main className="px-8">
        {currentStep === 1 && (
          <div className="flex gap-6 mt-6">
            {/* Left Column - Search and Results */}
