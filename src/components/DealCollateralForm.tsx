@@ -8,6 +8,8 @@ import { BlobServiceClient } from "@azure/storage-blob";
 interface DealCollateralFormProps {
   dealId: string;
   showForms?: boolean;
+  showCollaterals?: boolean;
+  showDocuments?: boolean;
 }
 
 const initialState = {
@@ -45,7 +47,7 @@ async function getViewUrl(blobName: string) {
   return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
 }
 
-const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showForms }) => {
+const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showForms, showCollaterals = true, showDocuments = true }) => {
   const [form, setForm] = useState<typeof initialState>(initialState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -317,7 +319,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   return (
     <div>
       {/* Added Collaterals Section */}
-      {addedCollaterals.length > 0 && (
+      {showCollaterals && addedCollaterals.length > 0 && (
         <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
           <div className="font-semibold text-violet-800 mb-2">Added Collaterals:</div>
           <ul className="space-y-2">
@@ -347,7 +349,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       )}
 
       {/* Added Documents Section */}
-      {addedDocuments.length > 0 && (
+      {showDocuments && addedDocuments.length > 0 && (
         <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
           <div className="font-semibold text-violet-800 mb-2">Added Documents:</div>
           <ul className="space-y-2">
@@ -483,7 +485,6 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
               </SecondaryButton>
             </div>
             {docError && <div className="text-red-600 mt-2">{docError}</div>}
-            {docSuccess && <div className="text-green-600 mt-2">Document saved successfully!</div>}
           </form>
         </>
       )}

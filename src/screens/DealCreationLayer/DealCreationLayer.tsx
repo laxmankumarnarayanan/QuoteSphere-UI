@@ -78,6 +78,13 @@ export const DealCreationLayer = (): JSX.Element => {
  const [customerDetailsCollapsedDoc, setCustomerDetailsCollapsedDoc] = useState(true);
  const [comboCollapsedDoc, setComboCollapsedDoc] = useState<{ [key: string]: boolean }>({});
 
+ // Collapsible state for Pricing and Fees step
+ const [dealDetailsCollapsedPricing, setDealDetailsCollapsedPricing] = useState(true);
+ const [customerDetailsCollapsedPricing, setCustomerDetailsCollapsedPricing] = useState(true);
+ const [comboCollapsedPricing, setComboCollapsedPricing] = useState<{ [key: string]: boolean }>({});
+ const [collateralsCollapsedPricing, setCollateralsCollapsedPricing] = useState(true);
+ const [documentsCollapsedPricing, setDocumentsCollapsedPricing] = useState(true);
+
  const handleNext = async () => {
    if (currentStep === 3 && createdDeal && addedCombinations.length > 0) {
      try {
@@ -394,8 +401,47 @@ export const DealCreationLayer = (): JSX.Element => {
        )}
        {currentStep === 4 && (
          <>
-           <DealDetailsContainer deal={createdDeal} />
-           {selectedCustomer && <CustomerInfoBanner customer={selectedCustomer} />}
+           {/* Collapsible Deal Details */}
+           <div className="mb-4">
+             <div
+               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               onClick={() => setDealDetailsCollapsedPricing((prev) => !prev)}
+             >
+               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+                 Deal Details
+               </div>
+               <div className="flex items-center gap-2">
+                 {dealDetailsCollapsedPricing && createdDeal?.dealId ? (
+                   <span className="text-sm text-gray-700">Deal ID: <span className="font-semibold">{createdDeal.dealId}</span></span>
+                 ) : null}
+                 <span className={`transition-transform duration-200 ${dealDetailsCollapsedPricing ? 'rotate-90' : ''}`}>▶</span>
+               </div>
+             </div>
+             {!dealDetailsCollapsedPricing && (
+               <DealDetailsContainer deal={createdDeal} />
+             )}
+           </div>
+           {/* Collapsible Customer Details */}
+           <div className="mb-4">
+             <div
+               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               onClick={() => setCustomerDetailsCollapsedPricing((prev) => !prev)}
+             >
+               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+                 Selected Customer Details
+               </div>
+               <div className="flex items-center gap-2">
+                 {customerDetailsCollapsedPricing && selectedCustomer?.customer?.customerName ? (
+                   <span className="text-sm text-gray-700">Customer Name: <span className="font-semibold">{selectedCustomer.customer.customerName}</span></span>
+                 ) : null}
+                 <span className={`transition-transform duration-200 ${customerDetailsCollapsedPricing ? 'rotate-90' : ''}`}>▶</span>
+               </div>
+             </div>
+             {!customerDetailsCollapsedPricing && selectedCustomer && (
+               <CustomerInfoBanner customer={selectedCustomer} />
+             )}
+           </div>
+           {/* Collapsible Added Product-SubProduct Combinations */}
            {addedCombinations.length > 0 && (
              <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
                <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
@@ -405,14 +451,20 @@ export const DealCreationLayer = (): JSX.Element => {
                    const comboCommitments = commitments.filter(c => 
                      c.productID === combo.productId && c.subProductID === combo.subProductId
                    );
-                   
+                   const isCollapsed = comboCollapsedPricing[comboKey] ?? true;
                    return (
                      <div key={comboKey} className="bg-white p-3 rounded border">
-                       <div className="flex gap-6 items-center mb-2">
-                         <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
-                         <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                       <div
+                         className="flex items-center justify-between cursor-pointer select-none border-b pb-2 mb-2"
+                         onClick={() => setComboCollapsedPricing(prev => ({ ...prev, [comboKey]: !isCollapsed }))}
+                       >
+                         <div className="flex gap-6 items-center">
+                           <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                           <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                         </div>
+                         <span className={`transition-transform duration-200 ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
                        </div>
-                       {comboCommitments.length > 0 && (
+                       {!isCollapsed && comboCommitments.length > 0 && (
                          <div className="mt-3 pl-4 border-l-2 border-violet-200">
                            <div className="font-medium text-violet-700 mb-1">Deal Commitments:</div>
                            <div className="space-y-1">
@@ -436,10 +488,49 @@ export const DealCreationLayer = (): JSX.Element => {
                </div>
              </div>
            )}
-           {createdDeal && createdDeal.dealId && (
-             <DealCollateralForm dealId={createdDeal.dealId} showForms={false} />
-           )}
+           {/* Collapsible Collaterals */}
+           <div className="mb-4">
+             <div
+               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               onClick={() => setCollateralsCollapsedPricing((prev) => !prev)}
+             >
+               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+                 Collaterals
+               </div>
+               <div className="flex items-center gap-2">
+                 {collateralsCollapsedPricing && createdDeal?.dealId ? (
+                   <span className="text-sm text-gray-700">Deal ID: <span className="font-semibold">{createdDeal.dealId}</span></span>
+                 ) : null}
+                 <span className={`transition-transform duration-200 ${collateralsCollapsedPricing ? 'rotate-90' : ''}`}>▶</span>
+               </div>
+             </div>
+             {!collateralsCollapsedPricing && (
+               <DealCollateralForm dealId={createdDeal?.dealId || ''} showForms={false} showCollaterals={true} showDocuments={false} />
+             )}
+           </div>
+           {/* Collapsible Documents */}
+           <div className="mb-4">
+             <div
+               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               onClick={() => setDocumentsCollapsedPricing((prev) => !prev)}
+             >
+               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+                 Documents
+               </div>
+               <div className="flex items-center gap-2">
+                 {documentsCollapsedPricing && createdDeal?.dealId ? (
+                   <span className="text-sm text-gray-700">Deal ID: <span className="font-semibold">{createdDeal.dealId}</span></span>
+                 ) : null}
+                 <span className={`transition-transform duration-200 ${documentsCollapsedPricing ? 'rotate-90' : ''}`}>▶</span>
+               </div>
+             </div>
+             {!documentsCollapsedPricing && (
+               <DealCollateralForm dealId={createdDeal?.dealId || ''} showForms={false} showCollaterals={false} showDocuments={true} />
+             )}
+           </div>
+           {/* Pricing & Fees Table */}
            <DealPricingTable dealId={createdDeal?.dealId || ''} />
+           {/* Navigation Buttons for Pricing and Fees */}
            <div className="flex justify-end gap-4 mt-8">
              <SecondaryButton onClick={handleBack}>
                Back
@@ -496,10 +587,6 @@ export const DealCreationLayer = (): JSX.Element => {
            )}
            {createdDeal && createdDeal.dealId && (
              <DealCollateralForm dealId={createdDeal.dealId} showForms={false} />
-           )}
-           {/* Show Pricing & Fees Details table here as well */}
-           {createdDeal && createdDeal.dealId && (
-             <DealPricingTable dealId={createdDeal.dealId} />
            )}
            {createdDeal && createdDeal.dealId && (
              <SpecialConditionsSection dealId={createdDeal.dealId} />
