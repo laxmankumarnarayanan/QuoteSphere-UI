@@ -6,7 +6,6 @@ import React from 'react';
 import Sidebar from '../Sidebar/Sidebar';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
-import Breadcrumb from '../Breadcrumb/Breadcrumb';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -33,7 +32,6 @@ const Layout: React.FC<LayoutProps> = ({
         className="flex-1 flex flex-col transition-all duration-300 ease-in-out min-w-0 relative"
       >
         <Header />
-        <Breadcrumb items={currentBreadcrumb} />
         <main className="flex-1 p-6">
           {children}
         </main>
