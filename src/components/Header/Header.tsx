@@ -19,14 +19,19 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 h-16 flex items-center justify-between px-6 border-b border-gray-200 bg-white transition-all duration-300 ease-in-out z-20">
-      <div className="flex items-center space-x-6">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600">{employeeId}</span>
-          <span className="text-gray-400">|</span>
-          <span className="text-sm text-gray-600">{userEmail}</span>
-          <span className="ml-4 text-sm font-semibold text-gray-800">Welcome, Laxman Narayanan</span>
-        </div>
+      {/* Left section - Employee ID and Email */}
+      <div className="flex items-center space-x-2">
+        <span className="text-sm text-gray-600">{employeeId}</span>
+        <span className="text-gray-400">|</span>
+        <span className="text-sm text-gray-600">{userEmail}</span>
       </div>
+      
+      {/* Center section - Welcome text */}
+      <div className="flex-1 flex justify-center">
+        <span className="text-sm font-semibold text-gray-800">Welcome, Laxman Narayanan</span>
+      </div>
+      
+      {/* Right section - Manager View toggle and action buttons */}
       <div className="flex items-center space-x-6">
         <Toggle
           label="Manager View"
