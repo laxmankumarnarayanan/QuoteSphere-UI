@@ -105,7 +105,7 @@ export const CustomerSelectionSection = ({ onCustomerSelect, searchValue }: Cust
                     {customer.customerName}
                   </div>
                   <div className="font-normal text-xs text-[#8c8d8b] font-['Inter',Helvetica] leading-4 mt-1">
-                    CustomerID: {customer.customerCode}
+                    Customer ID: {customer.customerCode}
                   </div>
                   <div className="font-normal text-xs text-[#8c8d8b] font-['Inter',Helvetica] leading-4 mt-1">
                     Industry: {customer.industry}
