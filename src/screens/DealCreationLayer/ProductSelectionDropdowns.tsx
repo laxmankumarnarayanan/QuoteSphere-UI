@@ -92,11 +92,10 @@ interface ProductSubproductSectionProps {
 const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ combo, dealId, nextCommitmentNumber, onCommitmentSave, commitments }) => {
   const comboKey = combo.productId + '-' + combo.subProductId;
   const [deletingId, setDeletingId] = React.useState<number | null>(null);
+  const [editingCommitment, setEditingCommitment] = React.useState<DealCommitment | null>(null);
 
-  // Handler stubs for edit and delete
   const handleEditCommitment = (commitment: DealCommitment) => {
-    // TODO: Open edit modal or inline form
-    alert(`Edit commitment #${commitment.commitmentNumber}`);
+    setEditingCommitment(commitment);
   };
 
   const handleDeleteCommitment = async (commitment: DealCommitment) => {
@@ -104,20 +103,19 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
     setDeletingId(commitment.commitmentNumber!);
     try {
       await deleteDealCommitment(commitment.dealID, commitment.commitmentNumber!);
-      // Remove from UI (parent state update)
-      if (typeof window !== "undefined" && window.dispatchEvent) {
-        // Optionally, you can trigger a reload from parent if needed
-      }
-      // Remove from local list (if managed locally)
-      // This should be handled by parent via setCommitments after refetch, but for instant UI:
-      // setCommitments(prev => prev.filter(c => !(c.dealID === commitment.dealID && c.commitmentNumber === commitment.commitmentNumber)));
-      // If not, ask parent to reload commitments
       window.location.reload(); // Or trigger a refetch in parent
     } catch (err) {
       alert("Failed to delete commitment. Please try again.");
     } finally {
       setDeletingId(null);
     }
+  };
+
+  // Handler for saving (add or update)
+  const handleSave = async (commitment: DealCommitment, isEdit: boolean) => {
+    await saveDealCommitment(commitment);
+    setEditingCommitment(null);
+    window.location.reload(); // Or trigger a refetch in parent
   };
 
   return (
@@ -130,8 +128,11 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
         dealId={dealId}
         productId={combo.productId}
         subProductId={combo.subProductId}
-        commitmentNumber={nextCommitmentNumber}
-        onSave={commitment => onCommitmentSave(comboKey, commitment)}
+        commitmentNumber={editingCommitment ? editingCommitment.commitmentNumber! : nextCommitmentNumber}
+        onSave={commitment => handleSave(commitment, !!editingCommitment)}
+        initialData={editingCommitment || undefined}
+        isEdit={!!editingCommitment}
+        onCancelEdit={() => setEditingCommitment(null)}
       />
       {/* Replicated Deal Commitments display */}
       {commitments.length > 0 && (
@@ -147,7 +148,6 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
                 {commitment.description && (
                   <span>Description: <span className="font-medium">{commitment.description}</span></span>
                 )}
-                {/* Edit and Delete Icons */}
                 <Edit2Icon
                   className="w-4 h-4 text-blue-500 cursor-pointer"
                   onClick={() => handleEditCommitment(commitment)}
@@ -424,15 +424,40 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   );
 };
 
-const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProductId: string; commitmentNumber: number; onSave: (commitment: DealCommitment) => void }> = ({ dealId, productId, subProductId, commitmentNumber, onSave }) => {
-  const [currency, setCurrency] = useState('');
-  const [commitmentAmount, setCommitmentAmount] = useState('');
-  const [tenure, setTenure] = useState('');
-  const [description, setDescription] = useState('');
+const DealCommitmentForm: React.FC<{
+  dealId: string;
+  productId: string;
+  subProductId: string;
+  commitmentNumber: number;
+  onSave: (commitment: DealCommitment) => void;
+  initialData?: DealCommitment;
+  isEdit?: boolean;
+  onCancelEdit?: () => void;
+}> = ({
+  dealId,
+  productId,
+  subProductId,
+  commitmentNumber,
+  onSave,
+  initialData,
+  isEdit,
+  onCancelEdit
+}) => {
+  const [currency, setCurrency] = useState(initialData?.currency || '');
+  const [commitmentAmount, setCommitmentAmount] = useState(initialData?.commitmentAmount?.toString() || '');
+  const [tenure, setTenure] = useState(initialData?.tenure?.toString() || '');
+  const [description, setDescription] = useState(initialData?.description || '');
   const [currencyOptions, setCurrencyOptions] = useState<{ value: string; label: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCurrency(initialData?.currency || '');
+    setCommitmentAmount(initialData?.commitmentAmount?.toString() || '');
+    setTenure(initialData?.tenure?.toString() || '');
+    setDescription(initialData?.description || '');
+  }, [initialData]);
 
   useEffect(() => {
     translateFieldService.getDropdownValues('Currency')
@@ -454,9 +479,9 @@ const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProdu
       productID: productId,
       subProductID: subProductId,
       description,
-      createdBy: '',
-      createdDateTime: new Date().toISOString(),
-      lastUpdatedBy: '',
+      createdBy: initialData?.createdBy || '',
+      createdDateTime: initialData?.createdDateTime || new Date().toISOString(),
+      lastUpdatedBy: '', // You can set this as needed
       lastUpdatedDateTime: new Date().toISOString(),
     };
 
@@ -467,11 +492,6 @@ const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProdu
       setCommitmentAmount('');
       setTenure('');
       setDescription('');
-      // Explicitly reset number fields to empty string to flush the form
-      const commitmentAmountInput = document.getElementById('commitmentAmount') as HTMLInputElement | null;
-      if (commitmentAmountInput) commitmentAmountInput.value = '';
-      const tenureInput = document.getElementById('tenure') as HTMLInputElement | null;
-      if (tenureInput) tenureInput.value = '';
       onSave(commitment);
     } catch (err: any) {
       setError('Failed to save Deal Commitment.');
@@ -482,7 +502,7 @@ const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProdu
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded mb-4 bg-white">
-      <div className="font-semibold text-violet-700 mb-2">Deal Commitment</div>
+      <div className="font-semibold text-violet-700 mb-2">{isEdit ? "Edit Deal Commitment" : "Deal Commitment"}</div>
       <SelectInput
         id="currency"
         label="Currency"
@@ -519,6 +539,11 @@ const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProdu
         placeholder="Enter description"
       />
       <div className="flex gap-4 justify-end">
+        {isEdit && onCancelEdit && (
+          <SecondaryButton type="button" onClick={onCancelEdit}>
+            Cancel
+          </SecondaryButton>
+        )}
         <SecondaryButton 
           type="submit" 
           isLoading={loading} 
@@ -527,7 +552,7 @@ const DealCommitmentForm: React.FC<{ dealId: string; productId: string; subProdu
             !currency || !commitmentAmount || !tenure || !description || loading
           }
         >
-          Add
+          {isEdit ? "Update" : "Add"}
         </SecondaryButton>
       </div>
       {error && <div className="text-red-600">{error}</div>}
