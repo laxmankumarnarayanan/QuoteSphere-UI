@@ -125,6 +125,8 @@ export const CustomerDetailsSection = ({ selectedCustomer }: CustomerDetailsSect
                   <div><span className="font-medium">Account Status:</span> {account.accountStatus || 'N/A'}</div>
                   <div><span className="font-medium">Expiry Date:</span> {account.expiryDate ? new Date(account.expiryDate).toLocaleDateString() : 'N/A'}</div>
                   <div><span className="font-medium">Currency:</span> {account.currency || 'N/A'}</div>
+                  <div><span className="font-medium">Maturity Date:</span> {account.maturityDate ? new Date(account.maturityDate).toLocaleDateString() : 'N/A'}</div>
+                  <div><span className="font-medium">Total Outstanding:</span> {account.totalOutstanding !== undefined && account.totalOutstanding !== null ? account.totalOutstanding : 'N/A'}</div>
                 </div>
               ))}
             </div>
