@@ -4,6 +4,7 @@ import { dealService } from "../services/dealService";
 import TextInput from "../template components/components/form/TextInput";
 import SecondaryButton from "../template components/components/elements/SecondaryButton";
 import { BlobServiceClient } from "@azure/storage-blob";
+import { Edit2Icon, Trash2Icon } from "lucide-react";
 
 interface DealCollateralFormProps {
   dealId: string;
@@ -70,6 +71,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   const [collateralFile, setCollateralFile] = useState<File | null>(null);
   const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [docSuccess, setDocSuccess] = useState(false);
+  const [editingCollateral, setEditingCollateral] = useState<any | null>(null);
+  const [editingDocument, setEditingDocument] = useState<any | null>(null);
 
   // Refs for file inputs
   const collateralFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -316,6 +319,38 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     }
   };
 
+  // Edit handlers
+  const handleEditCollateral = (collateral: any) => {
+    setEditingCollateral(collateral);
+    setForm({
+      collateralType: collateral.collateralType,
+      collateralValue: collateral.collateralValue,
+      currency: collateral.currency,
+      description: collateral.description,
+    });
+  };
+
+  const handleEditDocument = (doc: any) => {
+    setEditingDocument(doc);
+    setDocumentCategory(doc.documentCategory);
+    setDocumentType(doc.documentType);
+    setDocumentDescription(doc.description);
+    // File cannot be prefilled for security reasons
+  };
+
+  // Delete handlers
+  const handleDeleteCollateral = async (collateral: any) => {
+    if (!window.confirm("Delete this collateral?")) return;
+    await fetch(`${API_BASE_URL}/deal-collaterals/${collateral.id.dealID}/${collateral.id.collateralID}`, { method: "DELETE" });
+    setSuccess(s => !s); // trigger refetch
+  };
+
+  const handleDeleteDocument = async (doc: any) => {
+    if (!window.confirm("Delete this document?")) return;
+    await fetch(`${API_BASE_URL}/deal-documents/${doc.id.dealID}/${doc.id.documentID}`, { method: "DELETE" });
+    setDocSuccess(s => !s); // trigger refetch
+  };
+
   return (
     <div>
       {/* Added Collaterals Section */}
@@ -342,6 +377,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
                     </button>
                   </span>
                 )}
+                <Edit2Icon className="w-4 h-4 text-blue-500 cursor-pointer" onClick={() => handleEditCollateral(collateral)} title="Edit" />
+                <Trash2Icon className="w-4 h-4 text-red-500 cursor-pointer" onClick={() => handleDeleteCollateral(collateral)} title="Delete" />
               </li>
             ))}
           </ul>
@@ -370,6 +407,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
                     View
                   </button>
                 </span>
+                <Edit2Icon className="w-4 h-4 text-blue-500 cursor-pointer" onClick={() => handleEditDocument(doc)} title="Edit" />
+                <Trash2Icon className="w-4 h-4 text-red-500 cursor-pointer" onClick={() => handleDeleteDocument(doc)} title="Delete" />
               </li>
             ))}
           </ul>
