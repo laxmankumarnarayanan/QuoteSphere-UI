@@ -4,7 +4,7 @@ import SecondaryButton from "../../template components/components/elements/Secon
 import PrimaryButton from "../../template components/components/elements/PrimaryButton";
 import SelectInput from "../../template components/components/elements/SelectInput";
 import { addDealProduct, addDealSubProduct } from "../../services/dealProductApi";
-import { saveDealCommitment, DealCommitment, deleteDealCommitment } from '../../services/dealCommitmentService';
+import { saveDealCommitment, DealCommitment, deleteDealCommitment, getDealCommitmentsByDealId } from '../../services/dealCommitmentService';
 import { translateFieldService } from '../../services/translateFieldService';
 import TextInput from '../../template components/components/form/TextInput';
 import { BlobServiceClient } from "@azure/storage-blob";
@@ -85,11 +85,13 @@ interface ProductSubproductSectionProps {
   };
   dealId: string;
   nextCommitmentNumber: number;
-  onCommitmentSave: (comboKey: string, commitment: DealCommitment) => void;
+  onCommitmentSave: (comboKey: string, commitment: DealCommitment | null) => void;
   commitments: DealCommitment[];
 }
 
-const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ combo, dealId, nextCommitmentNumber, onCommitmentSave, commitments }) => {
+const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({
+  combo, dealId, nextCommitmentNumber, onCommitmentSave, commitments
+}) => {
   const comboKey = combo.productId + '-' + combo.subProductId;
   const [deletingId, setDeletingId] = React.useState<number | null>(null);
   const [editingCommitment, setEditingCommitment] = React.useState<DealCommitment | null>(null);
@@ -103,7 +105,7 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
     setDeletingId(commitment.commitmentNumber!);
     try {
       await deleteDealCommitment(commitment.dealID, commitment.commitmentNumber!);
-      window.location.reload(); // Or trigger a refetch in parent
+      onCommitmentSave(comboKey, null); // Signal parent to refetch or update
     } catch (err) {
       alert("Failed to delete commitment. Please try again.");
     } finally {
@@ -111,11 +113,10 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
     }
   };
 
-  // Handler for saving (add or update)
   const handleSave = async (commitment: DealCommitment, isEdit: boolean) => {
     await saveDealCommitment(commitment);
     setEditingCommitment(null);
-    window.location.reload(); // Or trigger a refetch in parent
+    onCommitmentSave(comboKey, commitment); // Signal parent to refetch or update
   };
 
   return (
@@ -123,7 +124,6 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
       <div className="font-semibold text-violet-800 mb-2">
         {combo.domainType || "Domain"} | - | {combo.productLabel} | - | {combo.subProductLabel}
       </div>
-      {/* DealCommitment form for all combinations */}
       <DealCommitmentForm
         dealId={dealId}
         productId={combo.productId}
@@ -134,7 +134,6 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
         isEdit={!!editingCommitment}
         onCancelEdit={() => setEditingCommitment(null)}
       />
-      {/* Replicated Deal Commitments display */}
       {commitments.length > 0 && (
         <div className="mt-3 pl-4 border-l-2 border-violet-200">
           <div className="font-medium text-violet-700 mb-1">Deal Commitments:</div>
@@ -167,7 +166,9 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
   );
 };
 
-export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({ dealId, customerId, onNext, onBack, addedCombinations, setAddedCombinations, commitments, setCommitments }) => {
+export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps> = ({
+  dealId, customerId, onNext, onBack, addedCombinations, setAddedCombinations, commitments, setCommitments
+}) => {
   const [businessDomains, setBusinessDomains] = useState<Entity[]>([]);
   const [productCategories, setProductCategories] = useState<Entity[]>([]);
   const [productSubCategories, setProductSubCategories] = useState<Entity[]>([]);
@@ -312,6 +313,12 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
     }
   };
 
+  // Handler to refetch commitments after add/edit/delete
+  const handleCommitmentChange = async () => {
+    const updatedCommitments = await getDealCommitmentsByDealId(dealId);
+    setCommitments(updatedCommitments);
+  };
+
   return (
     <div className="flex flex-col gap-4">
       {/* Added combinations list (legacy) */}
@@ -338,10 +345,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
               combo={combo}
               dealId={dealId}
               nextCommitmentNumber={nextCommitmentNumber}
-              onCommitmentSave={(comboKey, commitment) => {
-                setNextCommitmentNumber(n => n + 1);
-                setCommitments(prev => [...prev, commitment]);
-              }}
+              onCommitmentSave={() => handleCommitmentChange()}
               commitments={commitmentsByCombo[combo.productId + '-' + combo.subProductId] || []}
             />
           ))}
