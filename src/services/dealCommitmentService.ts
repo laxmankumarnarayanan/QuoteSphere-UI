@@ -25,4 +25,10 @@ export async function saveDealCommitment(data: DealCommitment) {
 export async function getDealCommitmentsByDealId(dealId: string): Promise<DealCommitment[]> {
   const response = await axios.get(`${API_BASE_URL}/deal-commitments/deal/${dealId}`);
   return response.data;
+}
+
+export async function deleteDealCommitment(dealID: string, commitmentNumber: number) {
+  // commitmentNumber is required and must be a number
+  const response = await axios.delete(`${API_BASE_URL}/deal-commitments/${dealID}/${commitmentNumber}`);
+  return response.data;
 } 

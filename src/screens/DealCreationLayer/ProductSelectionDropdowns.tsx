@@ -4,10 +4,11 @@ import SecondaryButton from "../../template components/components/elements/Secon
 import PrimaryButton from "../../template components/components/elements/PrimaryButton";
 import SelectInput from "../../template components/components/elements/SelectInput";
 import { addDealProduct, addDealSubProduct } from "../../services/dealProductApi";
-import { saveDealCommitment, DealCommitment } from '../../services/dealCommitmentService';
+import { saveDealCommitment, DealCommitment, deleteDealCommitment } from '../../services/dealCommitmentService';
 import { translateFieldService } from '../../services/translateFieldService';
 import TextInput from '../../template components/components/form/TextInput';
 import { BlobServiceClient } from "@azure/storage-blob";
+import { Edit2Icon, Trash2Icon } from "lucide-react";
 
 function isValidUUID(uuid: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -90,6 +91,35 @@ interface ProductSubproductSectionProps {
 
 const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ combo, dealId, nextCommitmentNumber, onCommitmentSave, commitments }) => {
   const comboKey = combo.productId + '-' + combo.subProductId;
+  const [deletingId, setDeletingId] = React.useState<number | null>(null);
+
+  // Handler stubs for edit and delete
+  const handleEditCommitment = (commitment: DealCommitment) => {
+    // TODO: Open edit modal or inline form
+    alert(`Edit commitment #${commitment.commitmentNumber}`);
+  };
+
+  const handleDeleteCommitment = async (commitment: DealCommitment) => {
+    if (!window.confirm(`Are you sure you want to delete commitment #${commitment.commitmentNumber}?`)) return;
+    setDeletingId(commitment.commitmentNumber!);
+    try {
+      await deleteDealCommitment(commitment.dealID, commitment.commitmentNumber!);
+      // Remove from UI (parent state update)
+      if (typeof window !== "undefined" && window.dispatchEvent) {
+        // Optionally, you can trigger a reload from parent if needed
+      }
+      // Remove from local list (if managed locally)
+      // This should be handled by parent via setCommitments after refetch, but for instant UI:
+      // setCommitments(prev => prev.filter(c => !(c.dealID === commitment.dealID && c.commitmentNumber === commitment.commitmentNumber)));
+      // If not, ask parent to reload commitments
+      window.location.reload(); // Or trigger a refetch in parent
+    } catch (err) {
+      alert("Failed to delete commitment. Please try again.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className="border border-violet-200 rounded-lg bg-violet-50 p-4">
       <div className="font-semibold text-violet-800 mb-2">
@@ -117,6 +147,17 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({ com
                 {commitment.description && (
                   <span>Description: <span className="font-medium">{commitment.description}</span></span>
                 )}
+                {/* Edit and Delete Icons */}
+                <Edit2Icon
+                  className="w-4 h-4 text-blue-500 cursor-pointer"
+                  onClick={() => handleEditCommitment(commitment)}
+                  title="Edit"
+                />
+                <Trash2Icon
+                  className={`w-4 h-4 text-red-500 cursor-pointer ${deletingId === commitment.commitmentNumber ? "opacity-50 pointer-events-none" : ""}`}
+                  onClick={() => handleDeleteCommitment(commitment)}
+                  title="Delete"
+                />
               </div>
             ))}
           </div>
