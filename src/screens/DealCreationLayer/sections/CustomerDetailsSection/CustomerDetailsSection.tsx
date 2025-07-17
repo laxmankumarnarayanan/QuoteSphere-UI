@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "../../../../components/ui/table";
 import { CustomerDetails, ChildCustomer } from "../../../../services/customerService";
+import GuarantorIcon from '../../../../components/GuarantorIcon';
 
 interface CustomerDetailsSectionProps {
   selectedCustomer: CustomerDetails | null;
@@ -168,6 +169,11 @@ export const CustomerDetailsSection = ({ selectedCustomer }: CustomerDetailsSect
                                 <div className="flex items-center gap-2">
                                     <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 19.25v-.667A2.583 2.583 0 017.083 16h9.834a2.583 2.583 0 012.583 2.583v.667A2.25 2.25 0 0117.25 21h-10.5A2.25 2.25 0 014.5 19.25z" /></svg>
                                     <span className="text-base font-medium text-[#242524]">{contact.name} {contact.designation && <span className="text-xs text-gray-500 ml-1">({contact.designation})</span>}</span>
+                                    {contact.IsGuarantor && (
+                                        <span title="Guarantor">
+                                            <GuarantorIcon />
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="flex flex-col gap-1 ml-7">
                                     {addresses.length > 0 && (
