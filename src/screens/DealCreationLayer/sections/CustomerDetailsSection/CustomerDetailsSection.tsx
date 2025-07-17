@@ -115,17 +115,20 @@ export const CustomerDetailsSection = ({ selectedCustomer }: CustomerDetailsSect
         )}
 
         {customerAccounts && customerAccounts.length > 0 && (
-          <Section title="Accounts">
-            {customerAccounts.map((account: any, index: number) => (
-              <div key={index} className="p-2 my-2 border rounded">
-                <h4 className="font-semibold text-md mb-2">Account {index + 1}</h4>
-                <DetailItem label="Account Name" value={account.accountName} />
-                <DetailItem label="Account Number" value={account.accountNum} />
-                <DetailItem label="Status" value={account.accountStatus} />
-                <DetailItem label="Currency" value={account.currency} />
-              </div>
-            ))}
-          </Section>
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold mb-2">Accounts</h3>
+            <div className="space-y-2">
+              {customerAccounts.map((account, idx) => (
+                <div key={account.id.accountNumber || idx} className="border rounded p-3 flex flex-col gap-1 bg-gray-50">
+                  <div><span className="font-medium">Relationship Type:</span> {account.relationshipType || 'N/A'}</div>
+                  <div><span className="font-medium">Account Type:</span> {account.attribute || 'N/A'}</div>
+                  <div><span className="font-medium">Account Status:</span> {account.accountStatus || 'N/A'}</div>
+                  <div><span className="font-medium">Expiry Date:</span> {account.expiryDate ? new Date(account.expiryDate).toLocaleDateString() : 'N/A'}</div>
+                  <div><span className="font-medium">Currency:</span> {account.currency || 'N/A'}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
         
         {customerFacilities && customerFacilities.length > 0 && (
