@@ -115,22 +115,19 @@ export const CustomerDetailsSection = ({ selectedCustomer }: CustomerDetailsSect
         )}
 
         {customerAccounts && customerAccounts.length > 0 && (
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold mb-2">Accounts</h3>
-            <div className="space-y-2">
-              {customerAccounts.map((account, idx) => (
-                <div key={account.id.accountNumber || idx} className="border rounded p-3 flex flex-col gap-1 bg-gray-50">
-                  <div><span className="font-medium">Relationship Type:</span> {account.relationshipType || 'N/A'}</div>
-                  <div><span className="font-medium">Account Type:</span> {account.attribute || 'N/A'}</div>
-                  <div><span className="font-medium">Account Status:</span> {account.accountStatus || 'N/A'}</div>
-                  <div><span className="font-medium">Expiry Date:</span> {account.expiryDate ? new Date(account.expiryDate).toLocaleDateString() : 'N/A'}</div>
-                  <div><span className="font-medium">Currency:</span> {account.currency || 'N/A'}</div>
-                  <div><span className="font-medium">Maturity Date:</span> {account.maturityDate ? new Date(account.maturityDate).toLocaleDateString() : 'N/A'}</div>
-                  <div><span className="font-medium">Total Outstanding:</span> {account.totalOutstanding !== undefined && account.totalOutstanding !== null ? account.totalOutstanding : 'N/A'}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <Section title="Accounts">
+            {customerAccounts.map((account, idx) => (
+              <div key={account.id.accountNumber || idx} className="mb-4 pb-4 border-b last:border-b-0 last:pb-0">
+                <DetailItem label="Relationship Type" value={account.relationshipType || 'N/A'} />
+                <DetailItem label="Account Type" value={account.attribute || 'N/A'} />
+                <DetailItem label="Account Status" value={account.accountStatus || 'N/A'} />
+                <DetailItem label="Expiry Date" value={account.expiryDate ? new Date(account.expiryDate).toLocaleDateString() : 'N/A'} />
+                <DetailItem label="Currency" value={account.currency || 'N/A'} />
+                <DetailItem label="Maturity Date" value={account.maturityDate ? new Date(account.maturityDate).toLocaleDateString() : 'N/A'} />
+                <DetailItem label="Total Outstanding" value={account.totalOutstanding !== undefined && account.totalOutstanding !== null ? account.totalOutstanding : 'N/A'} />
+              </div>
+            ))}
+          </Section>
         )}
         
         {customerFacilities && customerFacilities.length > 0 && (
