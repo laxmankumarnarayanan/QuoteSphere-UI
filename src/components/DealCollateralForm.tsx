@@ -104,7 +104,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   useEffect(() => {
     async function fetchCurrentCollaterals() {
       try {
-        const res = await fetch(`${API_BASE_URL}/deal-collaterals/deal/${dealId}`);
+        const res = await fetch(`${API_BASE_URL}/deal-collateral/deal/${dealId}`);
         if (!res.ok) throw new Error('Failed to fetch collaterals');
         const data = await res.json();
         setAddedCollaterals(data);
@@ -202,7 +202,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         lastUpdatedDateTime: new Date().toISOString(),
       };
       
-      const response = await fetch(`${API_BASE_URL}/deal-collaterals`, {
+      const response = await fetch(`${API_BASE_URL}/deal-collateral`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -341,7 +341,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   // Delete handlers
   const handleDeleteCollateral = async (collateral: any) => {
     if (!window.confirm("Delete this collateral?")) return;
-    await fetch(`${API_BASE_URL}/deal-collaterals/${collateral.id.dealID}/${collateral.id.collateralID}`, { method: "DELETE" });
+    await fetch(`${API_BASE_URL}/deal-collateral/${collateral.id.dealID}/${collateral.id.collateralID}`, { method: "DELETE" });
     setSuccess(s => !s); // trigger refetch
   };
 

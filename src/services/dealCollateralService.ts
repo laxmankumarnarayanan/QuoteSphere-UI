@@ -17,6 +17,6 @@ export interface DealCollateral {
 }
 
 export async function saveDealCollateral(data: DealCollateral) {
-  const response = await axios.post(`${API_BASE_URL}/deal-collaterals`, data);
+  const response = await axios.post(`${API_BASE_URL}/deal-collateral`, data);
   return response.data;
 } 
