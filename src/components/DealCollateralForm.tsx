@@ -109,7 +109,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         const data = await res.json();
         setAddedCollaterals(data);
         const maxId = data.reduce((max: number, c: any) => {
-          const idVal = c.id?.collateralID || 0;
+          const idVal = c.collateralID || 0; // Flat structure now
           return idVal > max ? idVal : max;
         }, 0);
         setNextCollateralId(maxId + 1);
@@ -185,12 +185,10 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         storagePath = await uploadFileToAzure(collateralFile, blobName, sasToken);
       }
       
-      // Use the correct payload structure (nested id)
+      // Use FLAT payload structure (not nested)
       const payload = {
-        id: {
-          dealID: dealId,
-          collateralID: nextCollateralId
-        },
+        dealID: dealId,
+        collateralID: nextCollateralId,
         collateralType: form.collateralType,
         collateralValue: Number(form.collateralValue),
         currency: form.currency,
@@ -201,6 +199,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         lastUpdatedBy: "system",
         lastUpdatedDateTime: new Date().toISOString(),
       };
+      
+      console.log("Sending flat payload:", JSON.stringify(payload, null, 2));
       
       const response = await fetch(`${API_BASE_URL}/deal-collateral`, {
         method: "POST",
@@ -341,7 +341,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   // Delete handlers
   const handleDeleteCollateral = async (collateral: any) => {
     if (!window.confirm("Delete this collateral?")) return;
-    await fetch(`${API_BASE_URL}/deal-collateral/${collateral.id.dealID}/${collateral.id.collateralID}`, { method: "DELETE" });
+    await fetch(`${API_BASE_URL}/deal-collateral/${collateral.dealID}/${collateral.collateralID}`, { method: "DELETE" });
     setSuccess(s => !s); // trigger refetch
   };
 
@@ -359,7 +359,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
           <div className="font-semibold text-violet-800 mb-2">Added Collaterals:</div>
           <ul className="space-y-2">
             {addedCollaterals.map((collateral, idx) => (
-              <li key={collateral.id?.dealID + '-' + collateral.id?.collateralID || idx} className="flex gap-6 items-center">
+              <li key={collateral.dealID + '-' + collateral.collateralID || idx} className="flex gap-6 items-center">
                 <span className="text-sm font-medium text-violet-900">Type: <span className="font-normal text-slate-800">{collateral.collateralType}</span></span>
                 <span className="text-sm font-medium text-violet-900">Value: <span className="font-normal text-slate-800">{collateral.collateralValue}</span></span>
                 <span className="text-sm font-medium text-violet-900">Currency: <span className="font-normal text-slate-800">{collateral.currency}</span></span>
@@ -470,6 +470,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
               </SecondaryButton>
             </div>
             {error && <div className="text-red-600 mt-2">{error}</div>}
+            {success && <div className="text-green-600 mt-2">Collateral added successfully!</div>}
           </form>
 
           {/* Documentation Section */}
@@ -524,6 +525,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
               </SecondaryButton>
             </div>
             {docError && <div className="text-red-600 mt-2">{docError}</div>}
+            {docSuccess && <div className="text-green-600 mt-2">Document saved successfully!</div>}
           </form>
         </>
       )}
