@@ -111,10 +111,10 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
         <table className="min-w-full bg-white rounded shadow">
           <thead>
             <tr className="bg-violet-100">
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Price Description</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee Name</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Currency</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Standard Price</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Preferential Type</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee Type</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Discount %</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Discount Amount</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Final Price</th>
