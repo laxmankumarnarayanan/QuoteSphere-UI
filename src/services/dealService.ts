@@ -17,7 +17,7 @@ export interface Deal {
 
 export const dealService = {
   async createDraftDeal(customerId: string, customerName: string, initiator: string): Promise<Deal> {
-    const response = await axios.post(`${API_BASE_URL}/deals/draft`, {
+    const response = await axios.post(`${API_BASE_URL}/deal/draft`, {
       customerId,
       customerName,
       initiator,
