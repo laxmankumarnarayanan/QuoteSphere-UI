@@ -25,18 +25,18 @@ const DetailItem = ({ label, value }: { label: string; value: React.ReactNode })
   if (value === null || value === undefined || value === '') return null;
   return (
     <div className="py-2 sm:grid sm:grid-cols-3 sm:gap-4">
-      <dt className="text-sm font-medium text-gray-500">{label}</dt>
-      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{value}</dd>
+      <dt className="text-sm font-medium text-brand-600">{label}</dt>
+      <dd className="mt-1 text-sm text-brand-900 sm:mt-0 sm:col-span-2">{value}</dd>
     </div>
   );
 };
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
     <div className="mb-6">
-      <h3 className="text-lg font-semibold text-gray-800 mb-2">{title}</h3>
-      <Card>
+      <h3 className="text-lg font-semibold text-brand-800 mb-2">{title}</h3>
+      <Card className="border border-brand-200">
         <CardContent className="p-4">
-          <dl className="divide-y divide-gray-200">{children}</dl>
+          <dl className="divide-y divide-brand-100">{children}</dl>
         </CardContent>
       </Card>
     </div>
@@ -152,9 +152,9 @@ export const CustomerDetailsSection = ({ selectedCustomer, onCustomerSelect }: C
 
   if (!selectedCustomer) {
     return (
-      <Card className="w-full shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] border-[#ebebea]">
+      <Card className="w-full shadow border border-brand-200">
         <CardContent className="px-4 py-4">
-          <div className="text-center text-gray-500">Select a customer to view details</div>
+          <div className="text-center text-brand-400">Select a customer to view details</div>
         </CardContent>
       </Card>
     );
@@ -188,9 +188,9 @@ export const CustomerDetailsSection = ({ selectedCustomer, onCustomerSelect }: C
   };
 
   return (
-    <Card className="w-full shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] border-[#ebebea]">
+    <Card className="w-full shadow border border-brand-200">
       <CardHeader className="px-4 py-[19px]">
-        <CardTitle className="font-semibold text-base text-[#242524] font-['Archivo',Helvetica]">
+        <CardTitle className="font-semibold text-base text-brand-900 font-['Archivo',Helvetica]">
           Customer Details
         </CardTitle>
       </CardHeader>
