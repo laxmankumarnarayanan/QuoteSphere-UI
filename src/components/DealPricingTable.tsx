@@ -147,14 +147,13 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
             <tr className="bg-violet-100">
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee Name</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Currency</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Standard Price</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee Type</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee %</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Preferential Type</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Discount %</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Discount Amount</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Final Price</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee Type</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee %</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Flat Fee</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Standard Fee</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee Cap</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Max Discount</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Calculated Fee</th>
