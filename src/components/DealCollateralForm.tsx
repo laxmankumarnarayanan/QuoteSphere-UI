@@ -22,7 +22,8 @@ const initialState = {
 };
 
 const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
-const AZURE_CONTAINER_URL = "https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer";
+const AZURE_ACCOUNT_URL = "https://dealdeskdocumentstorage.blob.core.windows.net";
+const AZURE_CONTAINER_NAME = "dealdeskdocumentscontainer";
 
 // Unified SAS token getter
 async function getSasToken(blobName: string) {
@@ -33,19 +34,19 @@ async function getSasToken(blobName: string) {
 
 // Unified file upload function
 async function uploadFileToAzure(file: File, blobName: string, sasToken: string): Promise<string> {
-  const blobServiceClient = new BlobServiceClient(`${AZURE_CONTAINER_URL}?${sasToken}`);
-  const containerClient = blobServiceClient.getContainerClient("dealdeskdocumentscontainer");
+  const blobServiceClient = new BlobServiceClient(`${AZURE_ACCOUNT_URL}?${sasToken}`);
+  const containerClient = blobServiceClient.getContainerClient(AZURE_CONTAINER_NAME);
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-  
+
   await blockBlobClient.uploadData(file, { blobHTTPHeaders: { blobContentType: file.type } });
-  return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
+  return `${AZURE_ACCOUNT_URL}/${AZURE_CONTAINER_NAME}/${blobName}?${sasToken}`;
 }
 
 // Unified view URL getter
 async function getViewUrl(blobName: string): Promise<string> {
   const res = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
   if (!res.ok) throw new Error('Failed to get view URL');
-  return `${AZURE_CONTAINER_URL}/${blobName}?${await res.text()}`;
+  return `${AZURE_ACCOUNT_URL}/${AZURE_CONTAINER_NAME}/${blobName}?${await res.text()}`;
 }
 
 const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showForms, showCollaterals = true, showDocuments = true }) => {
