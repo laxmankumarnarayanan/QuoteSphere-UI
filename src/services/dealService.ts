@@ -45,4 +45,16 @@ export const dealService = {
     const response = await axios.get(`${API_BASE_URL}/deal-special-conditions/deal/${dealId}`);
     return response.data;
   },
-}; 
+};
+
+export async function updateDealStatus(dealId: string, status: string) {
+  const response = await fetch(`${API_BASE_URL}/deal/${dealId}/status`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ dealStatus: status }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to update deal status");
+  }
+  return response.json();
+} 
