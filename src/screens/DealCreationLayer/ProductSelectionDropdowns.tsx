@@ -84,20 +84,31 @@ interface ProductSubproductSectionProps {
     businessDomainId?: string;
   };
   dealId: string;
-  nextCommitmentNumber: number;
   onCommitmentSave: (comboKey: string, commitment: DealCommitment | null) => void;
   commitments: DealCommitment[];
+  allCommitments: DealCommitment[]; // Add this to get the highest commitment number
 }
 
 const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({
-  combo, dealId, nextCommitmentNumber, onCommitmentSave, commitments
+  combo, dealId, onCommitmentSave, commitments, allCommitments
 }) => {
   const comboKey = combo.productId + '-' + combo.subProductId;
   const [deletingId, setDeletingId] = React.useState<number | null>(null);
   const [editingCommitment, setEditingCommitment] = React.useState<DealCommitment | null>(null);
 
+  // Calculate next commitment number dynamically
+  const getNextCommitmentNumber = () => {
+    if (allCommitments.length === 0) return 1;
+    const maxNumber = Math.max(...allCommitments.map(c => c.commitmentNumber || 0));
+    return maxNumber + 1;
+  };
+
   const handleEditCommitment = (commitment: DealCommitment) => {
     setEditingCommitment(commitment);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCommitment(null);
   };
 
   const handleDeleteCommitment = async (commitment: DealCommitment) => {
@@ -115,7 +126,7 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({
 
   const handleSave = async (commitment: DealCommitment, isEdit: boolean) => {
     await saveDealCommitment(commitment);
-    setEditingCommitment(null);
+    setEditingCommitment(null); // Clear editing state after save
     onCommitmentSave(comboKey, commitment); // Signal parent to refetch or update
   };
 
@@ -125,14 +136,15 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({
         {combo.domainType || "Domain"} | - | {combo.productLabel} | - | {combo.subProductLabel}
       </div>
       <DealCommitmentForm
+        key={editingCommitment ? `edit-${editingCommitment.commitmentNumber}` : 'new'} // Force re-render
         dealId={dealId}
         productId={combo.productId}
         subProductId={combo.subProductId}
-        commitmentNumber={editingCommitment ? editingCommitment.commitmentNumber! : nextCommitmentNumber}
+        commitmentNumber={editingCommitment ? editingCommitment.commitmentNumber! : getNextCommitmentNumber()}
         onSave={commitment => handleSave(commitment, !!editingCommitment)}
         initialData={editingCommitment || undefined}
         isEdit={!!editingCommitment}
-        onCancelEdit={() => setEditingCommitment(null)}
+        onCancelEdit={handleCancelEdit}
       />
       {commitments.length > 0 && (
         <div className="mt-3 pl-4 border-l-2 border-violet-200">
@@ -184,7 +196,7 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
   const [loading, setLoading] = useState(false);
   const [added, setAdded] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
-  const [nextCommitmentNumber, setNextCommitmentNumber] = useState(1);
+  
   // Store commitments for each combo: { [comboKey]: DealCommitment[] }
   const [commitmentsByCombo, setCommitmentsByCombo] = useState<Record<string, DealCommitment[]>>({});
 
@@ -200,8 +212,6 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
     }, {} as Record<string, DealCommitment[]>);
     setCommitmentsByCombo(newCommitmentsByCombo);
   }, [commitments]);
-
-  // (removed useEffect for financial statuses)
 
   // Fetch business domains on mount
   useEffect(() => {
@@ -335,7 +345,6 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
           </ul>
         </div>
       )}
-      {/* (removed Deal Financial Status section and form) */}
       {/* New: DomainType containers for each added combination */}
       {addedCombinations.length > 0 && (
         <div className="mb-6 flex flex-col gap-4">
@@ -344,9 +353,9 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
               key={combo.productId + '-' + combo.subProductId}
               combo={combo}
               dealId={dealId}
-              nextCommitmentNumber={nextCommitmentNumber}
               onCommitmentSave={() => handleCommitmentChange()}
               commitments={commitmentsByCombo[combo.productId + '-' + combo.subProductId] || []}
+              allCommitments={commitments} // Pass all commitments to calculate next number
             />
           ))}
         </div>
@@ -471,7 +480,10 @@ const DealCommitmentForm: React.FC<{
       setTenure('');
       setDescription('');
     }
-  }, [initialData]);
+    // Reset states when switching between edit/add modes
+    setSuccess(false);
+    setError(null);
+  }, [initialData, commitmentNumber]); // Added commitmentNumber as dependency
 
   useEffect(() => {
     translateFieldService.getDropdownValues('Currency')
@@ -484,9 +496,10 @@ const DealCommitmentForm: React.FC<{
     setLoading(true);
     setError(null);
     setSuccess(false);
+    
     const commitment: DealCommitment = {
       dealID: dealId,
-      commitmentNumber,
+      commitmentNumber, // This will be the correct number (either new or existing for edit)
       currency,
       commitmentAmount: Number(commitmentAmount),
       tenure: Number(tenure),
@@ -502,11 +515,15 @@ const DealCommitmentForm: React.FC<{
     try {
       await saveDealCommitment(commitment);
       setSuccess(true);
-      // Clear form after successful save
-      setCurrency('');
-      setCommitmentAmount('');
-      setTenure('');
-      setDescription('');
+      
+      // Only clear form if it's a new commitment (not editing)
+      if (!isEdit) {
+        setCurrency('');
+        setCommitmentAmount('');
+        setTenure('');
+        setDescription('');
+      }
+      
       onSave(commitment);
     } catch (err: any) {
       setError('Failed to save Deal Commitment.');
@@ -517,7 +534,9 @@ const DealCommitmentForm: React.FC<{
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded mb-4 bg-white">
-      <div className="font-semibold text-violet-700 mb-2">{isEdit ? "Edit Deal Commitment" : "Deal Commitment"}</div>
+      <div className="font-semibold text-violet-700 mb-2">
+        {isEdit ? `Edit Deal Commitment #${commitmentNumber}` : `Deal Commitment #${commitmentNumber}`}
+      </div>
       <SelectInput
         id="currency"
         label="Currency"
@@ -571,6 +590,7 @@ const DealCommitmentForm: React.FC<{
         </SecondaryButton>
       </div>
       {error && <div className="text-red-600">{error}</div>}
+      {success && <div className="text-green-600">{isEdit ? "Commitment updated successfully!" : "Commitment added successfully!"}</div>}
     </form>
   );
-}; 
+};
