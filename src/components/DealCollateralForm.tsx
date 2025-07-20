@@ -44,7 +44,7 @@ async function uploadFileToAzure(file: File, blobName: string, sasToken: string)
 
 // Unified view URL getter
 async function getViewUrl(blobName: string): Promise<string> {
-  const res = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
+  const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
   if (!res.ok) throw new Error('Failed to get view URL');
   return `${AZURE_ACCOUNT_URL}/${AZURE_CONTAINER_NAME}/${blobName}?${await res.text()}`;
 }
