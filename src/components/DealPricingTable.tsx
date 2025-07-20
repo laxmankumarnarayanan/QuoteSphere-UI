@@ -18,12 +18,12 @@ export interface DealPricingRow {
   priceDescription: string;
   currency: string;
   feePercentage: string;
+  flatFeeAmount: string;
+  discountPercentage: string;
   standardPrice: string;
   preferentialType: string;
-  discountPercentage: string;
   finalPrice: string;
   feeType: string;
-  flatFeeAmount: string;
   feeCap: string;
   maxDiscountAmount: string;
   calculatedFeeAmount: string;
