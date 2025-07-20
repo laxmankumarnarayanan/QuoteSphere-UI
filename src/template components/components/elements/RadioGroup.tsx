@@ -68,8 +68,8 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
               aria-describedby={option.description ? `${option.id}-desc` : undefined}
               className={`
                 relative flex items-start p-3.5 border rounded-lg transition-all duration-200
-                focus-within:ring-2 focus-within:ring-offset-1 focus-within:ring-violet-400 
-                ${isSelected ? 'bg-violet-50 border-violet-500 ring-1 ring-violet-500' : 'bg-white border-slate-300 hover:border-slate-400'}
+                focus-within:ring-2 focus-within:ring-offset-1 focus-within:ring-brand-400 
+                ${isSelected ? 'bg-brand-50 border-brand-500 ring-1 ring-brand-500' : 'bg-white border-slate-300 hover:border-slate-400'}
                 ${isDisabled ? 'opacity-70 cursor-not-allowed bg-slate-50 !border-slate-200' : 'cursor-pointer hover:shadow-sm'}
               `}
             >
@@ -80,8 +80,8 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
                     w-5 h-5 rounded-full border-2 flex items-center justify-center
                     transition-all duration-150
                     ${isSelected ? 
-                      (isDisabled ? 'border-violet-300 bg-violet-300' : 'border-violet-500 bg-violet-500') : 
-                      (isDisabled ? 'border-slate-300 bg-slate-100' : 'border-slate-400 bg-white group-hover:border-violet-400')}
+                      (isDisabled ? 'border-brand-300 bg-brand-300' : 'border-brand-500 bg-brand-500') : 
+                      (isDisabled ? 'border-slate-300 bg-slate-100' : 'border-slate-400 bg-white group-hover:border-brand-400')}
                   `}
                 >
                   {isSelected && <div className={`w-2 h-2 rounded-full ${isDisabled ? 'bg-white opacity-70' : 'bg-white'}`}></div>}
@@ -102,18 +102,18 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
               <div className="text-sm flex-grow">
                 <label
                   id={`${option.id}-label`}
-                  className={`font-medium ${isSelected ? 'text-violet-700' : 'text-slate-800'} ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                  className={`font-medium ${isSelected ? 'text-brand-700' : 'text-slate-800'} ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   {option.label}
                 </label>
                 {option.description && (
-                  <p id={`${option.id}-desc`} className={`mt-0.5 ${isSelected ? 'text-violet-600' : 'text-slate-500'}`}>
+                  <p id={`${option.id}-desc`} className={`mt-0.5 ${isSelected ? 'text-brand-600' : 'text-slate-500'}`}>
                     {option.description}
                   </p>
                 )}
               </div>
               {isSelected && !isDisabled && (
-                  <CheckCircle2 className="w-5 h-5 text-violet-500 absolute top-3.5 right-3.5" />
+                  <CheckCircle2 className="w-5 h-5 text-brand-500 absolute top-3.5 right-3.5" />
               )}
             </div>
           );

@@ -441,19 +441,19 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     <div>
       {/* Added Collaterals Section */}
       {showCollaterals && addedCollaterals.length > 0 && (
-        <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
-          <div className="font-semibold text-violet-800 mb-2">Added Collaterals:</div>
+        <div className="mb-6 border border-brand-200 rounded-lg bg-brand-50 p-4">
+          <div className="font-semibold text-brand-800 mb-2">Added Collaterals:</div>
           <ul className="space-y-2">
             {addedCollaterals.map((collateral, idx) => (
               <li key={collateral.dealID + '-' + collateral.collateralID || idx} className="flex gap-6 items-center">
-                <span className="text-sm font-medium text-violet-900">Type: <span className="font-normal text-slate-800">{collateral.collateralType}</span></span>
-                <span className="text-sm font-medium text-violet-900">Value: <span className="font-normal text-slate-800">{collateral.collateralValue}</span></span>
-                <span className="text-sm font-medium text-violet-900">Currency: <span className="font-normal text-slate-800">{collateral.currency}</span></span>
+                <span className="text-sm font-medium text-brand-900">Type: <span className="font-normal text-slate-800">{collateral.collateralType}</span></span>
+                <span className="text-sm font-medium text-brand-900">Value: <span className="font-normal text-slate-800">{collateral.collateralValue}</span></span>
+                <span className="text-sm font-medium text-brand-900">Currency: <span className="font-normal text-slate-800">{collateral.currency}</span></span>
                 {collateral.description && (
-                  <span className="text-sm font-medium text-violet-900">Description: <span className="font-normal text-slate-800">{collateral.description}</span></span>
+                  <span className="text-sm font-medium text-brand-900">Description: <span className="font-normal text-slate-800">{collateral.description}</span></span>
                 )}
                 {collateral.storagePath && (
-                  <span className="text-sm font-medium text-violet-900">
+                  <span className="text-sm font-medium text-brand-900">
                     <button
                       className="text-blue-600 underline"
                       onClick={() => handleViewCollateral(collateral.storagePath)}
@@ -473,18 +473,18 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
 
       {/* Added Documents Section */}
       {showDocuments && addedDocuments.length > 0 && (
-        <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
-          <div className="font-semibold text-violet-800 mb-2">Added Documents:</div>
+        <div className="mb-6 border border-brand-200 rounded-lg bg-brand-50 p-4">
+          <div className="font-semibold text-brand-800 mb-2">Added Documents:</div>
           <ul className="space-y-2">
             {addedDocuments.map((doc, idx) => (
               <li key={doc.id?.dealID + '-' + doc.id?.documentID || idx} className="flex gap-6 items-center">
-                <span className="text-sm font-medium text-violet-900">Category: <span className="font-normal text-slate-800">{doc.documentCategory}</span></span>
-                <span className="text-sm font-medium text-violet-900">Type: <span className="font-normal text-slate-800">{doc.documentType}</span></span>
-                <span className="text-sm font-medium text-violet-900">Name: <span className="font-normal text-slate-800">{doc.documentName}</span></span>
+                <span className="text-sm font-medium text-brand-900">Category: <span className="font-normal text-slate-800">{doc.documentCategory}</span></span>
+                <span className="text-sm font-medium text-brand-900">Type: <span className="font-normal text-slate-800">{doc.documentType}</span></span>
+                <span className="text-sm font-medium text-brand-900">Name: <span className="font-normal text-slate-800">{doc.documentName}</span></span>
                 {doc.description && (
-                  <span className="text-sm font-medium text-violet-900">Description: <span className="font-normal text-slate-800">{doc.description}</span></span>
+                  <span className="text-sm font-medium text-brand-900">Description: <span className="font-normal text-slate-800">{doc.description}</span></span>
                 )}
-                <span className="text-sm font-medium text-violet-900">
+                <span className="text-sm font-medium text-brand-900">
                   <button
                     className="text-blue-600 underline"
                     onClick={() => handleViewDocument(doc)}
@@ -506,7 +506,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         <>
           {/* Collateral Section */}
           <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded mb-8">
-            <div className="font-semibold text-violet-800 mb-2">
+            <div className="font-semibold text-brand-800 mb-2">
               {isEditCollateral ? `Edit Collateral #${editingCollateral?.collateralID}` : "Collateral"}
             </div>
             <SelectInput
@@ -587,7 +587,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
 
           {/* Documentation Section */}
           <form onSubmit={handleSaveDocument} className="space-y-4 p-4 border rounded">
-            <div className="font-semibold text-violet-800 mb-2">
+            <div className="font-semibold text-brand-800 mb-2">
               {isEditDocument ? `Edit Document #${editingDocument?.id?.documentID}` : "Documentation"}
             </div>
             <SelectInput

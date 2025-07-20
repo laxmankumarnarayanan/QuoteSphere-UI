@@ -51,10 +51,10 @@ const Checkbox: React.FC<CheckboxProps> = ({
             className={`
               w-5 h-5 rounded border-2 transition-all duration-150 ease-in-out
               flex items-center justify-center flex-shrink-0
-              peer-focus:ring-2 peer-focus:ring-offset-1 peer-focus:ring-violet-400 
-              ${disabled ? 'border-slate-300 bg-slate-100 cursor-not-allowed' : 'cursor-pointer border-slate-400 hover:border-violet-500'}
+              peer-focus:ring-2 peer-focus:ring-offset-1 peer-focus:ring-brand-400 
+              ${disabled ? 'border-slate-300 bg-slate-100 cursor-not-allowed' : 'cursor-pointer border-slate-400 hover:border-brand-500'}
               ${checked ? 
-                (disabled ? 'bg-violet-300 border-violet-300' : 'bg-violet-500 border-violet-500 hover:bg-violet-600 hover:border-violet-600') : 
+                (disabled ? 'bg-brand-300 border-brand-300' : 'bg-brand-500 border-brand-500 hover:bg-brand-600 hover:border-brand-600') : 
                 (disabled ? '' : 'bg-white')}
             `}
           >

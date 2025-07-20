@@ -26,18 +26,18 @@ const WorkflowProgress: React.FC<WorkflowProgressProps> = ({ stages, className }
     switch (status) {
       case 'completed':
         return {
-          borderColor: 'border-violet-500',
-          bgColor: 'bg-violet-500',
+          borderColor: 'border-brand-500',
+          bgColor: 'bg-brand-500',
           textColor: 'text-white',
           Icon: Check,
-          lineBg: 'bg-violet-500',
+          lineBg: 'bg-brand-500',
         };
       case 'current':
         return {
-          borderColor: 'border-violet-500 animate-pulse-border', 
+          borderColor: 'border-brand-500 animate-pulse-border', 
           bgColor: 'bg-white',
-          textColor: 'text-violet-500',
-          Icon: () => <div className="w-3 h-3 bg-violet-500 rounded-full animate-pulse"></div>, 
+          textColor: 'text-brand-500',
+          Icon: () => <div className="w-3 h-3 bg-brand-500 rounded-full animate-pulse"></div>, 
           lineBg: 'bg-slate-200', 
         };
       case 'delayed':
@@ -125,7 +125,7 @@ const WorkflowProgress: React.FC<WorkflowProgressProps> = ({ stages, className }
                   ) : stage.expectedDate ? (
                     <span>Exp: {stage.expectedDate}</span>
                   ) : stage.status === 'current' ? (
-                    <span className="font-medium text-violet-600">In Progress</span>
+                    <span className="font-medium text-brand-600">In Progress</span>
                   ) : null}
                    {stage.status === 'delayed' && (
                         <p className="text-amber-600 font-medium">Delayed</p>

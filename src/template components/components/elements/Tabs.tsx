@@ -64,21 +64,21 @@ const Tabs: React.FC<TabsProps> = ({
     line: {
       nav: 'border-b border-slate-200 relative',
       button: 'py-3 px-4 text-sm font-medium transition-colors duration-200 ease-in-out focus:outline-none focus:z-10',
-      activeButton: 'text-violet-600',
+      activeButton: 'text-brand-600',
       inactiveButton: 'text-slate-500 hover:text-slate-700 hover:border-slate-300',
-      indicator: 'absolute bottom-0 h-0.5 bg-violet-600 transition-all duration-300 ease-in-out'
+      indicator: 'absolute bottom-0 h-0.5 bg-brand-600 transition-all duration-300 ease-in-out'
     },
     pills: {
       nav: 'flex space-x-1 bg-slate-100 p-1 rounded-lg',
-      button: 'flex-1 text-center py-2 px-3 text-sm font-medium rounded-md transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1',
-      activeButton: 'bg-white text-violet-600 shadow-sm',
+      button: 'flex-1 text-center py-2 px-3 text-sm font-medium rounded-md transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-1',
+      activeButton: 'bg-white text-brand-600 shadow-sm',
       inactiveButton: 'text-slate-600 hover:bg-slate-200 hover:text-slate-800',
       indicator: 'hidden'
     },
     enclosed: {
         nav: 'border-b border-slate-200',
         button: 'py-2.5 px-4 text-sm font-medium border border-b-0 border-transparent rounded-t-md -mb-px focus:outline-none focus:z-10 transition-colors',
-        activeButton: 'bg-white border-slate-200 text-violet-600',
+        activeButton: 'bg-white border-slate-200 text-brand-600',
         inactiveButton: 'text-slate-500 hover:text-slate-700 hover:border-slate-200 hover:bg-slate-50',
         indicator: 'hidden'
     }

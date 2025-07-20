@@ -155,7 +155,7 @@ const AllComponentsPageContent: React.FC = () => {
                 <SecondaryButton className="border-red-500 text-red-500 hover:bg-red-50"><Trash2 size={16}/></SecondaryButton>
             </Tooltip>
              <Tooltip content={<span>Edit your <strong>account settings</strong>. Click here!</span>} position="bottom">
-                <span className="text-violet-600 cursor-help border-b border-dashed border-violet-600">Hover for rich tooltip</span>
+                <span className="text-brand-600 cursor-help border-b border-dashed border-brand-600">Hover for rich tooltip</span>
             </Tooltip>
              <Tooltip content="Download report (PDF)" position="top">
                 <button className="p-2 rounded-full hover:bg-slate-100 text-slate-600"><Download size={20}/></button>
@@ -205,7 +205,7 @@ const AllComponentsPageContent: React.FC = () => {
 
           <div className="space-y-3 mt-4">
             <h3 className="text-sm font-medium text-slate-600 col-span-full">Preferences:</h3>
-            <Checkbox id="page-terms" label={<span>I agree to the <a href="#" className="text-violet-600 hover:underline">Terms and Conditions</a></span>} checked={isChecked} onChange={setIsChecked} required/>
+            <Checkbox id="page-terms" label={<span>I agree to the <a href="#" className="text-brand-600 hover:underline">Terms and Conditions</a></span>} checked={isChecked} onChange={setIsChecked} required/>
             <Toggle id="page-notifications" label="Enable Email Notifications" checked={isNotificationsToggled} onChange={setIsNotificationsToggled} />
             <Toggle id="page-marketing" label="Receive Marketing Updates" checked={isMarketingToggled} onChange={setIsMarketingToggled} size="sm" labelPosition="left"/>
           </div>
@@ -261,7 +261,7 @@ const AllComponentsPageContent: React.FC = () => {
           )}
           renderRowActions={(row) => (
             <div className="flex items-center justify-end space-x-2">
-                <Tooltip content="View Details" position="top"><button className="p-1.5 text-slate-500 hover:text-violet-600 rounded-md hover:bg-violet-100"><Eye size={16}/></button></Tooltip>
+                <Tooltip content="View Details" position="top"><button className="p-1.5 text-slate-500 hover:text-brand-600 rounded-md hover:bg-brand-100"><Eye size={16}/></button></Tooltip>
                 <Tooltip content="Edit User" position="top"><button onClick={() => handleEditRow(row)} className="p-1.5 text-slate-500 hover:text-green-600 rounded-md hover:bg-green-100"><Edit3 size={16}/></button></Tooltip>
                 <Tooltip content="Delete User" position="top"><button onClick={() => handleDeleteRow(row)} className="p-1.5 text-slate-500 hover:text-red-600 rounded-md hover:bg-red-100"><Trash2 size={16}/></button></Tooltip>
             </div>

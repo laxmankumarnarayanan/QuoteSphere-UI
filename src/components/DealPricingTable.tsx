@@ -131,8 +131,8 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
   };
 
   return (
-    <div className="w-full border border-violet-200 rounded-lg bg-violet-50 p-6 mt-0">
-      <div className="font-semibold text-violet-800 mb-4">Pricing & Fees Details</div>
+    <div className="w-full border border-brand-200 rounded-lg bg-brand-50 p-6 mt-0">
+      <div className="font-semibold text-brand-800 mb-4">Pricing & Fees Details</div>
       {error && <div className="text-red-600 mb-2">{error}</div>}
       {loading && <div className="text-slate-600 mb-2">Loading...</div>}
       <div className="overflow-x-auto">
@@ -140,18 +140,18 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
           {rows.map((row, idx) => (
             <div
               key={row.id.priceId}
-              className="bg-white rounded-lg shadow border border-violet-200 p-0"
+              className="bg-white rounded-lg shadow border border-brand-200 p-0"
             >
               <table className="w-full">
                 <tbody>
                   {/* First line: Fee Description + Edit button */}
                   <tr>
                     <td
-                      className="px-4 py-3 text-base font-semibold text-violet-900"
+                      className="px-4 py-3 text-base font-semibold text-brand-900"
                       colSpan={7}
                     >
                       {row.priceDescription}
-                      <span className="ml-2 text-xs text-violet-500 font-normal">(Fee Description)</span>
+                      <span className="ml-2 text-xs text-brand-500 font-normal">(Fee Description)</span>
                     </td>
                     <td className="px-4 py-3 text-right" style={{ width: "1%" }}>
                       {editIdx === idx ? (
@@ -167,21 +167,21 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
                     </td>
                   </tr>
                   {/* Second line: Other fields */}
-                  <tr className="bg-violet-50">
+                  <tr className="bg-brand-50">
                     <td className="px-4 py-2 text-sm text-slate-800">
-                      <span className="font-medium text-violet-700">Currency:</span> {row.currency}
+                      <span className="font-medium text-brand-700">Currency:</span> {row.currency}
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-800">
-                      <span className="font-medium text-violet-700">Fee Type:</span> {row.feeType}
+                      <span className="font-medium text-brand-700">Fee Type:</span> {row.feeType}
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-800">
-                      <span className="font-medium text-violet-700">Flat Fee Amount:</span> {row.flatFeeAmount}
+                      <span className="font-medium text-brand-700">Flat Fee Amount:</span> {row.flatFeeAmount}
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-800">
-                      <span className="font-medium text-violet-700">Fee Percentage:</span> {row.feePercentage}
+                      <span className="font-medium text-brand-700">Fee Percentage:</span> {row.feePercentage}
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-800">
-                      <span className="font-medium text-violet-700">Preferential Type:</span>{" "}
+                      <span className="font-medium text-brand-700">Preferential Type:</span>{" "}
                       {editIdx === idx ? (
                         <SelectInput
                           id={`preferentialType-${idx}`}
@@ -197,7 +197,7 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
                       )}
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-800">
-                      <span className="font-medium text-violet-700">Standard Price:</span>{" "}
+                      <span className="font-medium text-brand-700">Standard Price:</span>{" "}
                       {editIdx === idx ? (
                         <TextInput
                           id={`standardPrice-${idx}`}
@@ -211,7 +211,7 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
                       )}
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-800">
-                      <span className="font-medium text-violet-700">Discount %:</span>{" "}
+                      <span className="font-medium text-brand-700">Discount %:</span>{" "}
                       {editIdx === idx ? (
                         <TextInput
                           id={`discountPercentage-${idx}`}

@@ -46,10 +46,10 @@ const Toggle: React.FC<ToggleProps> = ({
         className={`
             relative inline-flex items-center flex-shrink-0 rounded-full cursor-pointer
             transition-colors duration-200 ease-in-out
-            focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-violet-500
+            focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-brand-500
             ${currentSize.switch}
             ${disabled ? 'opacity-60 cursor-not-allowed' : ''}
-            ${checked ? (disabled ? 'bg-violet-300' : 'bg-violet-500') : (disabled ? 'bg-slate-200' : 'bg-slate-300 hover:bg-slate-400')}
+            ${checked ? (disabled ? 'bg-brand-300' : 'bg-brand-500') : (disabled ? 'bg-slate-200' : 'bg-slate-300 hover:bg-slate-400')}
         `}
     >
         <span className="sr-only">Use setting</span>

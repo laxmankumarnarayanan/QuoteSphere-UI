@@ -57,7 +57,7 @@ const Slider: React.FC<SliderProps> = ({
           {label}
         </label>
         {showValueTooltip === 'never' && ( 
-             <span className={`text-sm font-medium ${disabled ? 'text-slate-400' : 'text-violet-600'}`}>
+             <span className={`text-sm font-medium ${disabled ? 'text-slate-400' : 'text-brand-600'}`}>
                 {displayValue}
             </span>
         )}
@@ -67,9 +67,9 @@ const Slider: React.FC<SliderProps> = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className={`relative h-2 rounded-full ${disabled ? 'bg-slate-200' : 'bg-violet-100'}`}>
+        <div className={`relative h-2 rounded-full ${disabled ? 'bg-slate-200' : 'bg-brand-100'}`}>
           <div
-            className={`absolute h-2 rounded-full ${disabled ? 'bg-slate-300' : 'bg-violet-500'}`}
+            className={`absolute h-2 rounded-full ${disabled ? 'bg-slate-300' : 'bg-brand-500'}`}
             style={{ width: `${Math.max(0, Math.min(100, percentage))}%` }}
           />
         </div>
@@ -96,7 +96,7 @@ const Slider: React.FC<SliderProps> = ({
             [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-slate-300
             [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:duration-150
             [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:hover:shadow-lg
-            ${disabled ? '[&::-webkit-slider-thumb]:bg-slate-200 [&::-webkit-slider-thumb]:border-slate-300' : '[&::-webkit-slider-thumb]:bg-violet-500 [&::-webkit-slider-thumb]:border-violet-500 group-hover:[&::-webkit-slider-thumb]:bg-violet-600'}
+            ${disabled ? '[&::-webkit-slider-thumb]:bg-slate-200 [&::-webkit-slider-thumb]:border-slate-300' : '[&::-webkit-slider-thumb]:bg-brand-500 [&::-webkit-slider-thumb]:border-brand-500 group-hover:[&::-webkit-slider-thumb]:bg-brand-600'}
             
             [&::-moz-range-thumb]:appearance-none
             [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5
@@ -106,7 +106,7 @@ const Slider: React.FC<SliderProps> = ({
             [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-slate-300
             [&::-moz-range-thumb]:transition-transform [&::-moz-range-thumb]:duration-150
             [&::-moz-range-thumb]:hover:scale-110 [&::-moz-range-thumb]:hover:shadow-lg
-             ${disabled ? '[&::-moz-range-thumb]:bg-slate-200 [&::-moz-range-thumb]:border-slate-300' : '[&::-moz-range-thumb]:bg-violet-500 [&::-moz-range-thumb]:border-violet-500 group-hover:[&::-moz-range-thumb]:bg-violet-600'}
+             ${disabled ? '[&::-moz-range-thumb]:bg-slate-200 [&::-moz-range-thumb]:border-slate-300' : '[&::-moz-range-thumb]:bg-brand-500 [&::-moz-range-thumb]:border-brand-500 group-hover:[&::-moz-range-thumb]:bg-brand-600'}
           `}
         />
          {showTooltip && (

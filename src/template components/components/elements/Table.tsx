@@ -174,7 +174,7 @@ const Table = <T extends { id: string | number }>({
           {isLoading ? (<tr><td colSpan={currentColumns.length} className="p-8 text-center text-slate-500">Loading...</td></tr>)
            : paginatedData.length === 0 ? (<tr><td colSpan={currentColumns.length} className="p-8 text-center text-slate-500">No data.</td></tr>)
            : (paginatedData.map((row, rowIndex) => (
-              <tr key={row.id} className={`transition-colors duration-150 ${onRowClick ? 'cursor-pointer hover:bg-violet-50' : 'hover:bg-slate-50'}`} onClick={() => onRowClick?.(row)}>
+              <tr key={row.id} className={`transition-colors duration-150 ${onRowClick ? 'cursor-pointer hover:bg-brand-50' : 'hover:bg-slate-50'}`} onClick={() => onRowClick?.(row)}>
                 {currentColumns.map((column) => (
                   <td key={String(column.key)} className={`px-4 py-3 whitespace-nowrap text-sm text-slate-700 ${column.align === 'right' ? 'text-right' : column.align === 'center' ? 'text-center' : 'text-left'}`} style={{ width: column.width, minWidth: column.minWidth }}>
                     {renderCellContent(row, column, rowIndex)}

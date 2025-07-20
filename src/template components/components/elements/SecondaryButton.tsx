@@ -27,10 +27,10 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
       type="button"
       disabled={disabled || isLoading}
       className={`
-        font-semibold rounded-lg border-2 border-violet-500 text-violet-500
+        font-semibold rounded-lg border-2 border-brand-500 text-brand-500
         bg-white
-        hover:bg-violet-50 hover:text-violet-600 hover:border-violet-600
-        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-400
+        hover:bg-brand-50 hover:text-brand-600 hover:border-brand-600
+        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-400
         transition-all duration-200 ease-in-out transform hover:scale-[1.03] active:scale-[0.98]
         disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 disabled:bg-slate-100 disabled:border-slate-300 disabled:text-slate-500
         flex items-center justify-center
@@ -40,7 +40,7 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
       {...props}
     >
       {isLoading && (
-         <svg className="animate-spin h-5 w-5 text-violet-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+         <svg className="animate-spin h-5 w-5 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
           style={{ marginLeft: icon ? '-0.25rem' : '-0.5rem', marginRight: '0.75rem' }}
          >
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

@@ -64,7 +64,7 @@ const TextareaInput: React.FC<TextareaInputProps> = ({
           relative border rounded-lg transition-all duration-200 ease-in-out group
           ${disabled ? 'bg-slate-100 cursor-not-allowed' : 'bg-white hover:border-slate-400'}
           ${error ? 'border-red-500 hover:border-red-600' :
-            isFocused ? 'border-violet-500 ring-1 ring-violet-500 hover:border-violet-600' :
+            isFocused ? 'border-brand-500 ring-1 ring-brand-500 hover:border-brand-600' :
             'border-slate-300'}
         `}
       >
@@ -96,7 +96,7 @@ const TextareaInput: React.FC<TextareaInputProps> = ({
             absolute text-sm left-0 transition-all duration-200 ease-in-out pointer-events-none
             transform origin-[0]
             px-3.5
-            ${error ? 'text-red-500' : isFocused ? 'text-violet-500' : 'text-slate-500'}
+            ${error ? 'text-red-500' : isFocused ? 'text-brand-500' : 'text-slate-500'}
             ${isLabelFloating ? '-translate-y-3 scale-[0.8] top-3' : 'scale-100 top-1/2 -translate-y-1/2'}
           `}
         >

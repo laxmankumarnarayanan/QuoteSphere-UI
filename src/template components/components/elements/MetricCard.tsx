@@ -39,7 +39,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
         <div className={`text-xs font-medium text-slate-500 uppercase tracking-wider`}>
           {label}
         </div>
-        {icon && <div className="text-violet-500 opacity-80">{icon}</div>}
+        {icon && <div className="text-brand-500 opacity-80">{icon}</div>}
       </div>
       <div className="text-3xl font-bold text-slate-800 mb-2">
         {value}

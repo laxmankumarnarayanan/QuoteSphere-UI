@@ -60,12 +60,12 @@ const TextInput: React.FC<TextInputProps> = ({
           flex items-center
           ${disabled ? 'bg-slate-100 cursor-not-allowed' : 'bg-white hover:border-slate-400'}
           ${error ? 'border-red-500 hover:border-red-600' :
-            isFocused ? 'border-violet-500 ring-1 ring-violet-500 hover:border-violet-600' :
+            isFocused ? 'border-brand-500 ring-1 ring-brand-500 hover:border-brand-600' :
             'border-slate-300'}
         `}
       >
         {leadingIcon && (
-          <div className="absolute inset-y-0 left-0 pl-3.5 pr-2 flex items-center pointer-events-none text-slate-400 peer-focus:text-violet-500"> 
+          <div className="absolute inset-y-0 left-0 pl-3.5 pr-2 flex items-center pointer-events-none text-slate-400 peer-focus:text-brand-500"> 
             {React.cloneElement(leadingIcon as React.ReactElement, { className: 'w-5 h-5' })}
           </div>
         )}
@@ -98,7 +98,7 @@ const TextInput: React.FC<TextInputProps> = ({
             transform origin-[0]
             ${leadingIcon ? 'pl-11' : 'pl-3.5'} 
             ${error ? 'text-red-500' :
-              isFocused ? 'text-violet-500' :
+              isFocused ? 'text-brand-500' :
               'text-slate-500'}
             ${isLabelFloating ?
               '-translate-y-3 scale-[0.8] top-3' : 
@@ -112,7 +112,7 @@ const TextInput: React.FC<TextInputProps> = ({
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-violet-500 focus:outline-none z-10"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-brand-500 focus:outline-none z-10"
             aria-label={showPassword ? "Hide password" : "Show password"}
             tabIndex={-1}
           >

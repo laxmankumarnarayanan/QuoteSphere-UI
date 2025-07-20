@@ -70,7 +70,7 @@ const Modal: React.FC<ModalProps> = ({
                     {!hideCloseButton && (
                       <button
                         type="button"
-                        className="text-slate-400 hover:text-slate-600 transition-colors p-1 -mr-1 rounded-full focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                        className="text-slate-400 hover:text-slate-600 transition-colors p-1 -mr-1 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
                         onClick={onClose}
                       >
                         <span className="sr-only">Close</span>
@@ -82,7 +82,7 @@ const Modal: React.FC<ModalProps> = ({
                  {!title && !hideCloseButton && ( 
                     <button
                         type="button"
-                        className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1"
+                        className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1"
                         onClick={onClose}
                     >
                         <span className="sr-only">Close</span>

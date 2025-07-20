@@ -76,12 +76,12 @@ const SelectInput: React.FC<SelectInputProps> = ({
           relative border rounded-lg transition-all duration-200 ease-in-out group flex items-center
           ${disabled ? 'bg-slate-100 cursor-not-allowed' : 'bg-white hover:border-slate-400'}
           ${error ? 'border-red-500 hover:border-red-600' :
-            (isFocused || isOpen) ? 'border-violet-500 ring-1 ring-violet-500 hover:border-violet-600' :
+            (isFocused || isOpen) ? 'border-brand-500 ring-1 ring-brand-500 hover:border-brand-600' :
             'border-slate-300'}
         `}
       >
         {leadingIcon && (
-          <div className="absolute inset-y-0 left-0 pl-3.5 pr-2 flex items-center pointer-events-none text-slate-400 peer-focus:text-violet-500">
+          <div className="absolute inset-y-0 left-0 pl-3.5 pr-2 flex items-center pointer-events-none text-slate-400 peer-focus:text-brand-500">
             {React.cloneElement(leadingIcon as React.ReactElement, { className: 'w-5 h-5' })}
           </div>
         )}
@@ -113,7 +113,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
             absolute text-sm left-0 transition-all duration-200 ease-in-out pointer-events-none
             transform origin-[0]
             ${leadingIcon ? 'pl-11' : 'pl-3.5'}
-            ${error ? 'text-red-500' : (isFocused || isOpen) ? 'text-violet-500' : 'text-slate-500'}
+            ${error ? 'text-red-500' : (isFocused || isOpen) ? 'text-brand-500' : 'text-slate-500'}
             ${isLabelFloating ? '-translate-y-3 scale-[0.8] top-3' : 'scale-100 top-1/2 -translate-y-1/2'}
           `}
         >
@@ -146,7 +146,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
               aria-disabled={option.disabled && option.value !== ''}
               onClick={() => !(option.disabled && option.value !== '') && handleSelectOption(option.value)}
               onMouseDown={(e) => e.preventDefault()}
-              className={`px-3.5 py-2.5 text-sm ${option.disabled && option.value !== '' ? 'text-slate-400 cursor-not-allowed bg-slate-50' : value === option.value ? 'bg-violet-100 text-violet-700 font-medium' : 'text-slate-700 hover:bg-violet-50 hover:text-violet-600 cursor-pointer'}`}
+              className={`px-3.5 py-2.5 text-sm ${option.disabled && option.value !== '' ? 'text-slate-400 cursor-not-allowed bg-slate-50' : value === option.value ? 'bg-brand-100 text-brand-700 font-medium' : 'text-slate-700 hover:bg-brand-50 hover:text-brand-600 cursor-pointer'}`}
             >
               {option.label}
             </li>
