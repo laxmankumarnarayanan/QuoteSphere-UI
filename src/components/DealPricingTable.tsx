@@ -18,12 +18,12 @@ export interface DealPricingRow {
   priceDescription: string;
   currency: string;
   feePercentage: string;
+  feeType: string;
   flatFeeAmount: string;
   discountPercentage: string;
   standardPrice: string;
-  preferentialType: string;
+  //preferentialType: string;
   finalPrice: string;
-  feeType: string;
   feeCap: string;
   maxDiscountAmount: string;
   calculatedFeeAmount: string;
@@ -158,7 +158,6 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">11. Max Discount</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">12. Calculated Fee</th>
               <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">13. Total Commitment</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">14. Actions</th>
             </tr>
           </thead>
           <tbody>
