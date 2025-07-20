@@ -48,13 +48,20 @@ export const dealService = {
 };
 
 export async function updateDealStatus(dealId: string, status: string) {
-  const response = await fetch(`${API_BASE_URL}/deal/${dealId}/status`, {
+  // Fetch the current deal
+  const getRes = await fetch(`${API_BASE_URL}/deal/${dealId}`);
+  if (!getRes.ok) throw new Error("Failed to fetch deal");
+  const deal = await getRes.json();
+
+  // Update the status
+  deal.dealStatus = status;
+
+  // PUT the updated deal
+  const putRes = await fetch(`${API_BASE_URL}/deal/${dealId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ dealStatus: status }),
+    body: JSON.stringify(deal),
   });
-  if (!response.ok) {
-    throw new Error("Failed to update deal status");
-  }
-  return response.json();
+  if (!putRes.ok) throw new Error("Failed to update deal status");
+  return putRes.json();
 } 

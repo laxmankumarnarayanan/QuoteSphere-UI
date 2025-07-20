@@ -7,7 +7,7 @@ import { CustomerDetailsSection } from "./sections/CustomerDetailsSection/Custom
 import { CustomerSelectionSection } from "./sections/CustomerSelectionSection/CustomerSelectionSection";
 import { DealCreationSection } from "@sections/DealCreationSection/DealCreationSection";
 import { Customer, CustomerDetails } from "../../services/customerService";
-import { dealService, Deal } from '../../services/dealService';
+import { dealService, Deal, updateDealStatus } from '../../services/dealService';
 import { ProductSelectionDropdowns } from "./ProductSelectionDropdowns";
 import { CustomerInfoBanner } from "./CustomerInfoBanner";
 import DealCollateralForm from "../../components/DealCollateralForm";
@@ -94,7 +94,20 @@ export const DealCreationLayer = (): JSX.Element => {
  const [pricingCollapsedSpecial, setPricingCollapsedSpecial] = useState(true);
 
  const handleNext = async () => {
-   if (currentStep === 3 && createdDeal && addedCombinations.length > 0) {
+   if (currentStep === 5) {
+     // Special Conditions step - Submit the deal
+     if (createdDeal?.dealId) {
+       try {
+         await updateDealStatus(createdDeal.dealId, "Submitted");
+         // Optionally show success message or redirect
+         alert("Deal submitted successfully!");
+         // You can add navigation logic here if needed
+       } catch (error) {
+         console.error('Failed to submit deal:', error);
+         alert("Failed to submit deal. Please try again.");
+       }
+     }
+   } else if (currentStep === 3 && createdDeal && addedCombinations.length > 0) {
      try {
        await Promise.all(
          addedCombinations.map(async (combo) => {
@@ -701,12 +714,13 @@ export const DealCreationLayer = (): JSX.Element => {
            {createdDeal && createdDeal.dealId && (
              <SpecialConditionsSection dealId={createdDeal.dealId} />
            )}
+           {/* Navigation Buttons for Special Conditions */}
            <div className="flex justify-end gap-4 mt-8">
              <SecondaryButton onClick={handleBack}>
                Back
              </SecondaryButton>
              <PrimaryButton onClick={handleNext}>
-               Next
+               Submit Deal
              </PrimaryButton>
            </div>
          </>

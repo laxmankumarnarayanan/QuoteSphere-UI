@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TextInput from "../../../template components/components/elements/TextInput";
 import SecondaryButton from "../../../template components/components/elements/SecondaryButton";
-import { dealService, updateDealStatus } from "../../../services/dealService";
+import { dealService } from "../../../services/dealService";
 
 interface SpecialCondition {
   dealID: string;
@@ -58,17 +58,6 @@ const SpecialConditionsSection: React.FC<SpecialConditionsSectionProps> = ({ dea
     }
   };
 
-  const handleSubmitDeal = async () => {
-    try {
-      await updateDealStatus(dealId, "Submitted");
-      // Optionally, show a success message or redirect
-      // e.g., setSuccess(true) or navigate to another page
-    } catch (err) {
-      // Optionally, handle error
-      // e.g., setError("Failed to submit deal");
-    }
-  };
-
   const nextConditionNumber = specialConditions.length + 1;
 
   return (
@@ -105,15 +94,6 @@ const SpecialConditionsSection: React.FC<SpecialConditionsSectionProps> = ({ dea
       <div className="flex justify-end mt-4">
         <SecondaryButton onClick={handleAdd} disabled={loading || !description.trim()}>
           {loading ? "Adding..." : "Add"}
-        </SecondaryButton>
-      </div>
-      <div className="flex justify-end mt-6">
-        <SecondaryButton
-          type="button"
-          onClick={handleSubmitDeal}
-          // ...other props if any...
-        >
-          Submit Deal
         </SecondaryButton>
       </div>
     </div>
