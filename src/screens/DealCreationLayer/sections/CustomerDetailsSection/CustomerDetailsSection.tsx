@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "../../../../components/ui/table";
 import { CustomerDetails, ChildCustomer, customerService } from "../../../../services/customerService";
+import GuarantorIcon from '../../../../components/GuarantorIcon';
 
 interface CustomerDetailsSectionProps {
   selectedCustomer: CustomerDetails | null;
@@ -119,24 +120,28 @@ export const CustomerDetailsSection = ({ selectedCustomer, onCustomerSelect }: C
                         {childCustomers.map((child: ChildCustomer) => (
                             <TableRow key={child.customerID}>
                                 <TableCell>
-                                  <button
-                                    onClick={() => handleChildCustomerClick(child)}
-                                    disabled={loadingChildCustomer === child.customerID}
-                                    className={`text-left hover:text-blue-600 hover:underline transition-colors ${
-                                      loadingChildCustomer === child.customerID 
-                                        ? 'text-gray-400 cursor-not-allowed' 
-                                        : 'text-blue-600 cursor-pointer'
-                                    }`}
-                                  >
-                                    {loadingChildCustomer === child.customerID ? (
-                                      <span className="flex items-center gap-2">
-                                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                                        Loading...
-                                      </span>
-                                    ) : (
-                                      child.customerName
-                                    )}
-                                  </button>
+                                  {onCustomerSelect ? (
+                                    <button
+                                      onClick={() => handleChildCustomerClick(child)}
+                                      disabled={loadingChildCustomer === child.customerID}
+                                      className={`text-left hover:text-blue-600 hover:underline transition-colors ${
+                                        loadingChildCustomer === child.customerID 
+                                          ? 'text-gray-400 cursor-not-allowed' 
+                                          : 'text-blue-600 cursor-pointer'
+                                      }`}
+                                    >
+                                      {loadingChildCustomer === child.customerID ? (
+                                        <span className="flex items-center gap-2">
+                                          <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                          Loading...
+                                        </span>
+                                      ) : (
+                                        child.customerName
+                                      )}
+                                    </button>
+                                  ) : (
+                                    <span>{child.customerName}</span>
+                                  )}
                                 </TableCell>
                                 <TableCell>{child.cif}</TableCell>
                                 <TableCell>{new Date(child.onboardedDate).toLocaleDateString()}</TableCell>
