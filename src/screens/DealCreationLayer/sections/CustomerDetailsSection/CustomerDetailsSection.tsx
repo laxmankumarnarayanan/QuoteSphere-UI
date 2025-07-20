@@ -116,17 +116,34 @@ export const CustomerDetailsSection = ({ selectedCustomer }: CustomerDetailsSect
 
         {customerAccounts && customerAccounts.length > 0 && (
           <Section title="Accounts">
-            {customerAccounts.map((account, idx) => (
-              <div key={account.id.accountNumber || idx} className="mb-4 pb-4 border-b last:border-b-0 last:pb-0">
-                <DetailItem label="Relationship Type" value={account.relationshipType || 'N/A'} />
-                <DetailItem label="Account Type" value={account.attribute || 'N/A'} />
-                <DetailItem label="Account Status" value={account.accountStatus || 'N/A'} />
-                <DetailItem label="Expiry Date" value={account.expiryDate ? new Date(account.expiryDate).toLocaleDateString() : 'N/A'} />
-                <DetailItem label="Currency" value={account.currency || 'N/A'} />
-                <DetailItem label="Maturity Date" value={account.maturityDate ? new Date(account.maturityDate).toLocaleDateString() : 'N/A'} />
-                <DetailItem label="Total Outstanding" value={account.totalOutstanding !== undefined && account.totalOutstanding !== null ? account.totalOutstanding : 'N/A'} />
-              </div>
-            ))}
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Account Number</TableHead>
+                  <TableHead>Relationship Type</TableHead>
+                  <TableHead>Account Type</TableHead>
+                  <TableHead>Account Status</TableHead>
+                  <TableHead>Currency</TableHead>
+                  <TableHead>Expiry Date</TableHead>
+                  <TableHead>Maturity Date</TableHead>
+                  <TableHead>Total Outstanding</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {customerAccounts.map((account, idx) => (
+                  <TableRow key={account.id.accountNumber || idx}>
+                    <TableCell>{account.id.accountNumber || 'N/A'}</TableCell>
+                    <TableCell>{account.relationshipType || 'N/A'}</TableCell>
+                    <TableCell>{account.attribute || 'N/A'}</TableCell>
+                    <TableCell>{account.accountStatus || 'N/A'}</TableCell>
+                    <TableCell>{account.currency || 'N/A'}</TableCell>
+                    <TableCell>{account.expiryDate ? new Date(account.expiryDate).toLocaleDateString() : 'N/A'}</TableCell>
+                    <TableCell>{account.maturityDate ? new Date(account.maturityDate).toLocaleDateString() : 'N/A'}</TableCell>
+                    <TableCell>{account.totalOutstanding !== undefined && account.totalOutstanding !== null ? account.totalOutstanding : 'N/A'}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </Section>
         )}
         
