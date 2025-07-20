@@ -17,12 +17,12 @@ export interface DealPricingRow {
   };
   priceDescription: string;
   currency: string;
+  feePercentage: string;
   standardPrice: string;
   preferentialType: string;
   discountPercentage: string;
   finalPrice: string;
   feeType: string;
-  feePercentage: string;
   flatFeeAmount: string;
   feeCap: string;
   maxDiscountAmount: string;
@@ -145,20 +145,20 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
         <table className="min-w-full bg-white rounded shadow">
           <thead>
             <tr className="bg-violet-100">
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee Name</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Currency</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee Type</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee %</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Preferential Type</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Discount %</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Discount Amount</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Final Price</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Standard Fee</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee Cap</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Max Discount</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Calculated Fee</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Total Commitment</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Actions</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">1. Fee Name</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">2. Currency</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">3. Standard Price</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">4. Standard Percentage</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">5. Fee Type</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">6. Preferential Type</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">7. Preferential Value</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">8. Final Price</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">9. Actions</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">10. Fee Cap</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">11. Max Discount</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">12. Calculated Fee</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">13. Total Commitment</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">14. Actions</th>
             </tr>
           </thead>
           <tbody>
