@@ -13,11 +13,11 @@ import {
   TableHeader,
   TableRow,
 } from "../../../../components/ui/table";
-import { CustomerDetails, ChildCustomer } from "../../../../services/customerService";
-import GuarantorIcon from '../../../../components/GuarantorIcon';
+import { CustomerDetails, ChildCustomer, customerService } from "../../../../services/customerService";
 
 interface CustomerDetailsSectionProps {
   selectedCustomer: CustomerDetails | null;
+  onCustomerSelect?: (customer: CustomerDetails | null) => void;
 }
 
 const DetailItem = ({ label, value }: { label: string; value: React.ReactNode }) => {
@@ -41,7 +41,9 @@ const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title
     </div>
   );
 
-export const CustomerDetailsSection = ({ selectedCustomer }: CustomerDetailsSectionProps): JSX.Element => {
+export const CustomerDetailsSection = ({ selectedCustomer, onCustomerSelect }: CustomerDetailsSectionProps): JSX.Element => {
+  const [loadingChildCustomer, setLoadingChildCustomer] = useState<string | null>(null);
+
   if (!selectedCustomer) {
     return (
       <Card className="w-full shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] border-[#ebebea]">
@@ -63,6 +65,21 @@ export const CustomerDetailsSection = ({ selectedCustomer }: CustomerDetailsSect
     customerFacilities,
     childCustomers,
   } = selectedCustomer;
+
+  const handleChildCustomerClick = async (childCustomer: ChildCustomer) => {
+    if (!onCustomerSelect) return;
+    
+    try {
+      setLoadingChildCustomer(childCustomer.customerID);
+      const childCustomerDetails = await customerService.getCustomerDetails(childCustomer.customerID);
+      onCustomerSelect(childCustomerDetails);
+    } catch (error) {
+      console.error('Failed to fetch child customer details:', error);
+      // You could add a toast notification here to show the error
+    } finally {
+      setLoadingChildCustomer(null);
+    }
+  };
 
   return (
     <Card className="w-full shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] border-[#ebebea]">
@@ -101,7 +118,26 @@ export const CustomerDetailsSection = ({ selectedCustomer }: CustomerDetailsSect
                     <TableBody>
                         {childCustomers.map((child: ChildCustomer) => (
                             <TableRow key={child.customerID}>
-                                <TableCell>{child.customerName}</TableCell>
+                                <TableCell>
+                                  <button
+                                    onClick={() => handleChildCustomerClick(child)}
+                                    disabled={loadingChildCustomer === child.customerID}
+                                    className={`text-left hover:text-blue-600 hover:underline transition-colors ${
+                                      loadingChildCustomer === child.customerID 
+                                        ? 'text-gray-400 cursor-not-allowed' 
+                                        : 'text-blue-600 cursor-pointer'
+                                    }`}
+                                  >
+                                    {loadingChildCustomer === child.customerID ? (
+                                      <span className="flex items-center gap-2">
+                                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                        Loading...
+                                      </span>
+                                    ) : (
+                                      child.customerName
+                                    )}
+                                  </button>
+                                </TableCell>
                                 <TableCell>{child.cif}</TableCell>
                                 <TableCell>{new Date(child.onboardedDate).toLocaleDateString()}</TableCell>
                                 <TableCell>{child.segmentCode}</TableCell>

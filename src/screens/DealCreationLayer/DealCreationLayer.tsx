@@ -232,7 +232,10 @@ export const DealCreationLayer = (): JSX.Element => {
            </div>
            {/* Right Column - Customer Details */}
            <div className="flex-1">
-             <CustomerDetailsSection selectedCustomer={selectedCustomer} />
+             <CustomerDetailsSection 
+               selectedCustomer={selectedCustomer} 
+               onCustomerSelect={handleCustomerSelect}
+             />
              {/* Navigation Buttons */}
              <div className="flex justify-end gap-4 mt-8">
                <SecondaryButton onClick={handleBack} disabled={currentStep === 1}>
