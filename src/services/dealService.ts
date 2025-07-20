@@ -49,7 +49,7 @@ export const dealService = {
 
 export async function updateDealStatus(dealId: string, status: string) {
   // Fetch the current deal
-  const getRes = await fetch(`${API_BASE_URL}/deals/${dealId}`);
+  const getRes = await fetch(`${API_BASE_URL}/deal/${dealId}`);
   if (!getRes.ok) throw new Error("Failed to fetch deal");
   const deal = await getRes.json();
 
