@@ -131,8 +131,8 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({
   };
 
   return (
-    <div className="border border-violet-200 rounded-lg bg-violet-50 p-4">
-      <div className="font-semibold text-violet-800 mb-2">
+    <div className="border border-brand-200 rounded-lg bg-brand-50 p-4">
+      <div className="font-semibold text-brand-800 mb-2">
         {combo.domainType || "Domain"} | - | {combo.productLabel} | - | {combo.subProductLabel}
       </div>
       <DealCommitmentForm
@@ -147,8 +147,8 @@ const ProductSubproductSection: React.FC<ProductSubproductSectionProps> = ({
         onCancelEdit={handleCancelEdit}
       />
       {commitments.length > 0 && (
-        <div className="mt-3 pl-4 border-l-2 border-violet-200">
-          <div className="font-medium text-violet-700 mb-1">Deal Commitments:</div>
+        <div className="mt-3 pl-4 border-l-2 border-brand-200">
+          <div className="font-medium text-brand-700 mb-1">Deal Commitments:</div>
           <div className="space-y-1">
             {commitments.map((commitment, index) => (
               <div key={commitment.commitmentNumber} className="flex gap-4 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
@@ -333,13 +333,13 @@ export const ProductSelectionDropdowns: React.FC<ProductSelectionDropdownsProps>
     <div className="flex flex-col gap-4">
       {/* Added combinations list (legacy) */}
       {false && addedCombinations.length > 0 && (
-        <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
-          <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
+        <div className="mb-6 border border-brand-200 rounded-lg bg-brand-50 p-4">
+          <div className="font-semibold text-brand-800 mb-2">Added Product-SubProduct Combinations:</div>
           <ul className="space-y-2">
             {addedCombinations.map((combo, idx) => (
               <li key={combo.productId + '-' + combo.subProductId} className="flex gap-6 items-center">
-                <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
-                <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                <span className="text-sm font-medium text-brand-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                <span className="text-sm font-medium text-brand-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
               </li>
             ))}
           </ul>
@@ -534,7 +534,7 @@ const DealCommitmentForm: React.FC<{
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded mb-4 bg-white">
-      <div className="font-semibold text-violet-700 mb-2">
+      <div className="font-semibold text-brand-700 mb-2">
         {isEdit ? `Edit Deal Commitment #${commitmentNumber}` : `Deal Commitment #${commitmentNumber}`}
       </div>
       <SelectInput

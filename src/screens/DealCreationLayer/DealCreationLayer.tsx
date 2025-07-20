@@ -28,8 +28,8 @@ const stepsData = [
 function DealDetailsContainer({ deal }: { deal: Deal | null }) {
   if (!deal) return null;
   return (
-    <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
-      <div className="font-semibold text-violet-800 mb-2 text-base font-['Archivo',Helvetica]">Deal Details</div>
+    <div className="mb-6 border border-brand-200 rounded-lg bg-brand-50 p-4">
+      <div className="font-semibold text-brand-800 mb-2 text-base font-['Archivo',Helvetica]">Deal Details</div>
       <div className="space-y-2">
         <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
           <span className="text-sm font-medium text-gray-500 w-32">Deal ID</span>
@@ -267,10 +267,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Deal Details */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setDealDetailsCollapsed((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Deal Details
                </div>
                <div className="flex items-center gap-2">
@@ -287,10 +287,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Customer Details */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setCustomerDetailsCollapsed((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Selected Customer Details
                </div>
                <div className="flex items-center gap-2">
@@ -321,10 +321,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Deal Details */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setDealDetailsCollapsedDoc((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Deal Details
                </div>
                <div className="flex items-center gap-2">
@@ -341,10 +341,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Customer Details */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setCustomerDetailsCollapsedDoc((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Selected Customer Details
                </div>
                <div className="flex items-center gap-2">
@@ -360,8 +360,8 @@ export const DealCreationLayer = (): JSX.Element => {
            </div>
            {/* Collapsible Added Product-SubProduct Combinations */}
            {addedCombinations.length > 0 && (
-             <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
-               <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
+             <div className="mb-6 border border-brand-200 rounded-lg bg-brand-50 p-4">
+               <div className="font-semibold text-brand-800 mb-2">Added Product-SubProduct Combinations:</div>
                <div className="space-y-4">
                  {addedCombinations.map((combo, idx) => {
                    const comboKey = `${combo.productId}-${combo.subProductId}`;
@@ -376,14 +376,14 @@ export const DealCreationLayer = (): JSX.Element => {
                          onClick={() => setComboCollapsedDoc(prev => ({ ...prev, [comboKey]: !isCollapsed }))}
                        >
                          <div className="flex gap-6 items-center">
-                           <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
-                           <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                           <span className="text-sm font-medium text-brand-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                           <span className="text-sm font-medium text-brand-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
                          </div>
                          <span className={`transition-transform duration-200 ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
                        </div>
                        {!isCollapsed && comboCommitments.length > 0 && (
-                         <div className="mt-3 pl-4 border-l-2 border-violet-200">
-                           <div className="font-medium text-violet-700 mb-1">Deal Commitments:</div>
+                         <div className="mt-3 pl-4 border-l-2 border-brand-200">
+                           <div className="font-medium text-brand-700 mb-1">Deal Commitments:</div>
                            <div className="space-y-1">
                              {comboCommitments.map((commitment, index) => (
                                <div key={commitment.commitmentNumber} className="flex gap-4 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
@@ -424,10 +424,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Deal Details */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setDealDetailsCollapsedPricing((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Deal Details
                </div>
                <div className="flex items-center gap-2">
@@ -444,10 +444,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Customer Details */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setCustomerDetailsCollapsedPricing((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Selected Customer Details
                </div>
                <div className="flex items-center gap-2">
@@ -463,8 +463,8 @@ export const DealCreationLayer = (): JSX.Element => {
            </div>
            {/* Collapsible Added Product-SubProduct Combinations */}
            {addedCombinations.length > 0 && (
-             <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
-               <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
+             <div className="mb-6 border border-brand-200 rounded-lg bg-brand-50 p-4">
+               <div className="font-semibold text-brand-800 mb-2">Added Product-SubProduct Combinations:</div>
                <div className="space-y-4">
                  {addedCombinations.map((combo, idx) => {
                    const comboKey = `${combo.productId}-${combo.subProductId}`;
@@ -479,14 +479,14 @@ export const DealCreationLayer = (): JSX.Element => {
                          onClick={() => setComboCollapsedPricing(prev => ({ ...prev, [comboKey]: !isCollapsed }))}
                        >
                          <div className="flex gap-6 items-center">
-                           <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
-                           <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                           <span className="text-sm font-medium text-brand-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                           <span className="text-sm font-medium text-brand-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
                          </div>
                          <span className={`transition-transform duration-200 ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
                        </div>
                        {!isCollapsed && comboCommitments.length > 0 && (
-                         <div className="mt-3 pl-4 border-l-2 border-violet-200">
-                           <div className="font-medium text-violet-700 mb-1">Deal Commitments:</div>
+                         <div className="mt-3 pl-4 border-l-2 border-brand-200">
+                           <div className="font-medium text-brand-700 mb-1">Deal Commitments:</div>
                            <div className="space-y-1">
                              {comboCommitments.map((commitment, index) => (
                                <div key={commitment.commitmentNumber} className="flex gap-4 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
@@ -511,10 +511,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Collaterals */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setCollateralsCollapsedPricing((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Collaterals
                </div>
                <div className="flex items-center gap-2">
@@ -531,10 +531,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Documents */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setDocumentsCollapsedPricing((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Documents
                </div>
                <div className="flex items-center gap-2">
@@ -566,10 +566,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Deal Details */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setDealDetailsCollapsedSpecial((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Deal Details
                </div>
                <div className="flex items-center gap-2">
@@ -586,10 +586,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Customer Details */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setCustomerDetailsCollapsedSpecial((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Selected Customer Details
                </div>
                <div className="flex items-center gap-2">
@@ -605,8 +605,8 @@ export const DealCreationLayer = (): JSX.Element => {
            </div>
            {/* Collapsible Added Product-SubProduct Combinations */}
            {addedCombinations.length > 0 && (
-             <div className="mb-6 border border-violet-200 rounded-lg bg-violet-50 p-4">
-               <div className="font-semibold text-violet-800 mb-2">Added Product-SubProduct Combinations:</div>
+             <div className="mb-6 border border-brand-200 rounded-lg bg-brand-50 p-4">
+               <div className="font-semibold text-brand-800 mb-2">Added Product-SubProduct Combinations:</div>
                <div className="space-y-4">
                  {addedCombinations.map((combo, idx) => {
                    const comboKey = `${combo.productId}-${combo.subProductId}`;
@@ -621,14 +621,14 @@ export const DealCreationLayer = (): JSX.Element => {
                          onClick={() => setComboCollapsedSpecial(prev => ({ ...prev, [comboKey]: !isCollapsed }))}
                        >
                          <div className="flex gap-6 items-center">
-                           <span className="text-sm font-medium text-violet-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
-                           <span className="text-sm font-medium text-violet-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
+                           <span className="text-sm font-medium text-brand-900">Product: <span className="font-normal text-slate-800">{combo.productLabel}</span></span>
+                           <span className="text-sm font-medium text-brand-900">SubProduct: <span className="font-normal text-slate-800">{combo.subProductLabel}</span></span>
                          </div>
                          <span className={`transition-transform duration-200 ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
                        </div>
                        {!isCollapsed && comboCommitments.length > 0 && (
-                         <div className="mt-3 pl-4 border-l-2 border-violet-200">
-                           <div className="font-medium text-violet-700 mb-1">Deal Commitments:</div>
+                         <div className="mt-3 pl-4 border-l-2 border-brand-200">
+                           <div className="font-medium text-brand-700 mb-1">Deal Commitments:</div>
                            <div className="space-y-1">
                              {comboCommitments.map((commitment, index) => (
                                <div key={commitment.commitmentNumber} className="flex gap-4 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
@@ -653,10 +653,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Collaterals */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setCollateralsCollapsedSpecial((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Collaterals
                </div>
                <div className="flex items-center gap-2">
@@ -673,10 +673,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Documents */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setDocumentsCollapsedSpecial((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Documents
                </div>
                <div className="flex items-center gap-2">
@@ -693,10 +693,10 @@ export const DealCreationLayer = (): JSX.Element => {
            {/* Collapsible Pricing & Fees */}
            <div className="mb-4">
              <div
-               className="flex items-center justify-between cursor-pointer border border-violet-200 rounded-lg bg-violet-50 px-4 py-3 select-none"
+               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
                onClick={() => setPricingCollapsedSpecial((prev) => !prev)}
              >
-               <div className="font-semibold text-violet-800 text-base font-['Archivo',Helvetica]">
+               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
                  Pricing & Fees
                </div>
                <div className="flex items-center gap-2">

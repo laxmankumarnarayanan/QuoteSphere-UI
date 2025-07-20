@@ -61,15 +61,15 @@ const SpecialConditionsSection: React.FC<SpecialConditionsSectionProps> = ({ dea
   const nextConditionNumber = specialConditions.length + 1;
 
   return (
-    <div className="w-full border border-violet-200 rounded-lg bg-violet-50 p-6 mt-0">
-      <div className="font-semibold text-violet-800 mb-4">Special Conditions</div>
+    <div className="w-full border border-brand-200 rounded-lg bg-brand-50 p-6 mt-0">
+      <div className="font-semibold text-brand-800 mb-4">Special Conditions</div>
       {specialConditions.length > 0 && (
         <div className="mb-6">
-          <div className="font-medium text-violet-900 mb-2">Added Special Conditions:</div>
+          <div className="font-medium text-brand-900 mb-2">Added Special Conditions:</div>
           <ul className="space-y-2">
             {specialConditions.map((cond, idx) => (
               <li key={cond.conditionNumber} className="flex gap-4 items-center">
-                <span className="text-sm font-semibold text-violet-900">Condition {cond.conditionNumber}:</span>
+                <span className="text-sm font-semibold text-brand-900">Condition {cond.conditionNumber}:</span>
                 <span className="text-sm text-slate-800">{cond.description}</span>
               </li>
             ))}
