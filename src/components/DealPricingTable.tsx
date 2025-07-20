@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import TextInput from "../template components/components/form/TextInput";
 import SecondaryButton from "../template components/components/elements/SecondaryButton";
 import PrimaryButton from "../template components/components/elements/PrimaryButton";
+import SelectInput from "../template components/components/elements/SelectInput";
+import { dealService } from "../services/dealService";
 
 const API_BASE_URL = 'https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api';
 
@@ -36,9 +38,31 @@ interface DealPricingTableProps {
 const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
   const [rows, setRows] = useState<DealPricingRow[]>([]);
   const [editIdx, setEditIdx] = useState<number | null>(null);
-  const [editValues, setEditValues] = useState<{ discountPercentage: string; discountAmount: string }>({ discountPercentage: '', discountAmount: '' });
+  const [editValues, setEditValues] = useState<{ 
+    discountPercentage: string; 
+    discountAmount: string;
+    preferentialType: string;
+  }>({ 
+    discountPercentage: '', 
+    discountAmount: '',
+    preferentialType: ''
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [preferentialTypeOptions, setPreferentialTypeOptions] = useState<{ value: string; label: string }[]>([]);
+  const [preferentialTypeLoading, setPreferentialTypeLoading] = useState(false);
+
+  // Load preferential type dropdown options
+  useEffect(() => {
+    setPreferentialTypeLoading(true);
+    dealService.getDropdownValues("DealPricing", "PreferentialType")
+      .then(values => setPreferentialTypeOptions(values.map(v => ({ value: v, label: v }))))
+      .catch(err => {
+        console.error("Error loading preferential types:", err);
+        setError("Failed to load preferential type options.");
+      })
+      .finally(() => setPreferentialTypeLoading(false));
+  }, []);
 
   useEffect(() => {
     async function fetchRows() {
@@ -63,15 +87,20 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
     setEditValues({
       discountPercentage: rows[idx].discountPercentage || '',
       discountAmount: rows[idx].discountAmount || '',
+      preferentialType: rows[idx].preferentialType || '',
     });
   };
 
   const handleCancel = () => {
     setEditIdx(null);
-    setEditValues({ discountPercentage: '', discountAmount: '' });
+    setEditValues({ 
+      discountPercentage: '', 
+      discountAmount: '',
+      preferentialType: ''
+    });
   };
 
-  const handleChange = (field: 'discountPercentage' | 'discountAmount', value: string) => {
+  const handleChange = (field: 'discountPercentage' | 'discountAmount' | 'preferentialType', value: string) => {
     setEditValues(prev => ({ ...prev, [field]: value }));
   };
 
@@ -84,6 +113,7 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
         ...row,
         discountPercentage: editValues.discountPercentage,
         discountAmount: editValues.discountAmount,
+        preferentialType: editValues.preferentialType,
       };
       // PUT to backend
       await fetch(`${API_BASE_URL}/deal-pricing`, {
@@ -94,7 +124,11 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
       // Update local state
       setRows(prev => prev.map((r, i) => (i === idx ? updated : r)));
       setEditIdx(null);
-      setEditValues({ discountPercentage: '', discountAmount: '' });
+      setEditValues({ 
+        discountPercentage: '', 
+        discountAmount: '',
+        preferentialType: ''
+      });
     } catch (e) {
       setError("Failed to save changes.");
     } finally {
@@ -134,7 +168,21 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
                 <td className="px-3 py-2 text-sm text-slate-800">{row.priceDescription}</td>
                 <td className="px-3 py-2 text-sm text-slate-800">{row.currency}</td>
                 <td className="px-3 py-2 text-sm text-slate-800">{row.standardPrice}</td>
-                <td className="px-3 py-2 text-sm text-slate-800">{row.preferentialType}</td>
+                <td className="px-3 py-2 text-sm text-slate-800">
+                  {editIdx === idx ? (
+                    <SelectInput
+                      id={`preferentialType-${idx}`}
+                      label="Fee Type"
+                      value={editValues.preferentialType}
+                      onChange={val => handleChange('preferentialType', val)}
+                      options={preferentialTypeOptions}
+                      placeholder="Select Fee Type"
+                      disabled={preferentialTypeLoading}
+                    />
+                  ) : (
+                    row.preferentialType
+                  )}
+                </td>
                 <td className="px-3 py-2 text-sm text-slate-800">
                   {editIdx === idx ? (
                     <TextInput
