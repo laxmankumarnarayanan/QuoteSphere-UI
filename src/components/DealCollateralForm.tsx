@@ -39,7 +39,7 @@ async function uploadFileToAzure(file: File, blobName: string, sasToken: string)
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   await blockBlobClient.uploadData(file, { blobHTTPHeaders: { blobContentType: file.type } });
-  return `${AZURE_ACCOUNT_URL}/${AZURE_CONTAINER_NAME}/${blobName}?${sasToken}`;
+  return `${AZURE_ACCOUNT_URL}/${AZURE_CONTAINER_NAME}/${blobName}`;
 }
 
 // Unified view URL getter
@@ -113,8 +113,9 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         if (!res.ok) throw new Error('Failed to fetch collaterals');
         const data = await res.json();
         setAddedCollaterals(data);
+        // Data comes back as flat structure from DTO
         const maxId = data.reduce((max: number, c: any) => {
-          const idVal = c.id?.collateralID || 0;
+          const idVal = c.collateralID || 0; // FLAT structure
           return idVal > max ? idVal : max;
         }, 0);
         setNextCollateralId(maxId + 1);
@@ -216,20 +217,18 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       
       // Upload file if provided
       if (collateralFile) {
-        const collateralId = isEditCollateral ? editingCollateral.id.collateralID : nextCollateralId;
+        const collateralId = isEditCollateral ? editingCollateral.collateralID : nextCollateralId;
         const blobName = `${dealId},${collateralId}_${collateralFile.name}`;
         const sasToken = await getSasToken(blobName);
         storagePath = await uploadFileToAzure(collateralFile, blobName, sasToken);
       }
       
-      const collateralId = isEditCollateral ? editingCollateral.id.collateralID : nextCollateralId;
+      const collateralId = isEditCollateral ? editingCollateral.collateralID : nextCollateralId;
       
-      // Use the correct payload structure (nested id)
+      // Use FLAT payload structure (matches DealCollateralDTO)
       const payload = {
-        id: {
-          dealID: dealId,
-          collateralID: collateralId
-        },
+        dealID: dealId,                              // FLAT
+        collateralID: collateralId,                  // FLAT
         collateralType: form.collateralType,
         collateralValue: Number(form.collateralValue),
         currency: form.currency,
@@ -240,6 +239,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         lastUpdatedBy: "system",
         lastUpdatedDateTime: new Date().toISOString(),
       };
+      
+      console.log("Sending FLAT payload:", JSON.stringify(payload, null, 2));
       
       const method = isEditCollateral ? "PUT" : "POST";
       const url = isEditCollateral 
@@ -425,7 +426,8 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   // Delete handlers
   const handleDeleteCollateral = async (collateral: any) => {
     if (!window.confirm("Delete this collateral?")) return;
-    await fetch(`${API_BASE_URL}/deal-collateral/${collateral.id.dealID}/${collateral.id.collateralID}`, { method: "DELETE" });
+    // Use flat structure for delete
+    await fetch(`${API_BASE_URL}/deal-collateral/${collateral.dealID}/${collateral.collateralID}`, { method: "DELETE" });
     setSuccess(s => !s); // trigger refetch
   };
 
@@ -443,7 +445,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
           <div className="font-semibold text-violet-800 mb-2">Added Collaterals:</div>
           <ul className="space-y-2">
             {addedCollaterals.map((collateral, idx) => (
-              <li key={collateral.id?.dealID + '-' + collateral.id?.collateralID || idx} className="flex gap-6 items-center">
+              <li key={collateral.dealID + '-' + collateral.collateralID || idx} className="flex gap-6 items-center">
                 <span className="text-sm font-medium text-violet-900">Type: <span className="font-normal text-slate-800">{collateral.collateralType}</span></span>
                 <span className="text-sm font-medium text-violet-900">Value: <span className="font-normal text-slate-800">{collateral.collateralValue}</span></span>
                 <span className="text-sm font-medium text-violet-900">Currency: <span className="font-normal text-slate-800">{collateral.currency}</span></span>
@@ -505,7 +507,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
           {/* Collateral Section */}
           <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded mb-8">
             <div className="font-semibold text-violet-800 mb-2">
-              {isEditCollateral ? `Edit Collateral #${editingCollateral?.id?.collateralID}` : "Collateral"}
+              {isEditCollateral ? `Edit Collateral #${editingCollateral?.collateralID}` : "Collateral"}
             </div>
             <SelectInput
               id="collateralType"
