@@ -17,18 +17,12 @@ export interface DealPricingRow {
   };
   priceDescription: string;
   currency: string;
-  feePercentage: string;
   feeType: string;
   flatFeeAmount: string;
-  discountPercentage: string;
+  feePercentage: string;
+  preferentialType: string;
   standardPrice: string;
-  //preferentialType: string;
-  finalPrice: string;
-  feeCap: string;
-  maxDiscountAmount: string;
-  calculatedFeeAmount: string;
-  totalCommitmentAmount: string;
-  discountAmount: string;
+  discountPercentage: string;
 }
 
 interface DealPricingTableProps {
@@ -39,13 +33,13 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
   const [rows, setRows] = useState<DealPricingRow[]>([]);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [editValues, setEditValues] = useState<{ 
-    discountPercentage: string; 
-    discountAmount: string;
     preferentialType: string;
+    standardPrice: string;
+    discountPercentage: string;
   }>({ 
-    discountPercentage: '', 
-    discountAmount: '',
-    preferentialType: ''
+    preferentialType: '',
+    standardPrice: '',
+    discountPercentage: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -85,22 +79,22 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
   const handleEdit = (idx: number) => {
     setEditIdx(idx);
     setEditValues({
-      discountPercentage: rows[idx].discountPercentage || '',
-      discountAmount: rows[idx].discountAmount || '',
       preferentialType: rows[idx].preferentialType || '',
+      standardPrice: rows[idx].standardPrice || '',
+      discountPercentage: rows[idx].discountPercentage || '',
     });
   };
 
   const handleCancel = () => {
     setEditIdx(null);
     setEditValues({ 
-      discountPercentage: '', 
-      discountAmount: '',
-      preferentialType: ''
+      preferentialType: '',
+      standardPrice: '',
+      discountPercentage: ''
     });
   };
 
-  const handleChange = (field: 'discountPercentage' | 'discountAmount' | 'preferentialType', value: string) => {
+  const handleChange = (field: 'preferentialType' | 'standardPrice' | 'discountPercentage', value: string) => {
     setEditValues(prev => ({ ...prev, [field]: value }));
   };
 
@@ -111,9 +105,9 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
       const row = rows[idx];
       const updated = {
         ...row,
-        discountPercentage: editValues.discountPercentage,
-        discountAmount: editValues.discountAmount,
         preferentialType: editValues.preferentialType,
+        standardPrice: editValues.standardPrice,
+        discountPercentage: editValues.discountPercentage,
       };
       // PUT to backend
       await fetch(`${API_BASE_URL}/deal-pricing`, {
@@ -125,9 +119,9 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
       setRows(prev => prev.map((r, i) => (i === idx ? updated : r)));
       setEditIdx(null);
       setEditValues({ 
-        discountPercentage: '', 
-        discountAmount: '',
-        preferentialType: ''
+        preferentialType: '',
+        standardPrice: '',
+        discountPercentage: ''
       });
     } catch (e) {
       setError("Failed to save changes.");
@@ -145,19 +139,15 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
         <table className="min-w-full bg-white rounded shadow">
           <thead>
             <tr className="bg-violet-100">
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">1. Fee Name</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">2. Currency</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">3. Standard Price</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">4. Standard Percentage</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">5. Fee Type</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">6. Preferential Type</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">7. Preferential Value</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">8. Final Price</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">9. Actions</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">10. Fee Cap</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">11. Max Discount</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">12. Calculated Fee</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">13. Total Commitment</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Price Description</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Currency</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee Type</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Flat Fee Amount</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Fee Percentage</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Preferential Type</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Standard Price</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Discount %</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -165,20 +155,35 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
               <tr key={row.id.priceId} className="border-b last:border-b-0">
                 <td className="px-3 py-2 text-sm text-slate-800">{row.priceDescription}</td>
                 <td className="px-3 py-2 text-sm text-slate-800">{row.currency}</td>
-                <td className="px-3 py-2 text-sm text-slate-800">{row.standardPrice}</td>
+                <td className="px-3 py-2 text-sm text-slate-800">{row.feeType}</td>
+                <td className="px-3 py-2 text-sm text-slate-800">{row.flatFeeAmount}</td>
+                <td className="px-3 py-2 text-sm text-slate-800">{row.feePercentage}</td>
                 <td className="px-3 py-2 text-sm text-slate-800">
                   {editIdx === idx ? (
                     <SelectInput
                       id={`preferentialType-${idx}`}
-                      label="Fee Type"
+                      label="Preferential Type"
                       value={editValues.preferentialType}
                       onChange={val => handleChange('preferentialType', val)}
                       options={preferentialTypeOptions}
-                      placeholder="Select Fee Type"
+                      placeholder="Select Preferential Type"
                       disabled={preferentialTypeLoading}
                     />
                   ) : (
                     row.preferentialType
+                  )}
+                </td>
+                <td className="px-3 py-2 text-sm text-slate-800">
+                  {editIdx === idx ? (
+                    <TextInput
+                      id={`standardPrice-${idx}`}
+                      label="Standard Price"
+                      value={editValues.standardPrice}
+                      onChange={val => handleChange('standardPrice', val)}
+                      type="number"
+                    />
+                  ) : (
+                    row.standardPrice
                   )}
                 </td>
                 <td className="px-3 py-2 text-sm text-slate-800">
@@ -196,46 +201,19 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
                 </td>
                 <td className="px-3 py-2 text-sm text-slate-800">
                   {editIdx === idx ? (
-                    <TextInput
-                      id={`discountAmount-${idx}`}
-                      label="Discount Amount"
-                      value={editValues.discountAmount}
-                      onChange={val => handleChange('discountAmount', val)}
-                      type="number"
-                    />
+                    <>
+                      <PrimaryButton onClick={() => handleSave(idx)} className="mr-2">Save</PrimaryButton>
+                      <SecondaryButton onClick={handleCancel}>Cancel</SecondaryButton>
+                    </>
                   ) : (
-                    row.discountAmount
-                  )}
-                </td>
-                <td className="px-3 py-2 text-sm text-slate-800">{row.finalPrice}</td>
-                <td className="px-3 py-2 text-sm text-slate-800">{row.feeType}</td>
-                <td className="px-3 py-2 text-sm text-slate-800">{row.feePercentage}</td>
-                <td className="px-3 py-2 text-sm text-slate-800">{row.flatFeeAmount}</td>
-                <td className="px-3 py-2 text-sm text-slate-800">{row.feeCap}</td>
-                <td className="px-3 py-2 text-sm text-slate-800">{row.maxDiscountAmount}</td>
-                <td className="px-3 py-2 text-sm text-slate-800">{row.calculatedFeeAmount}</td>
-                <td className="px-3 py-2 text-sm text-slate-800">{row.totalCommitmentAmount}</td>
-                <td className="px-3 py-2 text-sm text-slate-800">
-                  {editIdx === idx ? (
-                    <div className="flex gap-2">
-                      <PrimaryButton size="sm" onClick={() => handleSave(idx)} isLoading={loading}>
-                        Save
-                      </PrimaryButton>
-                      <SecondaryButton size="sm" onClick={handleCancel}>
-                        Cancel
-                      </SecondaryButton>
-                    </div>
-                  ) : (
-                    <SecondaryButton size="sm" onClick={() => handleEdit(idx)}>
-                      Edit
-                    </SecondaryButton>
+                    <SecondaryButton onClick={() => handleEdit(idx)}>Edit</SecondaryButton>
                   )}
                 </td>
               </tr>
             ))}
             {rows.length === 0 && !loading && (
               <tr>
-                <td colSpan={15} className="text-center text-slate-500 py-4">No pricing details found for this deal.</td>
+                <td colSpan={10} className="text-center text-slate-500 py-4">No pricing details found for this deal.</td>
               </tr>
             )}
           </tbody>
