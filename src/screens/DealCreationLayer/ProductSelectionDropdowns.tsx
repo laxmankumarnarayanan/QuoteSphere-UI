@@ -447,20 +447,30 @@ const DealCommitmentForm: React.FC<{
   isEdit,
   onCancelEdit
 }) => {
-  const [currency, setCurrency] = useState(initialData?.currency || '');
-  const [commitmentAmount, setCommitmentAmount] = useState(initialData?.commitmentAmount?.toString() || '');
-  const [tenure, setTenure] = useState(initialData?.tenure?.toString() || '');
-  const [description, setDescription] = useState(initialData?.description || '');
+  const [currency, setCurrency] = useState('');
+  const [commitmentAmount, setCommitmentAmount] = useState('');
+  const [tenure, setTenure] = useState('');
+  const [description, setDescription] = useState('');
   const [currencyOptions, setCurrencyOptions] = useState<{ value: string; label: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Reset form when initialData changes (including when it becomes undefined)
   useEffect(() => {
-    setCurrency(initialData?.currency || '');
-    setCommitmentAmount(initialData?.commitmentAmount?.toString() || '');
-    setTenure(initialData?.tenure?.toString() || '');
-    setDescription(initialData?.description || '');
+    if (initialData) {
+      // Populate form with existing data for editing
+      setCurrency(initialData.currency || '');
+      setCommitmentAmount(initialData.commitmentAmount?.toString() || '');
+      setTenure(initialData.tenure?.toString() || '');
+      setDescription(initialData.description || '');
+    } else {
+      // Clear form for adding new commitment
+      setCurrency('');
+      setCommitmentAmount('');
+      setTenure('');
+      setDescription('');
+    }
   }, [initialData]);
 
   useEffect(() => {
@@ -492,6 +502,7 @@ const DealCommitmentForm: React.FC<{
     try {
       await saveDealCommitment(commitment);
       setSuccess(true);
+      // Clear form after successful save
       setCurrency('');
       setCommitmentAmount('');
       setTenure('');
