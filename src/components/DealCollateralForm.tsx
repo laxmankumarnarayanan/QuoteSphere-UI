@@ -3,6 +3,7 @@ import SelectInput from "../template components/components/form/SelectInput";
 import { dealService } from "../services/dealService";
 import TextInput from "../template components/components/form/TextInput";
 import SecondaryButton from "../template components/components/elements/SecondaryButton";
+import PrimaryButton from "../template components/components/elements/PrimaryButton";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { Edit2Icon, Trash2Icon } from "lucide-react";
 
@@ -31,21 +32,20 @@ async function getSasToken(blobName: string) {
 }
 
 // Unified file upload function
-async function uploadFileToAzure(file: File, blobName: string, sasToken: string) {
+async function uploadFileToAzure(file: File, blobName: string, sasToken: string): Promise<string> {
   const blobServiceClient = new BlobServiceClient(`${AZURE_CONTAINER_URL}?${sasToken}`);
-  const containerClient = blobServiceClient.getContainerClient("");
+  const containerClient = blobServiceClient.getContainerClient("dealdeskdocumentscontainer");
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-  await blockBlobClient.uploadBrowserData(file, {
-    blobHTTPHeaders: { blobContentType: file.type }
-  });
-  return `${AZURE_CONTAINER_URL}/${blobName}`;
+  
+  await blockBlobClient.uploadData(file, { blobHTTPHeaders: { blobContentType: file.type } });
+  return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
 }
 
-async function getViewUrl(blobName: string) {
-  const res = await fetch(`${API_BASE_URL}/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
-  if (!res.ok) throw new Error('Failed to get view SAS token');
-  const sasToken = await res.text();
-  return `${AZURE_CONTAINER_URL}/${blobName}?${sasToken}`;
+// Unified view URL getter
+async function getViewUrl(blobName: string): Promise<string> {
+  const res = await fetch(`${API_BASE_URL}/azure-sas?blobName=${encodeURIComponent(blobName)}`);
+  if (!res.ok) throw new Error('Failed to get view URL');
+  return `${AZURE_CONTAINER_URL}/${blobName}?${await res.text()}`;
 }
 
 const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showForms, showCollaterals = true, showDocuments = true }) => {
@@ -71,8 +71,12 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   const [collateralFile, setCollateralFile] = useState<File | null>(null);
   const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [docSuccess, setDocSuccess] = useState(false);
+  
+  // Edit state management
   const [editingCollateral, setEditingCollateral] = useState<any | null>(null);
   const [editingDocument, setEditingDocument] = useState<any | null>(null);
+  const [isEditCollateral, setIsEditCollateral] = useState(false);
+  const [isEditDocument, setIsEditDocument] = useState(false);
 
   // Refs for file inputs
   const collateralFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -109,7 +113,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         const data = await res.json();
         setAddedCollaterals(data);
         const maxId = data.reduce((max: number, c: any) => {
-          const idVal = c.collateralID || 0; // Flat structure now
+          const idVal = c.id?.collateralID || 0;
           return idVal > max ? idVal : max;
         }, 0);
         setNextCollateralId(maxId + 1);
@@ -144,6 +148,37 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     if (dealId) fetchCurrentDocuments();
   }, [dealId, docSuccess]);
 
+  // Enhanced useEffect for form population when editing collateral
+  useEffect(() => {
+    if (editingCollateral) {
+      setForm({
+        collateralType: editingCollateral.collateralType || '',
+        collateralValue: editingCollateral.collateralValue?.toString() || '',
+        currency: editingCollateral.currency || '',
+        description: editingCollateral.description || '',
+      });
+      setIsEditCollateral(true);
+    } else {
+      setForm(initialState);
+      setIsEditCollateral(false);
+    }
+  }, [editingCollateral]);
+
+  // Enhanced useEffect for document form population when editing document
+  useEffect(() => {
+    if (editingDocument) {
+      setDocumentCategory(editingDocument.documentCategory || '');
+      setDocumentType(editingDocument.documentType || '');
+      setDocumentDescription(editingDocument.description || '');
+      setIsEditDocument(true);
+    } else {
+      setDocumentCategory('');
+      setDocumentType('');
+      setDocumentDescription('');
+      setIsEditDocument(false);
+    }
+  }, [editingDocument]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({
@@ -176,34 +211,42 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       // Validate form first
       validateForm();
       
-      let storagePath = null;
+      let storagePath = editingCollateral?.storagePath || null;
       
       // Upload file if provided
       if (collateralFile) {
-        const blobName = `${dealId},${nextCollateralId}_${collateralFile.name}`;
+        const collateralId = isEditCollateral ? editingCollateral.id.collateralID : nextCollateralId;
+        const blobName = `${dealId},${collateralId}_${collateralFile.name}`;
         const sasToken = await getSasToken(blobName);
         storagePath = await uploadFileToAzure(collateralFile, blobName, sasToken);
       }
       
-      // Use FLAT payload structure (not nested)
+      const collateralId = isEditCollateral ? editingCollateral.id.collateralID : nextCollateralId;
+      
+      // Use the correct payload structure (nested id)
       const payload = {
-        dealID: dealId,
-        collateralID: nextCollateralId,
+        id: {
+          dealID: dealId,
+          collateralID: collateralId
+        },
         collateralType: form.collateralType,
         collateralValue: Number(form.collateralValue),
         currency: form.currency,
         description: form.description,
         storagePath: storagePath,
-        createdBy: "system",
-        createdDateTime: new Date().toISOString(),
+        createdBy: editingCollateral?.createdBy || "system",
+        createdDateTime: editingCollateral?.createdDateTime || new Date().toISOString(),
         lastUpdatedBy: "system",
         lastUpdatedDateTime: new Date().toISOString(),
       };
       
-      console.log("Sending flat payload:", JSON.stringify(payload, null, 2));
+      const method = isEditCollateral ? "PUT" : "POST";
+      const url = isEditCollateral 
+        ? `${API_BASE_URL}/deal-collateral/${dealId}/${collateralId}`
+        : `${API_BASE_URL}/deal-collateral`;
       
-      const response = await fetch(`${API_BASE_URL}/deal-collateral`, {
-        method: "POST",
+      const response = await fetch(url, {
+        method,
         headers: { 
           "Content-Type": "application/json",
           "Accept": "application/json"
@@ -220,9 +263,17 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       console.log("Success response:", result);
       
       setSuccess(true);
-      setForm(initialState);
-      setCollateralFile(null);
-      if (collateralFileInputRef.current) collateralFileInputRef.current.value = "";
+      
+      // Only clear form if it's a new collateral (not editing)
+      if (!isEditCollateral) {
+        setForm(initialState);
+        setCollateralFile(null);
+        if (collateralFileInputRef.current) collateralFileInputRef.current.value = "";
+      }
+      
+      // Clear edit state
+      setEditingCollateral(null);
+      setIsEditCollateral(false);
       
     } catch (err: any) {
       console.error("Error saving collateral:", err);
@@ -230,7 +281,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   // Document save handler
   const handleSaveDocument = async (e: React.FormEvent) => {
@@ -240,35 +291,50 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
     setDocSuccess(false);
     
     try {
-      if (!documentFile) throw new Error("No file selected");
-      if (documentFile.size > 10 * 1024 * 1024) throw new Error("File too large (max 10MB)");
+      if (!isEditDocument && !documentFile) throw new Error("No file selected");
+      if (documentFile && documentFile.size > 10 * 1024 * 1024) throw new Error("File too large (max 10MB)");
       
-      const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/png"];
-      if (!allowedTypes.includes(documentFile.type)) {
-        throw new Error("Invalid file type. Only PDF, DOCX, PNG allowed.");
+      if (documentFile) {
+        const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/png"];
+        if (!allowedTypes.includes(documentFile.type)) {
+          throw new Error("Invalid file type. Only PDF, DOCX, PNG allowed.");
+        }
       }
       
-      // Get SAS token and upload file
-      const blobName = `${dealId},${nextDocumentId}_${documentFile.name}`;
-      const sasToken = await getSasToken(blobName);
-      const blobUrl = await uploadFileToAzure(documentFile, blobName, sasToken);
+      let storageFilePath = editingDocument?.storageFilePath || null;
+      
+      // Upload file if provided
+      if (documentFile) {
+        const documentId = isEditDocument ? editingDocument.id.documentID : nextDocumentId;
+        const blobName = `${dealId},${documentId}_${documentFile.name}`;
+        const sasToken = await getSasToken(blobName);
+        storageFilePath = await uploadFileToAzure(documentFile, blobName, sasToken);
+      }
+      
+      const documentId = isEditDocument ? editingDocument.id.documentID : nextDocumentId;
+      const documentName = documentFile ? documentFile.name : editingDocument?.documentName;
       
       // Save metadata to backend
       const payload = {
-        id: { dealID: dealId, documentID: nextDocumentId },
+        id: { dealID: dealId, documentID: documentId },
         documentCategory,
         documentType,
-        documentName: documentFile.name,
+        documentName: documentName,
         description: documentDescription,
-        storageFilePath: blobUrl,
-        createdBy: "system",
-        createdDateTime: new Date().toISOString(),
+        storageFilePath: storageFilePath,
+        createdBy: editingDocument?.createdBy || "system",
+        createdDateTime: editingDocument?.createdDateTime || new Date().toISOString(),
         lastUpdatedBy: "system",
         lastUpdatedDateTime: new Date().toISOString(),
       };
       
-      const res = await fetch(`${API_BASE_URL}/deal-documents`, {
-        method: "POST",
+      const method = isEditDocument ? "PUT" : "POST";
+      const url = isEditDocument 
+        ? `${API_BASE_URL}/deal-documents/${dealId}/${documentId}`
+        : `${API_BASE_URL}/deal-documents`;
+      
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -282,11 +348,19 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
       console.log("Document saved successfully:", result);
       
       setDocSuccess(true);
-      setDocumentCategory("");
-      setDocumentType("");
-      setDocumentDescription("");
-      setDocumentFile(null);
-      if (documentFileInputRef.current) documentFileInputRef.current.value = "";
+      
+      // Only clear form if it's a new document (not editing)
+      if (!isEditDocument) {
+        setDocumentCategory("");
+        setDocumentType("");
+        setDocumentDescription("");
+        setDocumentFile(null);
+        if (documentFileInputRef.current) documentFileInputRef.current.value = "";
+      }
+      
+      // Clear edit state
+      setEditingDocument(null);
+      setIsEditDocument(false);
       
     } catch (err: any) {
       console.error("Error saving document:", err);
@@ -322,26 +396,35 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
   // Edit handlers
   const handleEditCollateral = (collateral: any) => {
     setEditingCollateral(collateral);
-    setForm({
-      collateralType: collateral.collateralType,
-      collateralValue: collateral.collateralValue,
-      currency: collateral.currency,
-      description: collateral.description,
-    });
   };
 
   const handleEditDocument = (doc: any) => {
     setEditingDocument(doc);
-    setDocumentCategory(doc.documentCategory);
-    setDocumentType(doc.documentType);
-    setDocumentDescription(doc.description);
-    // File cannot be prefilled for security reasons
+  };
+
+  // Cancel edit handlers
+  const handleCancelEditCollateral = () => {
+    setEditingCollateral(null);
+    setIsEditCollateral(false);
+    setForm(initialState);
+    setCollateralFile(null);
+    if (collateralFileInputRef.current) collateralFileInputRef.current.value = "";
+  };
+
+  const handleCancelEditDocument = () => {
+    setEditingDocument(null);
+    setIsEditDocument(false);
+    setDocumentCategory("");
+    setDocumentType("");
+    setDocumentDescription("");
+    setDocumentFile(null);
+    if (documentFileInputRef.current) documentFileInputRef.current.value = "";
   };
 
   // Delete handlers
   const handleDeleteCollateral = async (collateral: any) => {
     if (!window.confirm("Delete this collateral?")) return;
-    await fetch(`${API_BASE_URL}/deal-collateral/${collateral.dealID}/${collateral.collateralID}`, { method: "DELETE" });
+    await fetch(`${API_BASE_URL}/deal-collateral/${collateral.id.dealID}/${collateral.id.collateralID}`, { method: "DELETE" });
     setSuccess(s => !s); // trigger refetch
   };
 
@@ -359,7 +442,7 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
           <div className="font-semibold text-violet-800 mb-2">Added Collaterals:</div>
           <ul className="space-y-2">
             {addedCollaterals.map((collateral, idx) => (
-              <li key={collateral.dealID + '-' + collateral.collateralID || idx} className="flex gap-6 items-center">
+              <li key={collateral.id?.dealID + '-' + collateral.id?.collateralID || idx} className="flex gap-6 items-center">
                 <span className="text-sm font-medium text-violet-900">Type: <span className="font-normal text-slate-800">{collateral.collateralType}</span></span>
                 <span className="text-sm font-medium text-violet-900">Value: <span className="font-normal text-slate-800">{collateral.collateralValue}</span></span>
                 <span className="text-sm font-medium text-violet-900">Currency: <span className="font-normal text-slate-800">{collateral.currency}</span></span>
@@ -420,7 +503,9 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
         <>
           {/* Collateral Section */}
           <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded mb-8">
-            <div className="font-semibold text-violet-800 mb-2">Collateral</div>
+            <div className="font-semibold text-violet-800 mb-2">
+              {isEditCollateral ? `Edit Collateral #${editingCollateral?.id?.collateralID}` : "Collateral"}
+            </div>
             <SelectInput
               id="collateralType"
               label="Collateral Type"
@@ -458,24 +543,50 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
               required
               placeholder="Enter description"
             />
-            <input
-              type="file"
-              ref={collateralFileInputRef}
-              onChange={e => setCollateralFile(e.target.files?.[0] || null)}
-              className="block mt-2 mb-2"
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {isEditCollateral ? "Update File (optional)" : "Choose File"}
+              </label>
+              <input
+                type="file"
+                ref={collateralFileInputRef}
+                onChange={e => setCollateralFile(e.target.files?.[0] || null)}
+                className="block mt-2 mb-2"
+              />
+              {isEditCollateral && editingCollateral?.storagePath && (
+                <div className="text-sm text-gray-600 mt-1">
+                  Current file: {editingCollateral.storagePath.split('/').pop()?.split('?')[0]}
+                </div>
+              )}
+            </div>
             <div className="flex gap-4 justify-end">
-              <SecondaryButton type="submit" isLoading={loading} size="md">
-                Add
+              {isEditCollateral && (
+                <SecondaryButton type="button" onClick={handleCancelEditCollateral}>
+                  Cancel
+                </SecondaryButton>
+              )}
+              <SecondaryButton 
+                type="submit" 
+                isLoading={loading} 
+                size="md"
+                disabled={
+                  !form.collateralType || !form.collateralValue || !form.currency || !form.description || loading
+                }
+              >
+                {isEditCollateral ? "Update" : "Add"}
               </SecondaryButton>
             </div>
             {error && <div className="text-red-600 mt-2">{error}</div>}
-            {success && <div className="text-green-600 mt-2">Collateral added successfully!</div>}
+            {success && <div className="text-green-600 mt-2">
+              {isEditCollateral ? "Collateral updated successfully!" : "Collateral added successfully!"}
+            </div>}
           </form>
 
           {/* Documentation Section */}
           <form onSubmit={handleSaveDocument} className="space-y-4 p-4 border rounded">
-            <div className="font-semibold text-violet-800 mb-2">Documentation</div>
+            <div className="font-semibold text-violet-800 mb-2">
+              {isEditDocument ? `Edit Document #${editingDocument?.id?.documentID}` : "Documentation"}
+            </div>
             <SelectInput
               id="documentCategory"
               label="Document Category"
@@ -501,31 +612,45 @@ const DealCollateralForm: React.FC<DealCollateralFormProps> = ({ dealId, showFor
               onChange={setDocumentDescription}
               placeholder="Enter document description"
             />
-            <input
-              type="file"
-              accept=".pdf,.docx,.png"
-              ref={documentFileInputRef}
-              onChange={e => setDocumentFile(e.target.files?.[0] || null)}
-              required
-              className="block mt-2 mb-2"
-            />
-            {documentFile && (
-              <div className="text-sm text-slate-700 mb-2">
-                {documentFile.name} ({(documentFile.size / 1024 / 1024).toFixed(2)} MB)
-              </div>
-            )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {isEditDocument ? "Update File (optional)" : "Choose File"}
+              </label>
+              <input
+                type="file"
+                accept=".pdf,.docx,.png"
+                ref={documentFileInputRef}
+                onChange={e => setDocumentFile(e.target.files?.[0] || null)}
+                required={!isEditDocument}
+                className="block mt-2 mb-2"
+              />
+              {isEditDocument && editingDocument?.storageFilePath && (
+                <div className="text-sm text-gray-600 mt-1">
+                  Current file: {editingDocument.documentName}
+                </div>
+              )}
+            </div>
             <div className="flex gap-4 justify-end">
-              <SecondaryButton
-                type="submit"
-                isLoading={docLoading}
+              {isEditDocument && (
+                <SecondaryButton type="button" onClick={handleCancelEditDocument}>
+                  Cancel
+                </SecondaryButton>
+              )}
+              <SecondaryButton 
+                type="submit" 
+                isLoading={docLoading} 
                 size="md"
-                className="mt-4"
+                disabled={
+                  !documentCategory || !documentType || (!isEditDocument && !documentFile) || docLoading
+                }
               >
-                Save Document
+                {isEditDocument ? "Update" : "Add"}
               </SecondaryButton>
             </div>
             {docError && <div className="text-red-600 mt-2">{docError}</div>}
-            {docSuccess && <div className="text-green-600 mt-2">Document saved successfully!</div>}
+            {docSuccess && <div className="text-green-600 mt-2">
+              {isEditDocument ? "Document updated successfully!" : "Document added successfully!"}
+            </div>}
           </form>
         </>
       )}
