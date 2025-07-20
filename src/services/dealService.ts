@@ -64,4 +64,21 @@ export async function updateDealStatus(dealId: string, status: string) {
   });
   if (!putRes.ok) throw new Error("Failed to update deal status");
   return putRes.json();
+}
+
+export async function submitDeal(dealId: string) {
+  // Try /deal/{dealId} first. If your backend uses /deals/{dealId}, change both URLs accordingly.
+  const getRes = await fetch(`${API_BASE_URL}/deal/${dealId}`);
+  if (!getRes.ok) throw new Error("Failed to fetch deal");
+  const deal = await getRes.json();
+
+  deal.dealStatus = "Submitted";
+
+  const putRes = await fetch(`${API_BASE_URL}/deal/${dealId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(deal),
+  });
+  if (!putRes.ok) throw new Error("Failed to update deal status");
+  return putRes.json();
 } 
