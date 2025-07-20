@@ -136,92 +136,107 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
       {error && <div className="text-red-600 mb-2">{error}</div>}
       {loading && <div className="text-slate-600 mb-2">Loading...</div>}
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded shadow">
-          <thead>
-            <tr className="bg-violet-100">
-              <th className="px-3 py-2 text-left text-xs font-semibold text-violet-800" colSpan={8}>
-                Deal Pricing
-              </th>
+        <div className="space-y-4">
+          {rows.map((row, idx) => (
+            <div
+              key={row.id.priceId}
+              className="bg-white rounded-lg shadow border border-violet-200 p-0"
+            >
+              <table className="w-full">
+                <tbody>
+                  {/* First line: Fee Description + Edit button */}
+                  <tr>
+                    <td
+                      className="px-4 py-3 text-base font-semibold text-violet-900"
+                      colSpan={7}
+                    >
+                      {row.priceDescription}
+                      <span className="ml-2 text-xs text-violet-500 font-normal">(Fee Description)</span>
+                    </td>
+                    <td className="px-4 py-3 text-right" style={{ width: "1%" }}>
+                      {editIdx === idx ? (
+                        <>
+                          <PrimaryButton onClick={() => handleSave(idx)} className="mr-2">
+                            Save
+                          </PrimaryButton>
+                          <SecondaryButton onClick={handleCancel}>Cancel</SecondaryButton>
+                        </>
+                      ) : (
+                        <SecondaryButton onClick={() => handleEdit(idx)}>Edit</SecondaryButton>
+                      )}
+                    </td>
+                  </tr>
+                  {/* Second line: Other fields */}
+                  <tr className="bg-violet-50">
+                    <td className="px-4 py-2 text-sm text-slate-800">
+                      <span className="font-medium text-violet-700">Currency:</span> {row.currency}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-slate-800">
+                      <span className="font-medium text-violet-700">Fee Type:</span> {row.feeType}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-slate-800">
+                      <span className="font-medium text-violet-700">Flat Fee Amount:</span> {row.flatFeeAmount}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-slate-800">
+                      <span className="font-medium text-violet-700">Fee Percentage:</span> {row.feePercentage}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-slate-800">
+                      <span className="font-medium text-violet-700">Preferential Type:</span>{" "}
+                      {editIdx === idx ? (
+                        <SelectInput
+                          id={`preferentialType-${idx}`}
+                          label=""
+                          value={editValues.preferentialType}
+                          onChange={val => handleChange('preferentialType', val)}
+                          options={preferentialTypeOptions}
+                          placeholder="Select Preferential Type"
+                          disabled={preferentialTypeLoading}
+                        />
+                      ) : (
+                        row.preferentialType
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-slate-800">
+                      <span className="font-medium text-violet-700">Standard Price:</span>{" "}
+                      {editIdx === idx ? (
+                        <TextInput
+                          id={`standardPrice-${idx}`}
+                          label=""
+                          value={editValues.standardPrice}
+                          onChange={val => handleChange('standardPrice', val)}
+                          type="number"
+                        />
+                      ) : (
+                        row.standardPrice
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-slate-800">
+                      <span className="font-medium text-violet-700">Discount %:</span>{" "}
+                      {editIdx === idx ? (
+                        <TextInput
+                          id={`discountPercentage-${idx}`}
+                          label=""
+                          value={editValues.discountPercentage}
+                          onChange={val => handleChange('discountPercentage', val)}
+                          type="number"
+                        />
+                      ) : (
+                        row.discountPercentage
+                      )}
+                    </td>
+                    {/* Empty cell for alignment with the edit button column */}
+                    <td />
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          ))}
+          {rows.length === 0 && !loading && (
+            <tr>
+              <td colSpan={10} className="text-center text-slate-500 py-4">No pricing details found for this deal.</td>
             </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, idx) => (
-              <React.Fragment key={row.id.priceId}>
-                {/* First line: Price Description + Edit button */}
-                <tr className="border-b-0">
-                  <td className="px-3 py-2 text-sm text-slate-800 font-semibold" colSpan={7}>
-                    {row.priceDescription}
-                  </td>
-                  <td className="px-3 py-2 text-sm text-right" style={{ width: "1%" }}>
-                    {editIdx === idx ? (
-                      <>
-                        <PrimaryButton onClick={() => handleSave(idx)} className="mr-2">Save</PrimaryButton>
-                        <SecondaryButton onClick={handleCancel}>Cancel</SecondaryButton>
-                      </>
-                    ) : (
-                      <SecondaryButton onClick={() => handleEdit(idx)}>Edit</SecondaryButton>
-                    )}
-                  </td>
-                </tr>
-                {/* Second line: Other fields */}
-                <tr className="border-b last:border-b-0 bg-violet-50">
-                  <td className="px-3 py-2 text-sm text-slate-800">{row.currency}</td>
-                  <td className="px-3 py-2 text-sm text-slate-800">{row.feeType}</td>
-                  <td className="px-3 py-2 text-sm text-slate-800">{row.flatFeeAmount}</td>
-                  <td className="px-3 py-2 text-sm text-slate-800">{row.feePercentage}</td>
-                  <td className="px-3 py-2 text-sm text-slate-800">
-                    {editIdx === idx ? (
-                      <SelectInput
-                        id={`preferentialType-${idx}`}
-                        label="Preferential Type"
-                        value={editValues.preferentialType}
-                        onChange={val => handleChange('preferentialType', val)}
-                        options={preferentialTypeOptions}
-                        placeholder="Select Preferential Type"
-                        disabled={preferentialTypeLoading}
-                      />
-                    ) : (
-                      row.preferentialType
-                    )}
-                  </td>
-                  <td className="px-3 py-2 text-sm text-slate-800">
-                    {editIdx === idx ? (
-                      <TextInput
-                        id={`standardPrice-${idx}`}
-                        label="Standard Price"
-                        value={editValues.standardPrice}
-                        onChange={val => handleChange('standardPrice', val)}
-                        type="number"
-                      />
-                    ) : (
-                      row.standardPrice
-                    )}
-                  </td>
-                  <td className="px-3 py-2 text-sm text-slate-800">
-                    {editIdx === idx ? (
-                      <TextInput
-                        id={`discountPercentage-${idx}`}
-                        label="Discount %"
-                        value={editValues.discountPercentage}
-                        onChange={val => handleChange('discountPercentage', val)}
-                        type="number"
-                      />
-                    ) : (
-                      row.discountPercentage
-                    )}
-                  </td>
-                  {/* Empty cell for alignment with the edit button column */}
-                  <td />
-                </tr>
-              </React.Fragment>
-            ))}
-            {rows.length === 0 && !loading && (
-              <tr>
-                <td colSpan={10} className="text-center text-slate-500 py-4">No pricing details found for this deal.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+          )}
+        </div>
       </div>
     </div>
   );
