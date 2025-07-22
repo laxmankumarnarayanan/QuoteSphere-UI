@@ -1,29 +1,23 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Dashboard from './screens/Dashboard/Dashboard';
-import { DealCreationLayer } from './screens/DealCreationLayer/DealCreationLayer';
+
+// Simple test component
+const TestPage = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">Test Page</h1>
+      <p className="text-gray-600">If you can see this, routing is working!</p>
+    </div>
+  </div>
+);
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Redirect root to deal creation */}
-        <Route path="/" element={<Navigate to="/deal-creation" replace />} />
-        
-        {/* Main dashboard route */}
-        <Route path="/dashboard" element={<Dashboard />} />
-        
-        {/* Deal creation route */}
-        <Route path="/deal-creation" element={<DealCreationLayer />} />
-        
-        {/* Add placeholder routes for sidebar navigation */}
-        <Route path="/deal-desk" element={<div>Deal Desk - Coming Soon</div>} />
-        <Route path="/product-hub" element={<div>Product Hub - Coming Soon</div>} />
-        <Route path="/customer-tower" element={<div>Customer Tower - Coming Soon</div>} />
-        <Route path="/contract-vault" element={<div>Contract Vault - Coming Soon</div>} />
-        <Route path="/service-pod" element={<div>Service Pod - Coming Soon</div>} />
-        <Route path="/analytics-hq" element={<div>Analytics HQ - Coming Soon</div>} />
-        <Route path="/alert-central" element={<div>Alert Central - Coming Soon</div>} />
+        {/* Test with a simple component first */}
+        <Route path="/" element={<TestPage />} />
+        <Route path="/test" element={<TestPage />} />
       </Routes>
     </Router>
   );
