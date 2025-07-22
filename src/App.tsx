@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Dashboard from './screens/Dashboard/Dashboard'; // Update this path to match your actual file structure
+import Dashboard from './screens/Dashboard/Dashboard';
 import { DealCreationLayer } from './screens/DealCreationLayer/DealCreationLayer';
 
 function App() {
@@ -9,9 +9,14 @@ function App() {
       <Routes>
         {/* Redirect root to dashboard */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        
+        {/* Main dashboard route */}
         <Route path="/dashboard" element={<Dashboard />} />
+        
+        {/* Deal creation route */}
         <Route path="/deal-creation" element={<DealCreationLayer />} />
-        {/* Add other routes as needed */}
+        
+        {/* Add placeholder routes for sidebar navigation */}
         <Route path="/deal-desk" element={<div>Deal Desk - Coming Soon</div>} />
         <Route path="/product-hub" element={<div>Product Hub - Coming Soon</div>} />
         <Route path="/customer-tower" element={<div>Customer Tower - Coming Soon</div>} />
