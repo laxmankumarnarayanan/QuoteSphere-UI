@@ -7,9 +7,9 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<DealCreationLayer />} />
-        <Route path="/deal-creation" element={<DealCreationLayer />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/deal-creation" element={<DealCreationLayer />} />
       </Routes>
     </Router>
   );

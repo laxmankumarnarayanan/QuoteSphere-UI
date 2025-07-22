@@ -5,18 +5,24 @@
 import React, { useState } from 'react';
 import { 
   ChevronLeft, 
-  ChevronRight
+  ChevronRight,
+  LayoutDashboard
 } from 'lucide-react';
 import { useEffect } from 'react';
 
 interface NavItem {
-  icon: string;
+  icon: string | React.ReactNode;
   label: string;
   href: string;
   items?: NavItem[];
 }
 
 const navigation: NavItem[] = [
+  {
+    icon: <LayoutDashboard className="w-4 h-4" />,
+    label: 'Dashboard',
+    href: '/dashboard'
+  },
   {
     icon: '/Handshake.png',
     label: 'Deal Desk',
@@ -125,7 +131,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
         onClick={handleClick}
       >
         <span className="flex items-center min-w-[24px] justify-center">
-          <img src={item.icon} alt={item.label} className="w-4 h-4" />
+          {typeof item.icon === 'string' ? (
+            <img src={item.icon} alt={item.label} className="w-4 h-4" />
+          ) : (
+            item.icon
+          )}
           {!isCollapsed && (
             <span className="ml-3">{item.label}</span>
           )}

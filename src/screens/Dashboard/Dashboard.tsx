@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout/Layout';
 import StatusOverview from '../../template components/components/dashboard/StatusOverview';
 import MetricCard from '../../template components/components/dashboard/MetricCard';
 import Table from '../../template components/components/elements/Table';
+import PrimaryButton from '../../template components/components/elements/PrimaryButton';
 import { 
   getDealStatusCounts, 
   getDashboardMetrics, 
@@ -15,8 +17,10 @@ import {
 } from '../../services/dashboardService';
 import Toggle from '../../template components/components/elements/Toggle';
 import StatusBadge from '../../template components/components/elements/StatusBadge';
+import { Plus } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [dealStatusCounts, setDealStatusCounts] = useState<DealStatusCount[]>([]);
   const [dashboardMetrics, setDashboardMetrics] = useState<DashboardMetric[]>([]);
   const [allDeals, setAllDeals] = useState<DealTableRow[]>([]);
@@ -69,6 +73,10 @@ const Dashboard: React.FC = () => {
 
   const handleFilterChange = (filter: 'all' | 'my' | 'review' | 'completed') => {
     setActiveFilter(filter);
+  };
+
+  const handleCreateDeal = () => {
+    navigate('/deal-creation');
   };
 
   const tableColumns = [
@@ -137,6 +145,21 @@ const Dashboard: React.FC = () => {
   return (
     <Layout currentPath={[{ label: 'Dashboard', href: '/dashboard' }]}>
       <div className="space-y-6">
+        {/* Header with Create Deal Button */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+            <p className="text-slate-600 mt-1">Welcome to QuoteSphere - Your Deal Management Hub</p>
+          </div>
+          <PrimaryButton
+            onClick={handleCreateDeal}
+            className="flex items-center gap-2"
+          >
+            <Plus size={16} />
+            Create Deal
+          </PrimaryButton>
+        </div>
+
         {/* Section 1: Deal Status Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <StatusOverview
