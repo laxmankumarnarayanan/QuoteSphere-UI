@@ -19,4 +19,10 @@ export default defineConfig({
       plugins: [tailwind()],
     },
   },
+  build: {
+    outDir: 'dist',
+  },
+  server: {
+    port: 3000,
+  }
 });
