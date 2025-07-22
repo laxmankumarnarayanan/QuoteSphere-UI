@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
+import Dashboard from './screens/Dashboard/Dashboard';
 
 // Simple test component wrapped in Layout
 const TestPage = () => (
@@ -22,7 +23,9 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<TestPage />} />
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/test" element={<TestPage />} />
         <Route path="/*" element={<TestPage />} />
       </Routes>
     </Router>
