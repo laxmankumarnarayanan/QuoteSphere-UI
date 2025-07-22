@@ -15,7 +15,6 @@ interface NavItem {
   icon: string | React.ReactNode;
   label: string;
   href: string;
-  items?: NavItem[];
 }
 
 const navigation: NavItem[] = [
@@ -69,11 +68,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  
-  // Track if we're in mobile/tablet view
   const [isMobileView, setIsMobileView] = useState(false);
   
-  // Handle responsive behavior
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024) {
@@ -84,17 +80,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       }
     };
 
-    // Set initial state
     handleResize();
-
-    // Add event listener
     window.addEventListener('resize', handleResize);
-
-    // Cleanup
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Handle click outside to close sidebar on mobile/tablet
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (!isMobileView) return;
@@ -118,16 +108,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  const NavItem = ({ item, depth = 0 }: { item: NavItem; depth?: number }) => {
+  const NavItem = ({ item }: { item: NavItem }) => {
     const isActive = location.pathname === item.href || 
                     (item.href === '/dashboard' && location.pathname === '/');
 
-    const handleClick = (e: React.MouseEvent) => {
-      e.preventDefault();
+    const handleClick = () => {
       navigate(item.href);
       onNavigate?.([{ label: item.label, href: item.href }]);
       
-      // Close sidebar on mobile after navigation
       if (isMobileView) {
         setIsCollapsed(true);
       }
@@ -138,7 +126,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
         onClick={handleClick}
         className={`group flex items-center w-full px-2 py-2 rounded-lg text-gray-700 dark:text-gray-200
           hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200
-          ${depth > 0 ? 'ml-4' : ''}
           ${isActive ? 'bg-brand-50 text-brand-700 dark:bg-brand-900 dark:text-brand-300' : ''}
         `}
       >
@@ -161,7 +148,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       <div 
         className={`
           fixed h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-30
-          transition-all duration-300 ease-in-out z-30
+          transition-all duration-300 ease-in-out
           ${isCollapsed ? 'w-16' : 'w-64'}
         `}
         id="sidebar"
@@ -210,7 +197,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       </div>
       <div className={`flex-shrink-0 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`} />
       
-      {/* Overlay for mobile/tablet */}
       {!isCollapsed && isMobileView && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-20"
