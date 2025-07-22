@@ -1,18 +1,21 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout/Layout';
 
-// Simple test component
+// Simple test component wrapped in Layout
 const TestPage = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50">
-    <div className="text-center">
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">QuoteSphere</h1>
-      <p className="text-gray-600 mb-4">Application is working!</p>
-      <div className="space-y-2">
-        <p className="text-sm text-gray-500">If you can see this, the basic setup is working.</p>
-        <p className="text-sm text-gray-500">Next step: Add your components back one by one.</p>
+  <Layout currentPath={[{ label: 'Test', href: '/test' }]}>
+    <div className="flex items-center justify-center min-h-[50vh]">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">QuoteSphere</h1>
+        <p className="text-gray-600 mb-4">Layout component is working!</p>
+        <div className="space-y-2">
+          <p className="text-sm text-gray-500">If you can see this with header, sidebar, and footer, the Layout is working.</p>
+          <p className="text-sm text-gray-500">Next step: Add the Dashboard component.</p>
+        </div>
       </div>
     </div>
-  </div>
+  </Layout>
 );
 
 function App() {
