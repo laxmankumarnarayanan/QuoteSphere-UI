@@ -3,6 +3,7 @@
  * A collapsible sidebar component with icons for navigation.
  */
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   ChevronLeft, 
   ChevronRight,
@@ -65,6 +66,8 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   
   // Track if we're in mobile/tablet view
@@ -116,19 +119,28 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
   const NavItem = ({ item, depth = 0 }: { item: NavItem; depth?: number }) => {
+    const isActive = location.pathname === item.href || 
+                    (item.href === '/dashboard' && location.pathname === '/');
+
     const handleClick = (e: React.MouseEvent) => {
       e.preventDefault();
+      navigate(item.href);
       onNavigate?.([{ label: item.label, href: item.href }]);
+      
+      // Close sidebar on mobile after navigation
+      if (isMobileView) {
+        setIsCollapsed(true);
+      }
     };
 
     return (
-      <a
-        href={item.href}
-        className={`group flex items-center px-2 py-2 rounded-lg text-gray-700 dark:text-gray-200
+      <button
+        onClick={handleClick}
+        className={`group flex items-center w-full px-2 py-2 rounded-lg text-gray-700 dark:text-gray-200
           hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200
           ${depth > 0 ? 'ml-4' : ''}
+          ${isActive ? 'bg-brand-50 text-brand-700 dark:bg-brand-900 dark:text-brand-300' : ''}
         `}
-        onClick={handleClick}
       >
         <span className="flex items-center min-w-[24px] justify-center">
           {typeof item.icon === 'string' ? (
@@ -140,7 +152,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
             <span className="ml-3">{item.label}</span>
           )}
         </span>
-      </a>
+      </button>
     );
   };
 
