@@ -179,7 +179,7 @@ export const DealCreationLayer = (): JSX.Element => {
  }, [createdDeal?.dealId]);
 
  return (
-   <div className="flex-1">
+   <div className="min-h-screen bg-gray-50">
      {/* Progress Stepper */}
      <div className="sticky top-16 z-10 bg-white border-b border-gray-200 py-4 flex justify-center px-4">
        {stepsData.map((step, index) => (
@@ -224,19 +224,18 @@ export const DealCreationLayer = (): JSX.Element => {
          <div className="flex gap-6 mt-6">
            {/* Left Column - Search and Results */}
            <div className="flex flex-col gap-4">
-             {/* Search Card */}
-             <div className="w-[337px] border-[#ebebea] shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] rounded-lg p-4">
-               <div className="font-medium text-sm text-[#242524] mb-2">
-                 Search:
-               </div>
-               <div className="relative w-full h-[75px] bg-white rounded-md border border-[#ebebea] flex items-center">
-                 <SearchIcon className="absolute left-3 text-gray-400 h-4 w-4" />
+             {/* Search Card - Updated styling */}
+             <div className="w-full border-[#ebebea] shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] rounded-lg p-4">
+               <div className="relative w-full">
+                 <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
                  <TextInput
                    id="customer-search"
                    label="Search"
                    value={searchValue}
                    onChange={setSearchValue}
                    placeholder="Search by Customer Name, ID, or Group ID"
+                   className="w-full"
+                   inputClassName="pl-10 w-full"
                  />
                </div>
              </div>
