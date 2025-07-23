@@ -51,7 +51,7 @@ const colorThemes = {
 };
 
 // CHANGE THIS LINE TO SWITCH THEMES
-const ACTIVE_THEME = 'darkBlue'; // Options: 'violet', 'brown', 'darkGreen', 'darkBlue'
+const ACTIVE_THEME = 'violet'; // Options: 'violet', 'brown', 'darkGreen', 'darkBlue'
 
 module.exports = {
   content: [
