@@ -227,15 +227,20 @@ export const DealCreationLayer = (): JSX.Element => {
              {/* Search Card - Updated styling */}
              <div className="w-full border-[#ebebea] shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] rounded-lg p-4">
                <div className="relative w-full">
-                 <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
                  <TextInput
                    id="customer-search"
-                   label="Search"
+                   label={
+                     <div className="flex items-center gap-2">
+                       <SearchIcon className="h-3 w-3 text-gray-500" />
+                       <span>Search</span>
+                     </div>
+                   }
                    value={searchValue}
                    onChange={setSearchValue}
                    placeholder="Search by Customer Name, ID, or Group ID"
                    className="w-full"
-                   inputClassName="pl-10 w-full"
+                   inputClassName="w-full border-brand-200 focus:border-brand-500 focus:ring-brand-500 text-brand-900 placeholder-brand-400"
+                   labelClassName="text-brand-700 bg-transparent"
                  />
                </div>
              </div>
