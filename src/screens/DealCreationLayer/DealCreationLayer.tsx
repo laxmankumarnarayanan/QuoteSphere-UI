@@ -230,8 +230,8 @@ export const DealCreationLayer = (): JSX.Element => {
                  <TextInput
                    id="customer-search"
                    label={
-                     <div className="flex items-center gap-2">
-                       <SearchIcon className="h-3 w-3 text-gray-500" />
+                     <div className="flex items-center gap-1">
+                       <SearchIcon className="h-2.5 w-2.5 text-brand-500" />
                        <span>Search</span>
                      </div>
                    }
