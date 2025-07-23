@@ -57,19 +57,19 @@ const TextInput: React.FC<TextInputProps> = ({
         className={`relative transition-all duration-200 ${error ? 'text-red-500' : ''}`}
       >
         <div className="relative">
-          <div className="absolute -top-[9px] left-[15px] right-[15px] h-[2px] bg-white dark:bg-gray-800" />
+          <div className="absolute -top-[9px] left-[15px] right-[15px] h-[2px] bg-transparent dark:bg-transparent" />
           <label 
             htmlFor={id || label}
             className={`
-              absolute left-3 -top-[9px] px-1 text-xs bg-white dark:bg-gray-800 dark:text-white
-              ${error ? 'text-red-500' : focused ? 'text-purple-500' : 'text-gray-500'}
+              absolute left-3 -top-[9px] px-1 text-xs bg-transparent dark:bg-transparent dark:text-white
+              ${error ? 'text-red-500' : focused ? 'text-brand-500' : 'text-gray-500'}
             `}
           >
             {label}{required && <span className="text-red-500 ml-1">*</span>}
           </label>
           <div className={`
             border rounded-md transition-all duration-200
-            ${error ? 'border-red-500' : focused ? 'border-purple-500' : 'border-gray-300'}
+            ${error ? 'border-red-500' : focused ? 'border-brand-500' : 'border-gray-300'}
           `}>
           <input
             {...props}
