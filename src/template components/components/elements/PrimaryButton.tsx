@@ -28,11 +28,10 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       disabled={disabled || isLoading}
       className={`
         font-semibold text-white rounded-lg shadow-md border border-transparent
-        bg-gradient-to-r from-brand-600 via-brand-500 to-orange-500
-        hover:from-brand-700 hover:via-brand-600 hover:to-orange-600
+        bg-brand-500 hover:bg-brand-600
         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 
         transition-all duration-200 ease-in-out transform hover:scale-[1.03] active:scale-[0.98]
-        disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 disabled:hover:from-brand-600
+        disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 disabled:hover:bg-brand-500
         flex items-center justify-center
         ${sizeClasses[size]}
         ${className || ''}
