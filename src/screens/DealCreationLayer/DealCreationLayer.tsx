@@ -187,12 +187,12 @@ export const DealCreationLayer = (): JSX.Element => {
            <div className="flex flex-col items-center">
              <div
                className={`w-8 h-8 rounded-2xl flex items-center justify-center ${
-                 currentStep >= step.number ? "bg-[#636ae8]" : "bg-[#f7f7f7]"
+                 currentStep >= step.number ? "bg-brand-500" : "bg-gray-100"
                }`}
              >
                <span
                  className={`font-medium text-sm ${
-                   currentStep >= step.number ? "text-white" : "text-[#8c8d8b]"
+                   currentStep >= step.number ? "text-white" : "text-gray-500"
                  }`}
                >
                  {step.number}
@@ -201,8 +201,8 @@ export const DealCreationLayer = (): JSX.Element => {
              <span
                className={`mt-2 text-sm text-center ${
                  currentStep >= step.number
-                   ? "font-medium text-[#242524]"
-                   : "font-normal text-[#8c8d8b]"
+                   ? "font-medium text-brand-900"
+                   : "font-normal text-gray-500"
                }`}
              >
                {step.title}
@@ -211,7 +211,7 @@ export const DealCreationLayer = (): JSX.Element => {
 
            {index < stepsData.length - 1 && (
              <div className="flex items-center mx-4">
-               <div className="w-[123px] h-px bg-gray-200"></div>
+               <div className="w-[123px] h-px bg-brand-200"></div>
              </div>
            )}
          </React.Fragment>
@@ -230,7 +230,7 @@ export const DealCreationLayer = (): JSX.Element => {
                  <TextInput
                    id="customer-search"
                    label={
-                     <div className="flex items-center gap-1">
+                     <div className="flex items-center gap-1 bg-transparent">
                        <SearchIcon className="h-2.5 w-2.5 text-brand-500" />
                        <span>Search</span>
                      </div>
