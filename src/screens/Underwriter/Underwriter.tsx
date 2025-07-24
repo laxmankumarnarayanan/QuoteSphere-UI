@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../../components/Layout/Layout';
 import { UserPlus } from 'lucide-react';
 import { underwriterService } from '../../services/underwriterService';
+import { useNavigate } from 'react-router-dom';
 
 interface UnderwriterDeal {
   id: string;
@@ -19,6 +20,7 @@ const Underwriter: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [assigningDealId, setAssigningDealId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchSubmittedDeals();
@@ -40,16 +42,17 @@ const Underwriter: React.FC = () => {
     try {
       setAssigningDealId(dealId);
       
-      // You can customize the priority here if needed
-      const priority = "Medium"; // Default priority
-      
-      await underwriterService.assignDealToUnderwriter(dealId, priority);
+      // Use the service with default "Medium" priority
+      const assignment = await underwriterService.assignDealToUnderwriter(dealId, "Medium");
       
       // Show success message
       alert('Deal assigned successfully!');
-      // Refresh the deals list
-      fetchSubmittedDeals();
+      
+      // Navigate to assignment details page
+      navigate(`/assignment/${assignment.assignmentId}`);
+      
     } catch (err) {
+      console.error('Assignment error:', err);
       setError(err instanceof Error ? err.message : 'Failed to assign deal');
     } finally {
       setAssigningDealId(null);

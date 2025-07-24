@@ -4,6 +4,7 @@ import Layout from './components/Layout/Layout';
 import Dashboard from './screens/Dashboard/Dashboard';
 import DealCreationPage from './screens/DealCreationLayer/DealCreationPage';
 import Underwriter from './screens/Underwriter/Underwriter';
+import AssignmentDetails from './screens/AssignmentDetails/AssignmentDetails';
 
 // Simple test component wrapped in Layout
 const TestPage = () => (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/deal-creation" element={<DealCreationPage />} />
         <Route path="/underwriter" element={<Underwriter />} />
+        <Route path="/assignment/:assignmentId" element={<AssignmentDetails />} />
         <Route path="/test" element={<TestPage />} />
         <Route path="/*" element={<TestPage />} />
       </Routes>
