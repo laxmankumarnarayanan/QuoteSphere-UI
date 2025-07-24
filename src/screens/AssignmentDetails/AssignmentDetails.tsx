@@ -3,12 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout/Layout';
 import { ArrowLeft, Clock, User, FileText, CheckCircle } from 'lucide-react';
 
-// Import sections from DealCreationLayer
+// Import sections from DealCreationLayer with correct paths
 import { CustomerDetailsSection } from '../DealCreationLayer/sections/CustomerDetailsSection/CustomerDetailsSection';
 import { CustomerSelectionSection } from '../DealCreationLayer/sections/CustomerSelectionSection/CustomerSelectionSection';
 import { DealCreationSection } from '../DealCreationLayer/sections/DealCreationSection/DealCreationSection';
 import { SearchSection } from '../DealCreationLayer/sections/SearchSection/SearchSection';
-import { SpecialConditionsSection } from '../DealCreationLayer/SpecialConditionsSection';
+import { SpecialConditionsSection } from '../DealCreationLayer/sections/SpecialConditionsSection';
 
 interface AssignmentDetails {
   assignmentId: string;
