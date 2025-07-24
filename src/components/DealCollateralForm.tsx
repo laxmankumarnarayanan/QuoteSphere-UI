@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import SelectInput from "../template components/components/form/SelectInput";
 import { dealService } from "../services/dealService";
-import TextInput from "../template components/components/form/TextInput";
+import TextInput from "../template components/components/elements/TextInput";
 import SecondaryButton from "../template components/components/elements/SecondaryButton";
 import PrimaryButton from "../template components/components/elements/PrimaryButton";
 import { BlobServiceClient } from "@azure/storage-blob";

@@ -6,7 +6,7 @@ import SelectInput from "../../template components/components/elements/SelectInp
 import { addDealProduct, addDealSubProduct } from "../../services/dealProductApi";
 import { saveDealCommitment, DealCommitment, deleteDealCommitment, getDealCommitmentsByDealId } from '../../services/dealCommitmentService';
 import { translateFieldService } from '../../services/translateFieldService';
-import TextInput from '../../template components/components/form/TextInput';
+import TextInput from '../../template components/components/elements/TextInput';
 import { BlobServiceClient } from "@azure/storage-blob";
 import { Edit2Icon, Trash2Icon } from "lucide-react";
 

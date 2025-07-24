@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import TextInput from "../template components/components/form/TextInput";
+import TextInput from "../template components/components/elements/TextInput";
 import SecondaryButton from "../template components/components/elements/SecondaryButton";
 import PrimaryButton from "../template components/components/elements/PrimaryButton";
 import SelectInput from "../template components/components/elements/SelectInput";

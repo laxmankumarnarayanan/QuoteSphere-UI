@@ -1,6 +1,6 @@
 import { BellIcon, SearchIcon } from "lucide-react";
 import React, { useState } from "react";
-import TextInput from "@template/form/TextInput";
+import TextInput from "@template/elements/TextInput";
 import PrimaryButton from "@template/elements/PrimaryButton";
 import SecondaryButton from "@template/elements/SecondaryButton";
 import { CustomerDetailsSection } from "./sections/CustomerDetailsSection/CustomerDetailsSection";
@@ -229,18 +229,13 @@ export const DealCreationLayer = (): JSX.Element => {
                <div className="relative w-full">
                  <TextInput
                    id="customer-search"
-                   label={
-                     <div className="flex items-center gap-1 bg-transparent">
-                       <SearchIcon className="h-2.5 w-2.5 text-brand-500" />
-                       <span>Search</span>
-                     </div>
-                   }
+                   label="Search"
+                   leadingIcon={<SearchIcon className="h-2.5 w-2.5 text-brand-500" />}
                    value={searchValue}
                    onChange={setSearchValue}
                    placeholder="Search by Customer Name, ID, or Group ID"
                    className="w-full"
                    inputClassName="w-full border-brand-200 focus:border-brand-500 focus:ring-brand-500 text-brand-900 placeholder-brand-400"
-                   labelClassName="text-brand-700 bg-transparent"
                  />
                </div>
              </div>
