@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../../components/Layout/Layout';
-import { Eye, CheckCircle, XCircle, Clock, UserPlus } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
+import { underwriterService } from '../../services/underwriterService';
 
 interface UnderwriterDeal {
   id: string;
@@ -26,27 +27,8 @@ const Underwriter: React.FC = () => {
   const fetchSubmittedDeals = async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/dashboard/deal/by-status/Submitted');
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch submitted deals');
-      }
-      
-      const data = await response.json();
-      
-      // Transform the data to match our interface
-      const transformedDeals: UnderwriterDeal[] = data.map((deal: any) => ({
-        id: deal.id,
-        dealId: deal.dealId,
-        customerId: deal.customerId || 'N/A',
-        customerName: deal.customerName,
-        initiator: deal.initiator || 'N/A',
-        totalCommitmentAmount: deal.commitmentAmount || 'N/A',
-        dealPhase: deal.stage || 'Initial',
-        status: deal.status
-      }));
-      
-      setDeals(transformedDeals);
+      const deals = await underwriterService.getSubmittedDeals();
+      setDeals(deals);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -54,102 +36,23 @@ const Underwriter: React.FC = () => {
     }
   };
 
-  const handleViewDeal = (dealId: string) => {
-    // Navigate to deal details page
-    window.open(`/deal-details/${dealId}`, '_blank');
-  };
-
-  const handleApproveDeal = async (dealId: string) => {
-    try {
-      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/deal/${dealId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          dealStatus: 'Approved',
-          lastUpdatedBy: 'Underwriter'
-        }),
-      });
-
-      if (response.ok) {
-        // Refresh the deals list
-        fetchSubmittedDeals();
-      } else {
-        throw new Error('Failed to approve deal');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to approve deal');
-    }
-  };
-
-  const handleRejectDeal = async (dealId: string) => {
-    try {
-      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/deal/${dealId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          dealStatus: 'Rejected',
-          lastUpdatedBy: 'Underwriter'
-        }),
-      });
-
-      if (response.ok) {
-        // Refresh the deals list
-        fetchSubmittedDeals();
-      } else {
-        throw new Error('Failed to reject deal');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to reject deal');
-    }
-  };
-
   const handleAssignDeal = async (dealId: string) => {
     try {
       setAssigningDealId(dealId);
       
-      // For now, we'll use a hardcoded underwriter ID (1) and assigned by ID (1)
-      // In a real application, these would come from the current user context
-      const response = await fetch('https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/underwriter-assignments/assign', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          dealId: dealId,
-          underwriterUserId: 1, // This should come from user context
-          assignedBy: 1 // This should come from user context
-        }),
-      });
-
-      if (response.ok) {
-        // Show success message
-        alert('Deal assigned successfully!');
-        // Optionally refresh the deals list or remove the assigned deal
-        fetchSubmittedDeals();
-      } else {
-        throw new Error('Failed to assign deal');
-      }
+      // You can customize the priority here if needed
+      const priority = "Medium"; // Default priority
+      
+      await underwriterService.assignDealToUnderwriter(dealId, priority);
+      
+      // Show success message
+      alert('Deal assigned successfully!');
+      // Refresh the deals list
+      fetchSubmittedDeals();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to assign deal');
     } finally {
       setAssigningDealId(null);
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Submitted':
-        return <Clock className="w-4 h-4 text-yellow-500" />;
-      case 'Approved':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'Rejected':
-        return <XCircle className="w-4 h-4 text-red-500" />;
-      default:
-        return <Clock className="w-4 h-4 text-gray-500" />;
     }
   };
 
@@ -257,44 +160,21 @@ const Underwriter: React.FC = () => {
                         {deal.status}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleViewDeal(deal.dealId)}
-                            className="text-brand-600 hover:text-brand-900 flex items-center"
-                            title="View Deal"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleApproveDeal(deal.dealId)}
-                            className="text-green-600 hover:text-green-900 flex items-center"
-                            title="Approve Deal"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleRejectDeal(deal.dealId)}
-                            className="text-red-600 hover:text-red-900 flex items-center"
-                            title="Reject Deal"
-                          >
-                            <XCircle className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleAssignDeal(deal.dealId)}
-                            disabled={assigningDealId === deal.dealId}
-                            className={`text-brand-600 hover:text-brand-900 flex items-center ${
-                              assigningDealId === deal.dealId ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
-                            title="Assign Deal"
-                          >
-                            {assigningDealId === deal.dealId ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand-600"></div>
-                            ) : (
-                              <UserPlus className="w-4 h-4" />
-                            )}
-                            <span className="ml-1">Assign</span>
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => handleAssignDeal(deal.dealId)}
+                          disabled={assigningDealId === deal.dealId}
+                          className={`text-brand-600 hover:text-brand-900 flex items-center ${
+                            assigningDealId === deal.dealId ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          title="Assign Deal"
+                        >
+                          {assigningDealId === deal.dealId ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand-600"></div>
+                          ) : (
+                            <UserPlus className="w-4 h-4" />
+                          )}
+                          <span className="ml-1">Assign</span>
+                        </button>
                       </td>
                     </tr>
                   ))}

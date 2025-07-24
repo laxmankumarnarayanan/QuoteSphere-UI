@@ -13,6 +13,20 @@ export interface UnderwriterDeal {
   status: string;
 }
 
+export interface UnderwriterAssignment {
+  assignmentId: string;
+  dealId: string;
+  underwriterUserId: string;
+  assignmentStatus: string;
+  priority: string;
+  assignedDateTime: string;
+  completedDateTime?: string;
+  createdDateTime: string;
+  createdBy: string;
+  lastUpdatedDateTime: string;
+  lastUpdatedBy: string;
+}
+
 export const underwriterService = {
   async getSubmittedDeals(): Promise<UnderwriterDeal[]> {
     try {
@@ -41,46 +55,58 @@ export const underwriterService = {
     }
   },
 
-  async approveDeal(dealId: string): Promise<void> {
+  async assignDealToUnderwriter(dealId: string, priority: string = "Medium"): Promise<UnderwriterAssignment> {
     try {
-      const response = await fetch(`${API_BASE_URL}/deal/${dealId}`, {
-        method: 'PUT',
+      const response = await fetch(`${API_BASE_URL}/underwriter-assignments/assign`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          dealStatus: 'Approved',
-          lastUpdatedBy: 'Underwriter'
+          dealId: dealId,
+          underwriterUserId: "laxman.narayanan@fractalhive.com",
+          assignedBy: "laxman.narayanan@fractalhive.com",
+          priority: priority
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to approve deal');
+        throw new Error('Failed to assign deal');
       }
+
+      return await response.json();
     } catch (error) {
-      console.error('Error approving deal:', error);
+      console.error('Error assigning deal:', error);
       throw error;
     }
   },
 
-  async rejectDeal(dealId: string): Promise<void> {
+  async getAssignmentsByDealId(dealId: string): Promise<UnderwriterAssignment[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/deal/${dealId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          dealStatus: 'Rejected',
-          lastUpdatedBy: 'Underwriter'
-        }),
-      });
-
+      const response = await fetch(`${API_BASE_URL}/underwriter-assignments/deal/${dealId}`);
+      
       if (!response.ok) {
-        throw new Error('Failed to reject deal');
+        throw new Error('Failed to fetch assignments');
       }
+      
+      return await response.json();
     } catch (error) {
-      console.error('Error rejecting deal:', error);
+      console.error('Error fetching assignments:', error);
+      throw error;
+    }
+  },
+
+  async getAssignmentsByUnderwriterId(underwriterUserId: string): Promise<UnderwriterAssignment[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/underwriter-assignments/underwriter/${underwriterUserId}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch assignments');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching assignments:', error);
       throw error;
     }
   }
