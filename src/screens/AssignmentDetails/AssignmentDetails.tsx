@@ -8,7 +8,7 @@ import { CustomerDetailsSection } from '../DealCreationLayer/sections/CustomerDe
 import { CustomerSelectionSection } from '../DealCreationLayer/sections/CustomerSelectionSection/CustomerSelectionSection';
 import { DealCreationSection } from '../DealCreationLayer/sections/DealCreationSection/DealCreationSection';
 import { SearchSection } from '../DealCreationLayer/sections/SearchSection/SearchSection';
-import { SpecialConditionsSection } from '../DealCreationLayer/sections/SpecialConditionsSection';
+import SpecialConditionsSection from '../DealCreationLayer/sections/SpecialConditionsSection'; // Changed to default import
 
 interface AssignmentDetails {
   assignmentId: string;
@@ -295,7 +295,6 @@ const AssignmentDetails: React.FC = () => {
               <div className="p-6">
                 <SpecialConditionsSection 
                   dealId={dealData.dealId}
-                  isReadOnly={true}
                 />
               </div>
             </div>
