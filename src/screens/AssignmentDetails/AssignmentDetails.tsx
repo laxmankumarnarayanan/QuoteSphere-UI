@@ -6,8 +6,6 @@ import { ArrowLeft, Clock, User, FileText, CheckCircle, Building, Package, Shiel
 // Import sections from DealCreationLayer with correct paths
 import { CustomerDetailsSection } from '../DealCreationLayer/sections/CustomerDetailsSection/CustomerDetailsSection';
 import SpecialConditionsSection from '../DealCreationLayer/sections/SpecialConditionsSection';
-import ProductSelectionDropdowns from '../DealCreationLayer/ProductSelectionDropdowns';
-import DealCollateralForm from '../../components/DealCollateralForm';
 
 interface AssignmentDetails {
   assignmentId: string;
@@ -31,9 +29,6 @@ interface DealData {
 interface DealProduct {
   dealId: string;
   productId: string;
-  productName: string;
-  subProductId: string;
-  subProductName: string;
   accountNumber?: string;
 }
 
@@ -129,10 +124,12 @@ const AssignmentDetails: React.FC = () => {
 
   const fetchDealProducts = async (dealId: string) => {
     try {
-      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/deal-products/deal/${dealId}`);
+      // Get all deal products and filter by dealId
+      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/deal-products`);
       if (response.ok) {
-        const data = await response.json();
-        setDealProducts(data);
+        const allProducts = await response.json();
+        const filteredProducts = allProducts.filter((product: any) => product.dealId === dealId);
+        setDealProducts(filteredProducts);
       }
     } catch (error) {
       console.error('Error fetching deal products:', error);
@@ -141,7 +138,8 @@ const AssignmentDetails: React.FC = () => {
 
   const fetchDealCollaterals = async (dealId: string) => {
     try {
-      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/deal-collaterals/deal/${dealId}`);
+      // Use the correct endpoint
+      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/deal-collateral/deal/${dealId}`);
       if (response.ok) {
         const data = await response.json();
         setDealCollaterals(data);
@@ -165,10 +163,12 @@ const AssignmentDetails: React.FC = () => {
 
   const fetchDealPricing = async (dealId: string) => {
     try {
-      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/deal-pricing/deal/${dealId}`);
+      // Get all deal pricing and filter by dealId
+      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/deal-pricing`);
       if (response.ok) {
-        const data = await response.json();
-        setDealPricing(data);
+        const allPricing = await response.json();
+        const filteredPricing = allPricing.filter((pricing: any) => pricing.id?.dealId === dealId);
+        setDealPricing(filteredPricing);
       }
     } catch (error) {
       console.error('Error fetching deal pricing:', error);
@@ -363,12 +363,8 @@ const AssignmentDetails: React.FC = () => {
                       <div key={index} className="border border-gray-200 rounded-lg p-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <span className="text-sm font-medium text-gray-700">Product</span>
-                            <p className="text-gray-900">{product.productName}</p>
-                          </div>
-                          <div>
-                            <span className="text-sm font-medium text-gray-700">Sub-Product</span>
-                            <p className="text-gray-900">{product.subProductName}</p>
+                            <span className="text-sm font-medium text-gray-700">Product ID</span>
+                            <p className="text-gray-900 font-mono text-sm">{product.productId}</p>
                           </div>
                           {product.accountNumber && (
                             <div>
