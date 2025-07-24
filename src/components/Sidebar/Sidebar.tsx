@@ -7,7 +7,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   ChevronLeft, 
   ChevronRight,
-  LayoutDashboard
+  LayoutDashboard,
+  Shield
 } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -27,6 +28,11 @@ const navigation: NavItem[] = [
     icon: '/Handshake.png',
     label: 'Deal Desk',
     href: '/deal-desk'
+  },
+  {
+    icon: <Shield className="w-4 h-4" />,
+    label: 'Underwriter',
+    href: '/underwriter'
   },
   {
     icon: '/Exclusive Product.png',
