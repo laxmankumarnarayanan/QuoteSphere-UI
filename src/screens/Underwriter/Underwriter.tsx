@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../../components/Layout/Layout';
-import { Eye, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Eye, CheckCircle, XCircle, Clock, UserPlus } from 'lucide-react';
 
 interface UnderwriterDeal {
   id: string;
@@ -17,6 +17,7 @@ const Underwriter: React.FC = () => {
   const [deals, setDeals] = useState<UnderwriterDeal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [assigningDealId, setAssigningDealId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSubmittedDeals();
@@ -106,6 +107,39 @@ const Underwriter: React.FC = () => {
     }
   };
 
+  const handleAssignDeal = async (dealId: string) => {
+    try {
+      setAssigningDealId(dealId);
+      
+      // For now, we'll use a hardcoded underwriter ID (1) and assigned by ID (1)
+      // In a real application, these would come from the current user context
+      const response = await fetch('https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/underwriter-assignments/assign', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          dealId: dealId,
+          underwriterUserId: 1, // This should come from user context
+          assignedBy: 1 // This should come from user context
+        }),
+      });
+
+      if (response.ok) {
+        // Show success message
+        alert('Deal assigned successfully!');
+        // Optionally refresh the deals list or remove the assigned deal
+        fetchSubmittedDeals();
+      } else {
+        throw new Error('Failed to assign deal');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to assign deal');
+    } finally {
+      setAssigningDealId(null);
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'Submitted':
@@ -155,7 +189,7 @@ const Underwriter: React.FC = () => {
       <div className="p-6">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Underwriter Dashboard</h1>
-          <p className="text-gray-600">Review and approve submitted deals</p>
+          <p className="text-gray-600">Review and assign submitted deals</p>
         </div>
 
         <div className="bg-white rounded-lg shadow">
@@ -219,11 +253,8 @@ const Underwriter: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {deal.dealPhase}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          {getStatusIcon(deal.status)}
-                          <span className="ml-2 text-sm text-gray-900">{deal.status}</span>
-                        </div>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {deal.status}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
@@ -247,6 +278,21 @@ const Underwriter: React.FC = () => {
                             title="Reject Deal"
                           >
                             <XCircle className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleAssignDeal(deal.dealId)}
+                            disabled={assigningDealId === deal.dealId}
+                            className={`text-brand-600 hover:text-brand-900 flex items-center ${
+                              assigningDealId === deal.dealId ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                            title="Assign Deal"
+                          >
+                            {assigningDealId === deal.dealId ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand-600"></div>
+                            ) : (
+                              <UserPlus className="w-4 h-4" />
+                            )}
+                            <span className="ml-1">Assign</span>
                           </button>
                         </div>
                       </td>
