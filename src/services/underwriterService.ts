@@ -66,7 +66,7 @@ export const underwriterService = {
           dealId: dealId,
           underwriterUserId: "laxman.narayanan@fractalhive.com",
           assignedBy: "laxman.narayanan@fractalhive.com",
-          priority: priority
+          priority: priority // This will be "Medium" by default
         }),
       });
 
