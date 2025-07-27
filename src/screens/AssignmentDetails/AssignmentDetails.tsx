@@ -555,6 +555,7 @@ const AssignmentDetails: React.FC = () => {
           <div className="bg-white p-3 rounded border">
             <SpecialConditionsSection 
               dealId={assignmentDetails.dealId}
+              readOnly={true}
             />
           </div>
         </div>
