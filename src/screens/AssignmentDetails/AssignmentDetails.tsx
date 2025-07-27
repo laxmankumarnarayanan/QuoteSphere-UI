@@ -157,7 +157,9 @@ const AssignmentDetails: React.FC = () => {
 
   const fetchCustomerDetails = async (customerId: string) => {
     try {
+      console.log('Fetching customer details for ID:', customerId);
       const customerData = await customerService.getCustomerDetails(customerId);
+      console.log('Customer details received:', customerData);
       setCustomerDetails(customerData);
     } catch (error) {
       console.error('Error fetching customer details:', error);
@@ -362,23 +364,27 @@ const AssignmentDetails: React.FC = () => {
           </div>
         )}
 
-        {/* Selected Customer Details */}
-        {customerDetails && (
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                <Building className="w-5 h-5 mr-2" />
-                Selected Customer Details
-              </h3>
-            </div>
-            <div className="p-6">
-              <CustomerDetailsSection 
-                selectedCustomer={customerDetails}
-                onCustomerSelect={() => {}} // No-op for read-only view
-              />
-            </div>
-          </div>
-        )}
+                 {/* Selected Customer Details */}
+         <div className="bg-white rounded-lg shadow">
+           <div className="px-6 py-4 border-b border-gray-200">
+             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+               <Building className="w-5 h-5 mr-2" />
+               Selected Customer Details
+             </h3>
+           </div>
+           <div className="p-6">
+             {customerDetails ? (
+               <CustomerDetailsSection 
+                 selectedCustomer={customerDetails}
+                 onCustomerSelect={() => {}} // No-op for read-only view
+               />
+             ) : (
+               <div className="text-center py-8">
+                 <p className="text-gray-500">Loading customer details...</p>
+               </div>
+             )}
+           </div>
+         </div>
 
         {/* Added Product-SubProduct Combinations */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -386,14 +392,6 @@ const AssignmentDetails: React.FC = () => {
             <Package className="h-5 w-5 mr-2 text-purple-600" />
             Added Product-SubProduct Combinations
           </h2>
-          
-          {/* Debug: Print raw data */}
-          <div className="mb-4 p-4 bg-gray-100 rounded">
-            <h4 className="font-semibold mb-2">Debug - Raw Product Combinations Data:</h4>
-            <pre className="text-xs overflow-auto">
-              {JSON.stringify(productCombinations, null, 2)}
-            </pre>
-          </div>
           
           {productCombinations.length > 0 ? (
             <div className="space-y-6">
