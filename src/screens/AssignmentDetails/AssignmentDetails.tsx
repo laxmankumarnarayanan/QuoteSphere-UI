@@ -249,16 +249,11 @@ const AssignmentDetails: React.FC = () => {
       // Construct the full URL with SAS token
       const fullUrl = `https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer/${blobName}?${sasToken}`;
       
-      // Create a temporary link and trigger download
-      const link = document.createElement('a');
-      link.href = fullUrl;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Open in new tab
+      window.open(fullUrl, '_blank');
     } catch (error) {
-      console.error('Error downloading file:', error);
-      alert('Failed to download file. Please try again.');
+      console.error('Error opening file:', error);
+      alert('Failed to open file. Please try again.');
     }
   };
 
@@ -498,7 +493,7 @@ const AssignmentDetails: React.FC = () => {
                   {collateral.storagePath && (
                     <div className="mt-3 flex justify-end">
                       <button
-                        onClick={() => downloadFile(collateral.storagePath!, `collateral-${collateral.id.collateralID}.pdf`)}
+                        onClick={() => downloadFile(collateral.storagePath!, `collateral-${index + 1}.pdf`)}
                         className="flex items-center gap-2 px-3 py-1 bg-brand-600 text-white text-sm rounded hover:bg-brand-700 transition-colors"
                       >
                         <Eye className="w-4 h-4" />
