@@ -9,6 +9,8 @@ import SpecialConditionsSection from '../DealCreationLayer/sections/SpecialCondi
 import ProductSelectionDropdowns from '../DealCreationLayer/ProductSelectionDropdowns';
 import DealCollateralForm from '../../components/DealCollateralForm';
 import { CustomerDetails, customerService } from '../../services/customerService';
+import { UnderwriterFinancialAnalysisSection } from '../../components/UnderwriterFinancialAnalysisSection';
+import { UnderwriterDocumentsSection } from '../../components/UnderwriterDocumentsSection';
 
 interface AssignmentDetails {
   assignmentId: string;
@@ -607,6 +609,22 @@ const AssignmentDetails: React.FC = () => {
               readOnly={true}
             />
           </div>
+        </div>
+
+        {/* Underwriter Financial Analysis Section */}
+        <div className="mb-6">
+          <UnderwriterFinancialAnalysisSection 
+            dealId={assignmentDetails.dealId}
+            assignmentId={assignmentDetails.assignmentId}
+          />
+        </div>
+
+        {/* Underwriter Documents Section */}
+        <div className="mb-6">
+          <UnderwriterDocumentsSection 
+            dealId={assignmentDetails.dealId}
+            assignmentId={assignmentDetails.assignmentId}
+          />
         </div>
       </div>
     </Layout>
