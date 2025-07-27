@@ -232,15 +232,22 @@ const AssignmentDetails: React.FC = () => {
 
   const downloadFile = async (storagePath: string, fileName: string) => {
     try {
+      // Check if storagePath already contains the full URL
+      let blobName = storagePath;
+      if (storagePath.includes('https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer/')) {
+        // Extract just the blob name from the full URL
+        blobName = storagePath.replace('https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer/', '');
+      }
+      
       // Get SAS token for the file
-      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/azure-sas/read-sas?blobName=${encodeURIComponent(storagePath)}`);
+      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/azure-sas/read-sas?blobName=${encodeURIComponent(blobName)}`);
       if (!response.ok) {
         throw new Error('Failed to get SAS token');
       }
       const sasToken = await response.text();
       
       // Construct the full URL with SAS token
-      const fullUrl = `https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer/${storagePath}?${sasToken}`;
+      const fullUrl = `https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer/${blobName}?${sasToken}`;
       
       // Create a temporary link and trigger download
       const link = document.createElement('a');
