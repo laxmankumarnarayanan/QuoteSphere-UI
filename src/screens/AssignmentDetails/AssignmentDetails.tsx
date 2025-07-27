@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout/Layout';
-import { ArrowLeft, Clock, User, FileText, CheckCircle, Building, Package, Shield, FileText as FileTextIcon, DollarSign } from 'lucide-react';
+import { ArrowLeft, Clock, User, FileText, CheckCircle, Building, Package, Shield, FileText as FileTextIcon, DollarSign, Download, Eye } from 'lucide-react';
 
 // Import sections from DealCreationLayer with correct paths
 import { CustomerDetailsSection } from '../DealCreationLayer/sections/CustomerDetailsSection/CustomerDetailsSection';
@@ -227,6 +227,31 @@ const AssignmentDetails: React.FC = () => {
         return <Clock className="w-5 h-5 text-yellow-500" />;
       default:
         return <Clock className="w-5 h-5 text-gray-500" />;
+    }
+  };
+
+  const downloadFile = async (storagePath: string, fileName: string) => {
+    try {
+      // Get SAS token for the file
+      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/azure-sas/read-sas?blobName=${encodeURIComponent(storagePath)}`);
+      if (!response.ok) {
+        throw new Error('Failed to get SAS token');
+      }
+      const sasToken = await response.text();
+      
+      // Construct the full URL with SAS token
+      const fullUrl = `https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer/${storagePath}?${sasToken}`;
+      
+      // Create a temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = fullUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      alert('Failed to download file. Please try again.');
     }
   };
 
@@ -463,6 +488,17 @@ const AssignmentDetails: React.FC = () => {
                       <span className="text-sm text-slate-800">{collateral.description}</span>
                     </div>
                   </div>
+                  {collateral.storagePath && (
+                    <div className="mt-3 flex justify-end">
+                      <button
+                        onClick={() => downloadFile(collateral.storagePath!, `collateral-${collateral.id.collateralID}.pdf`)}
+                        className="flex items-center gap-2 px-3 py-1 bg-brand-600 text-white text-sm rounded hover:bg-brand-700 transition-colors"
+                      >
+                        <Eye className="w-4 h-4" />
+                        View
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -492,6 +528,17 @@ const AssignmentDetails: React.FC = () => {
                       <span className="text-sm text-slate-800">{document.description}</span>
                     </div>
                   </div>
+                  {document.storageFilePath && (
+                    <div className="mt-3 flex justify-end">
+                      <button
+                        onClick={() => downloadFile(document.storageFilePath!, document.documentName)}
+                        className="flex items-center gap-2 px-3 py-1 bg-brand-600 text-white text-sm rounded hover:bg-brand-700 transition-colors"
+                      >
+                        <Eye className="w-4 h-4" />
+                        View
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
