@@ -370,84 +370,92 @@ const AssignmentDetails: React.FC = () => {
               </div>
             </div>
 
-            {/* Product-SubProduct Combinations Section */}
-            <div className="bg-white rounded-lg shadow">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <Package className="w-5 h-5 mr-2" />
-                  Added Product-SubProduct Combinations
-                </h3>
+            {/* Added Product-SubProduct Combinations */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+              <h2 className="text-xl font-semibold mb-4 flex items-center">
+                <Package className="h-5 w-5 mr-2 text-purple-600" />
+                Added Product-SubProduct Combinations
+              </h2>
+              
+              {/* Debug: Print raw data */}
+              <div className="mb-4 p-4 bg-gray-100 rounded">
+                <h4 className="font-semibold mb-2">Debug - Raw Product Combinations Data:</h4>
+                <pre className="text-xs overflow-auto">
+                  {JSON.stringify(productCombinations, null, 2)}
+                </pre>
               </div>
-              <div className="p-6">
-                {productCombinations.length > 0 ? (
-                  <div className="space-y-4">
-                    {productCombinations.map((product, index) => (
-                      <div key={index} className="border border-gray-200 rounded-lg p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <span className="text-sm font-medium text-gray-700">Product ID</span>
-                            <p className="text-gray-900 font-mono text-sm">{product.productId}</p>
-                          </div>
-                          <div>
-                            <span className="text-sm font-medium text-gray-700">Product Description</span>
-                            <p className="text-gray-900">{product.productDescription}</p>
-                          </div>
+              
+              {productCombinations.length > 0 ? (
+                <div className="space-y-6">
+                  {productCombinations.map((product, index) => {
+                    console.log(`Product ${index}:`, product);
+                    return (
+                      <div key={index} className="border rounded-lg p-4">
+                        <div className="mb-3">
+                          <h3 className="font-semibold text-lg text-gray-800">
+                            Product ID: {product.productId}
+                          </h3>
+                          <p className="text-sm text-gray-600">Product Description: {product.productDescription || 'No description'}</p>
                           {product.accountNumber && (
-                            <div>
-                              <span className="text-sm font-medium text-gray-700">Account Number</span>
-                              <p className="text-gray-900">{product.accountNumber}</p>
-                            </div>
+                            <p className="text-sm text-gray-600">Account: {product.accountNumber}</p>
                           )}
                         </div>
-                        {product.subProducts.length > 0 && (
-                          <div className="mt-4 ml-4">
-                            <h4 className="text-sm font-semibold text-gray-800 mb-2">Sub-Products:</h4>
-                            <div className="space-y-3">
-                              {product.subProducts.map((subProduct, subIndex) => (
+                        
+                        {product.subProducts && product.subProducts.length > 0 ? (
+                          <div className="ml-4 space-y-3">
+                            {product.subProducts.map((subProduct, subIndex) => {
+                              console.log(`SubProduct ${subIndex}:`, subProduct);
+                              return (
                                 <div key={subIndex} className="border-l-2 border-gray-200 pl-4">
-                                  <h5 className="text-sm font-medium text-gray-700">{subProduct.subProductDescription}</h5>
-                                  {subProduct.commitments.length > 0 && (
+                                  <h4 className="font-medium text-gray-700">
+                                    SubProduct ID: {subProduct.subProductId}
+                                  </h4>
+                                  <p className="text-sm text-gray-600">SubProduct Description: {subProduct.subProductDescription || 'No description'}</p>
+                                  
+                                  {subProduct.commitments && subProduct.commitments.length > 0 && (
                                     <div className="mt-2 space-y-2">
-                                      <h6 className="text-xs font-medium text-gray-600">Commitments:</h6>
-                                      {subProduct.commitments.map((commitment, commitIndex) => (
-                                        <div key={commitIndex} className="bg-gray-50 rounded p-2 text-xs">
-                                          <div className="grid grid-cols-2 gap-1">
-                                            <div>
-                                              <span className="text-gray-500">Amount:</span>
-                                              <span className="ml-1 font-medium">
-                                                {commitment.commitmentAmount} {commitment.currency}
-                                              </span>
+                                      <h5 className="text-sm font-medium text-gray-600">Commitments:</h5>
+                                      {subProduct.commitments.map((commitment, commitIndex) => {
+                                        console.log(`Commitment ${commitIndex}:`, commitment);
+                                        return (
+                                          <div key={commitIndex} className="bg-gray-50 rounded p-2 text-sm">
+                                            <div className="grid grid-cols-2 gap-2">
+                                              <div>
+                                                <span className="text-gray-500">Amount:</span>
+                                                <span className="ml-1 font-medium">
+                                                  {commitment.commitmentAmount} {commitment.currency}
+                                                </span>
+                                              </div>
+                                              <div>
+                                                <span className="text-gray-500">Tenure:</span>
+                                                <span className="ml-1 font-medium">{commitment.tenure} months</span>
+                                              </div>
                                             </div>
-                                            <div>
-                                              <span className="text-gray-500">Tenure:</span>
-                                              <span className="ml-1 font-medium">{commitment.tenure} months</span>
-                                            </div>
+                                            {commitment.description && (
+                                              <div className="mt-1">
+                                                <span className="text-gray-500">Description:</span>
+                                                <span className="ml-1">{commitment.description}</span>
+                                              </div>
+                                            )}
                                           </div>
-                                          {commitment.description && (
-                                            <div className="mt-1">
-                                              <span className="text-gray-500">Description:</span>
-                                              <span className="ml-1">{commitment.description}</span>
-                                            </div>
-                                          )}
-                                        </div>
-                                      ))}
+                                        );
+                                      })}
                                     </div>
                                   )}
                                 </div>
-                              ))}
-                            </div>
+                              );
+                            })}
                           </div>
+                        ) : (
+                          <p className="text-gray-500">No sub-products found for this product</p>
                         )}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-gray-500 text-center py-8">
-                    <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p>No product combinations found for this deal</p>
-                  </div>
-                )}
-              </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-4">No product combinations found</p>
+              )}
             </div>
 
             {/* Collaterals Section */}
