@@ -6,6 +6,8 @@ import { ArrowLeft, Clock, User, FileText, CheckCircle, Building, Package, Shiel
 // Import sections from DealCreationLayer with correct paths
 import { CustomerDetailsSection } from '../DealCreationLayer/sections/CustomerDetailsSection/CustomerDetailsSection';
 import SpecialConditionsSection from '../DealCreationLayer/sections/SpecialConditionsSection';
+import ProductSelectionDropdowns from '../DealCreationLayer/ProductSelectionDropdowns';
+import DealCollateralForm from '../../components/DealCollateralForm';
 
 interface AssignmentDetails {
   assignmentId: string;
@@ -16,56 +18,85 @@ interface AssignmentDetails {
 }
 
 interface DealData {
+  id: string;
   dealId: string;
   customerId: string;
   customerName: string;
-  dealStatus: string;
-  dealPhase: string;
   initiator: string;
-  createdDateTime?: string;
-  lastUpdatedDateTime?: string;
+  dealPhase: string;
+  status: string;
 }
 
-interface DealProduct {
-  dealId: string;
+interface ProductSubProductCombination {
   productId: string;
+  productDescription: string;
   accountNumber?: string;
+  subProducts: Array<{
+    subProductId: string;
+    subProductDescription: string;
+    commitments: Array<{
+      currency: string;
+      commitmentAmount: number;
+      tenure: number;
+      description: string;
+    }>;
+  }>;
 }
 
 interface DealCollateral {
-  dealId: string;
-  collateralId: string;
+  id: {
+    dealID: string;
+    collateralID: number;
+  };
   collateralType: string;
   collateralValue: number;
   currency: string;
   description: string;
+  storagePath?: string;
 }
 
 interface DealDocument {
-  dealId: string;
-  documentId: string;
+  id: {
+    dealID: string;
+    documentID: number;
+  };
+  documentCategory: string;
   documentType: string;
   documentName: string;
   description: string;
-  storageFilePath: string;
+  storageFilePath?: string;
 }
 
 interface DealPricing {
-  dealId: string;
-  priceId: string;
+  id: {
+    dealId: string;
+    businessDomainId: string;
+    productId: string;
+    subProductId: string;
+    priceId: string;
+  };
   priceDescription: string;
   currency: string;
   standardPrice: number;
+  preferentialType: string;
+  discountPercentage: number;
   finalPrice: number;
   feeType: string;
+  feePercentage: number;
+  flatFeeAmount: number;
+  feeCap: number;
+  maxDiscountAmount: number;
+  calculatedFeeAmount: number;
+  totalCommitmentAmount: number;
+  discountAmount: number;
 }
 
 const AssignmentDetails: React.FC = () => {
   const { assignmentId } = useParams<{ assignmentId: string }>();
   const navigate = useNavigate();
-  const [assignment, setAssignment] = useState<AssignmentDetails | null>(null);
+  const [assignmentDetails, setAssignmentDetails] = useState<AssignmentDetails | null>(null);
   const [dealData, setDealData] = useState<DealData | null>(null);
-  const [dealProducts, setDealProducts] = useState<DealProduct[]>([]);
+  const [productCombinations, setProductCombinations] = useState<ProductSubProductCombination[]>([]);
   const [dealCollaterals, setDealCollaterals] = useState<DealCollateral[]>([]);
   const [dealDocuments, setDealDocuments] = useState<DealDocument[]>([]);
   const [dealPricing, setDealPricing] = useState<DealPricing[]>([]);
@@ -81,30 +112,25 @@ const AssignmentDetails: React.FC = () => {
   const fetchAssignmentDetails = async () => {
     try {
       setLoading(true);
-      
-      // Fetch assignment details
-      const assignmentResponse = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/underwriter-assignments/${assignmentId}`);
-      
-      if (!assignmentResponse.ok) {
-        throw new Error('Failed to fetch assignment details');
+      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/underwriter-assignments/${assignmentId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setAssignmentDetails(data);
+        if (data.dealId) {
+          await Promise.all([
+            fetchDealData(data.dealId),
+            fetchProductCombinations(data.dealId),
+            fetchDealCollaterals(data.dealId),
+            fetchDealDocuments(data.dealId),
+            fetchDealPricing(data.dealId)
+          ]);
+        }
+      } else {
+        setError('Failed to fetch assignment details');
       }
-      
-      const assignmentData = await assignmentResponse.json();
-      setAssignment(assignmentData);
-      
-      // Fetch deal details and related data
-      if (assignmentData.dealId) {
-        await Promise.all([
-          fetchDealData(assignmentData.dealId),
-          fetchDealProducts(assignmentData.dealId),
-          fetchDealCollaterals(assignmentData.dealId),
-          fetchDealDocuments(assignmentData.dealId),
-          fetchDealPricing(assignmentData.dealId)
-        ]);
-      }
-      
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+    } catch (error) {
+      console.error('Error fetching assignment details:', error);
+      setError('Error fetching assignment details');
     } finally {
       setLoading(false);
     }
@@ -122,23 +148,20 @@ const AssignmentDetails: React.FC = () => {
     }
   };
 
-  const fetchDealProducts = async (dealId: string) => {
+  const fetchProductCombinations = async (dealId: string) => {
     try {
-      // Get all deal products and filter by dealId
-      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/deal-products`);
+      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/deal-products/deal/${dealId}/with-details`);
       if (response.ok) {
-        const allProducts = await response.json();
-        const filteredProducts = allProducts.filter((product: any) => product.dealId === dealId);
-        setDealProducts(filteredProducts);
+        const data = await response.json();
+        setProductCombinations(data);
       }
     } catch (error) {
-      console.error('Error fetching deal products:', error);
+      console.error('Error fetching product combinations:', error);
     }
   };
 
   const fetchDealCollaterals = async (dealId: string) => {
     try {
-      // Use the correct endpoint
       const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/deal-collateral/deal/${dealId}`);
       if (response.ok) {
         const data = await response.json();
@@ -163,11 +186,10 @@ const AssignmentDetails: React.FC = () => {
 
   const fetchDealPricing = async (dealId: string) => {
     try {
-      // Get all deal pricing and filter by dealId
       const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/deal-pricing`);
       if (response.ok) {
         const allPricing = await response.json();
-        const filteredPricing = allPricing.filter((pricing: any) => pricing.id?.dealId === dealId);
+        const filteredPricing = allPricing.filter((pricing: any) => pricing.id.dealId === dealId);
         setDealPricing(filteredPricing);
       }
     } catch (error) {
@@ -221,7 +243,7 @@ const AssignmentDetails: React.FC = () => {
     );
   }
 
-  if (!assignment) {
+  if (!assignmentDetails) {
     return (
       <Layout currentPath={[{ label: 'Assignment Details', href: `/assignment/${assignmentId}` }]}>
         <div className="flex items-center justify-center min-h-[50vh]">
@@ -259,14 +281,14 @@ const AssignmentDetails: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="flex flex-col">
               <span className="text-sm font-medium text-gray-700">Assignment ID</span>
-              <span className="text-gray-900 font-mono text-sm">{assignment.assignmentId}</span>
+              <span className="text-gray-900 font-mono text-sm">{assignmentDetails.assignmentId}</span>
             </div>
             
             <div className="flex flex-col">
               <span className="text-sm font-medium text-gray-700">Underwriter User ID</span>
               <span className="text-gray-900 flex items-center">
                 <User className="w-4 h-4 mr-1" />
-                {assignment.underwriterUserId}
+                {assignmentDetails.underwriterUserId}
               </span>
             </div>
             
@@ -274,15 +296,15 @@ const AssignmentDetails: React.FC = () => {
               <span className="text-sm font-medium text-gray-700">Assigned Date Time</span>
               <span className="text-gray-900 flex items-center">
                 <Clock className="w-4 h-4 mr-1" />
-                {formatDateTime(assignment.assignedDateTime)}
+                {formatDateTime(assignmentDetails.assignedDateTime)}
               </span>
             </div>
             
             <div className="flex flex-col">
               <span className="text-sm font-medium text-gray-700">Assignment Status</span>
               <span className="text-gray-900 flex items-center">
-                {getStatusIcon(assignment.assignmentStatus)}
-                <span className="ml-1">{assignment.assignmentStatus}</span>
+                {getStatusIcon(assignmentDetails.assignmentStatus)}
+                <span className="ml-1">{assignmentDetails.assignmentStatus}</span>
               </span>
             </div>
           </div>
@@ -311,7 +333,7 @@ const AssignmentDetails: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-700">Deal Status</span>
-                    <p className="text-gray-900">{dealData.dealStatus}</p>
+                    <p className="text-gray-900">{dealData.status}</p>
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-700">Deal Phase</span>
@@ -321,12 +343,12 @@ const AssignmentDetails: React.FC = () => {
                     <span className="text-sm font-medium text-gray-700">Initiator</span>
                     <p className="text-gray-900">{dealData.initiator}</p>
                   </div>
-                  {dealData.createdDateTime && (
+                  {/* dealData.createdDateTime && (
                     <div>
                       <span className="text-sm font-medium text-gray-700">Created Date</span>
                       <p className="text-gray-900">{formatDateTime(dealData.createdDateTime)}</p>
                     </div>
-                  )}
+                  ) */}
                 </div>
               </div>
             </div>
@@ -357,14 +379,18 @@ const AssignmentDetails: React.FC = () => {
                 </h3>
               </div>
               <div className="p-6">
-                {dealProducts.length > 0 ? (
+                {productCombinations.length > 0 ? (
                   <div className="space-y-4">
-                    {dealProducts.map((product, index) => (
+                    {productCombinations.map((product, index) => (
                       <div key={index} className="border border-gray-200 rounded-lg p-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <span className="text-sm font-medium text-gray-700">Product ID</span>
                             <p className="text-gray-900 font-mono text-sm">{product.productId}</p>
+                          </div>
+                          <div>
+                            <span className="text-sm font-medium text-gray-700">Product Description</span>
+                            <p className="text-gray-900">{product.productDescription}</p>
                           </div>
                           {product.accountNumber && (
                             <div>
@@ -373,6 +399,45 @@ const AssignmentDetails: React.FC = () => {
                             </div>
                           )}
                         </div>
+                        {product.subProducts.length > 0 && (
+                          <div className="mt-4 ml-4">
+                            <h4 className="text-sm font-semibold text-gray-800 mb-2">Sub-Products:</h4>
+                            <div className="space-y-3">
+                              {product.subProducts.map((subProduct, subIndex) => (
+                                <div key={subIndex} className="border-l-2 border-gray-200 pl-4">
+                                  <h5 className="text-sm font-medium text-gray-700">{subProduct.subProductDescription}</h5>
+                                  {subProduct.commitments.length > 0 && (
+                                    <div className="mt-2 space-y-2">
+                                      <h6 className="text-xs font-medium text-gray-600">Commitments:</h6>
+                                      {subProduct.commitments.map((commitment, commitIndex) => (
+                                        <div key={commitIndex} className="bg-gray-50 rounded p-2 text-xs">
+                                          <div className="grid grid-cols-2 gap-1">
+                                            <div>
+                                              <span className="text-gray-500">Amount:</span>
+                                              <span className="ml-1 font-medium">
+                                                {commitment.commitmentAmount} {commitment.currency}
+                                              </span>
+                                            </div>
+                                            <div>
+                                              <span className="text-gray-500">Tenure:</span>
+                                              <span className="ml-1 font-medium">{commitment.tenure} months</span>
+                                            </div>
+                                          </div>
+                                          {commitment.description && (
+                                            <div className="mt-1">
+                                              <span className="text-gray-500">Description:</span>
+                                              <span className="ml-1">{commitment.description}</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -520,7 +585,7 @@ const AssignmentDetails: React.FC = () => {
               </div>
               <div className="p-6">
                 <SpecialConditionsSection 
-                  dealId={dealData.dealId}
+                  dealId={assignmentDetails.dealId}
                 />
               </div>
             </div>
