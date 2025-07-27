@@ -626,6 +626,16 @@ const AssignmentDetails: React.FC = () => {
             assignmentId={assignmentDetails.assignmentId}
           />
         </div>
+
+        {/* Submit Analysis Button */}
+        <div className="flex justify-end">
+          <button
+            onClick={() => alert("The Underwriter Analysis is submitted. Please update the DealPhase and DealStatus in the Deal table as needed")}
+            className="px-6 py-3 text-base font-semibold text-white rounded-lg shadow-md border border-transparent bg-brand-500 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all duration-200 ease-in-out transform hover:scale-[1.03] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 disabled:hover:bg-brand-500 flex items-center justify-center"
+          >
+            Submit Analysis
+          </button>
+        </div>
       </div>
     </Layout>
   );
