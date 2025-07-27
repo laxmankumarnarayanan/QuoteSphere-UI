@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Eye, Save, X } from 'lucide-react';
 import { underwriterAnalysisDocumentsService, UnderwriterDealAnalysisDocuments } from '../services/underwriterAnalysisDocumentsService';
+import { BlobServiceClient } from '@azure/storage-blob';
 
 interface UnderwriterDocumentsSectionProps {
   dealId: string;
@@ -53,10 +54,32 @@ export const UnderwriterDocumentsSection: React.FC<UnderwriterDocumentsSectionPr
   };
 
   const uploadFileToAzure = async (file: File): Promise<string> => {
-    // This would typically call your Azure upload service
-    // For now, we'll simulate the upload and return a storage path
-    const fileName = `${dealId}_${Date.now()}_${file.name}`;
-    return `https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer/${fileName}`;
+    try {
+      // Generate a unique blob name
+      const fileName = `${dealId}_${Date.now()}_${file.name}`;
+      
+      // Get SAS token for upload
+      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/azure-sas?blobName=${encodeURIComponent(fileName)}`);
+      if (!response.ok) {
+        throw new Error('Failed to get SAS token for upload');
+      }
+      const sasToken = await response.text();
+      
+      // Upload file to Azure Blob Storage
+      const blobServiceClient = new BlobServiceClient(`https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer?${sasToken}`);
+      const containerClient = blobServiceClient.getContainerClient("");
+      const blockBlobClient = containerClient.getBlockBlobClient(fileName);
+      
+      await blockBlobClient.uploadBrowserData(file, {
+        blobHTTPHeaders: { blobContentType: file.type }
+      });
+      
+      // Return the storage path
+      return `https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer/${fileName}`;
+    } catch (error) {
+      console.error('Error uploading file to Azure:', error);
+      throw new Error('Failed to upload file to Azure');
+    }
   };
 
   const handleSave = async () => {
