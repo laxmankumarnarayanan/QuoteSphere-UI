@@ -15,9 +15,10 @@ interface SpecialCondition {
 
 interface SpecialConditionsSectionProps {
   dealId: string;
+  readOnly?: boolean;
 }
 
-const SpecialConditionsSection: React.FC<SpecialConditionsSectionProps> = ({ dealId }) => {
+const SpecialConditionsSection: React.FC<SpecialConditionsSectionProps> = ({ dealId, readOnly = false }) => {
   const [description, setDescription] = useState("");
   const [specialConditions, setSpecialConditions] = useState<SpecialCondition[]>([]);
   const [loading, setLoading] = useState(false);
@@ -63,7 +64,7 @@ const SpecialConditionsSection: React.FC<SpecialConditionsSectionProps> = ({ dea
   return (
     <div className="w-full border border-brand-200 rounded-lg bg-brand-50 p-6 mt-0">
       <div className="font-semibold text-brand-800 mb-4">Special Conditions</div>
-      {specialConditions.length > 0 && (
+      {specialConditions.length > 0 ? (
         <div className="mb-6">
           <div className="font-medium text-brand-900 mb-2">Added Special Conditions:</div>
           <ul className="space-y-2">
@@ -75,27 +76,34 @@ const SpecialConditionsSection: React.FC<SpecialConditionsSectionProps> = ({ dea
             ))}
           </ul>
         </div>
+      ) : (
+        <p className="text-gray-500 text-center py-4">No special conditions found</p>
       )}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-4">
-          <span className="text-sm font-medium text-[#636ae8]">Condition Number: {nextConditionNumber}</span>
-          <div className="flex-1">
-            <TextInput
-              id="special-condition-description"
-              label="Description"
-              value={description}
-              onChange={setDescription}
-              placeholder="Enter special condition description"
-            />
+      
+      {!readOnly && (
+        <>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium text-[#636ae8]">Condition Number: {nextConditionNumber}</span>
+              <div className="flex-1">
+                <TextInput
+                  id="special-condition-description"
+                  label="Description"
+                  value={description}
+                  onChange={setDescription}
+                  placeholder="Enter special condition description"
+                />
+              </div>
+            </div>
+            {error && <div className="text-red-600 text-sm mt-1">{error}</div>}
           </div>
-        </div>
-        {error && <div className="text-red-600 text-sm mt-1">{error}</div>}
-      </div>
-      <div className="flex justify-end mt-4">
-        <SecondaryButton onClick={handleAdd} disabled={loading || !description.trim()}>
-          {loading ? "Adding..." : "Add"}
-        </SecondaryButton>
-      </div>
+          <div className="flex justify-end mt-4">
+            <SecondaryButton onClick={handleAdd} disabled={loading || !description.trim()}>
+              {loading ? "Adding..." : "Add"}
+            </SecondaryButton>
+          </div>
+        </>
+      )}
     </div>
   );
 };
