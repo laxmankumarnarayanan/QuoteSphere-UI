@@ -28,6 +28,7 @@ interface DealData {
 }
 
 interface ProductSubProductCombination {
+  dealId: string; // Add this field
   productId: string;
   productDescription: string;
   accountNumber?: string;
@@ -393,7 +394,7 @@ const AssignmentDetails: React.FC = () => {
                       <div key={index} className="border rounded-lg p-4">
                         <div className="mb-3">
                           <h3 className="font-semibold text-lg text-gray-800">
-                            Product ID: {product.productId}
+                            Deal ID: {product.dealId} | Product ID: {product.productId}
                           </h3>
                           <p className="text-sm text-gray-600">Product Description: {product.productDescription || 'No description'}</p>
                           {product.accountNumber && (
