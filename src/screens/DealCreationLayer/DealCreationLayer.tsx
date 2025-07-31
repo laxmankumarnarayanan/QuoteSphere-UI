@@ -135,7 +135,7 @@ export const DealCreationLayer = (): JSX.Element => {
        const deal = await dealService.createDraftDeal(
          selectedCustomer.customer.customerID,
          selectedCustomer.customer.customerName,
-         'initiator' // Replace with actual initiator (e.g., logged-in user)
+         'laxman.narayanan@fractalhive.com' // Replace with actual initiator (e.g., logged-in user)
        );
        setCreatedDeal(deal);
        await loadCommitments(deal.dealId);

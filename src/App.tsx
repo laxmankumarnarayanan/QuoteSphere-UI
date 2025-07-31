@@ -5,6 +5,8 @@ import Dashboard from './screens/Dashboard/Dashboard';
 import DealCreationPage from './screens/DealCreationLayer/DealCreationPage';
 import Underwriter from './screens/Underwriter/Underwriter';
 import AssignmentDetails from './screens/AssignmentDetails/AssignmentDetails';
+import CreditRisk from './screens/CreditRisk/CreditRisk';
+import CreditRiskAssignmentDetails from './screens/CreditRiskAssignmentDetails/CreditRiskAssignmentDetails';
 
 // Simple test component wrapped in Layout
 const TestPage = () => (
@@ -31,6 +33,8 @@ function App() {
         <Route path="/deal-creation" element={<DealCreationPage />} />
         <Route path="/underwriter" element={<Underwriter />} />
         <Route path="/assignment/:assignmentId" element={<AssignmentDetails />} />
+        <Route path="/credit-risk" element={<CreditRisk />} />
+        <Route path="/credit-risk-assignment/:assignmentId" element={<CreditRiskAssignmentDetails />} />
         <Route path="/test" element={<TestPage />} />
         <Route path="/*" element={<TestPage />} />
       </Routes>
