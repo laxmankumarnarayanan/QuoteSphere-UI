@@ -9,7 +9,8 @@ import {
   ChevronRight,
   LayoutDashboard,
   Shield,
-  AlertTriangle
+  AlertTriangle,
+  Scale
 } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -39,6 +40,11 @@ const navigation: NavItem[] = [
     icon: <AlertTriangle className="w-4 h-4" />,
     label: 'Credit Risk',
     href: '/credit-risk'
+  },
+  {
+    icon: <Scale className="w-4 h-4" />,
+    label: 'Legal',
+    href: '/legal'
   },
   {
     icon: '/Exclusive Product.png',
