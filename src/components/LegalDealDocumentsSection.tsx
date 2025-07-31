@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Upload, Eye, Trash2, Plus } from 'lucide-react';
+import { FileText, Upload, Eye, Trash2, Plus, Save, X, Edit } from 'lucide-react';
 
 interface LegalDocument {
   legalDocumentId: string;
@@ -29,8 +29,10 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
   const [documents, setDocuments] = useState<LegalDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newDocument, setNewDocument] = useState({
+  const [isAdding, setIsAdding] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useState({
     documentType: '',
     fileName: '',
     storageFilePath: '',
@@ -68,9 +70,31 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
     }
   };
 
-  const handleAddDocument = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleInputChange = (field: string, value: string | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSave = async () => {
+    if (!formData.documentType.trim()) {
+      alert('Please enter a document type');
+      return;
+    }
+
+    if (!formData.fileName.trim()) {
+      alert('Please enter a file name');
+      return;
+    }
+
+    if (!formData.storageFilePath.trim()) {
+      alert('Please enter a storage file path');
+      return;
+    }
+
     try {
+      setIsSaving(true);
       const response = await fetch('https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/legal-deal-documents', {
         method: 'POST',
         headers: {
@@ -79,10 +103,10 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
         body: JSON.stringify({
           assignmentId: assignmentId,
           dealId: dealId,
-          documentType: newDocument.documentType,
-          fileName: newDocument.fileName,
-          storageFilePath: newDocument.storageFilePath,
-          isMandatory: newDocument.isMandatory,
+          documentType: formData.documentType,
+          fileName: formData.fileName,
+          storageFilePath: formData.storageFilePath,
+          isMandatory: formData.isMandatory,
           createdBy: 'laxman.narayanan@fractalhive.com',
           lastUpdatedBy: 'laxman.narayanan@fractalhive.com'
         }),
@@ -91,23 +115,39 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
       if (response.ok) {
         const savedDocument = await response.json();
         setDocuments([...documents, savedDocument]);
-        setNewDocument({
+        setFormData({
           documentType: '',
           fileName: '',
           storageFilePath: '',
           isMandatory: false
         });
-        setShowAddForm(false);
+        setIsAdding(false);
       } else {
         setError('Failed to add document');
       }
     } catch (error) {
       console.error('Error adding document:', error);
       setError('Error adding document');
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  const handleDeleteDocument = async (documentId: string) => {
+  const handleEdit = (document: LegalDocument) => {
+    setEditingId(document.legalDocumentId);
+    setFormData({
+      documentType: document.documentType,
+      fileName: document.fileName,
+      storageFilePath: document.storageFilePath,
+      isMandatory: document.isMandatory
+    });
+  };
+
+  const handleDelete = async (documentId: string) => {
+    if (!confirm('Are you sure you want to delete this document?')) {
+      return;
+    }
+
     try {
       const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/legal-deal-documents/${documentId}`, {
         method: 'DELETE',
@@ -151,177 +191,179 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
     }
   };
 
-  const formatDateTime = (dateTimeString: string) => {
-    return new Date(dateTimeString).toLocaleString();
+  const cancelEdit = () => {
+    setIsAdding(false);
+    setEditingId(null);
+    setFormData({
+      documentType: '',
+      fileName: '',
+      storageFilePath: '',
+      isMandatory: false
+    });
   };
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600"></div>
-          <span className="ml-2">Loading documents...</span>
+      <div className="border border-brand-200 rounded-lg bg-brand-50 p-4">
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600 mx-auto mb-4"></div>
+          <p className="text-brand-600">Loading documents...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-          <FileText className="w-5 h-5 mr-2" />
-          Legal Documents
-        </h3>
-      </div>
-      
-      <div className="p-6">
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-red-600">{error}</p>
-          </div>
-        )}
-
-
-
+    <div className="border border-brand-200 rounded-lg bg-brand-50 p-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-brand-900">Legal Documents</h3>
         {!readOnly && (
-          <div className="mb-6">
-            {!showAddForm ? (
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="flex items-center px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Document
-              </button>
-            ) : (
-              <form onSubmit={handleAddDocument} className="bg-gray-50 p-4 rounded-lg">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Document Type
-                    </label>
-                    <input
-                      type="text"
-                      value={newDocument.documentType}
-                      onChange={(e) => setNewDocument({...newDocument, documentType: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      File Name
-                    </label>
-                    <input
-                      type="text"
-                      value={newDocument.fileName}
-                      onChange={(e) => setNewDocument({...newDocument, fileName: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-                      required
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Storage File Path
-                    </label>
-                    <input
-                      type="text"
-                      value={newDocument.storageFilePath}
-                      onChange={(e) => setNewDocument({...newDocument, storageFilePath: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-                      required
-                    />
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="isMandatory"
-                      checked={newDocument.isMandatory}
-                      onChange={(e) => setNewDocument({...newDocument, isMandatory: e.target.checked})}
-                      className="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="isMandatory" className="ml-2 block text-sm text-gray-900">
-                      Is Mandatory
-                    </label>
-                  </div>
-                </div>
-                <div className="mt-4 flex gap-2">
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"
-                  >
-                    Save Document
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddForm(false)}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
+          <button
+            onClick={() => setIsAdding(true)}
+            className="flex items-center px-3 py-1.5 text-sm font-semibold text-white rounded-lg shadow-md border border-transparent bg-brand-500 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all duration-200 ease-in-out transform hover:scale-[1.03] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 disabled:hover:bg-brand-500"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Document
+          </button>
         )}
-
-        <div className="space-y-4">
-          {documents.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">No documents found</p>
-          ) : (
-            documents.map((document) => (
-              <div key={document.legalDocumentId} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <FileText className="w-4 h-4 text-brand-600" />
-                      <h4 className="font-medium text-gray-900">{document.fileName}</h4>
-                      {document.isMandatory && (
-                        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                          Mandatory
-                        </span>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                      <div>
-                        <span className="font-medium">Type:</span> {document.documentType}
-                      </div>
-                      <div>
-                        <span className="font-medium">Created:</span> {formatDateTime(document.createdDateTime)}
-                      </div>
-                      <div>
-                        <span className="font-medium">Created By:</span> {document.createdBy}
-                      </div>
-                      <div>
-                        <span className="font-medium">Last Updated:</span> {formatDateTime(document.lastUpdatedDateTime)}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => downloadFile(document.storageFilePath, document.fileName)}
-                      className="p-2 text-brand-600 hover:text-brand-700 transition-colors"
-                      title="View Document"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    {!readOnly && (
-                      <button
-                        onClick={() => handleDeleteDocument(document.legalDocumentId)}
-                        className="p-2 text-red-600 hover:text-red-700 transition-colors"
-                        title="Delete Document"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
       </div>
+
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+          <p className="text-red-600">{error}</p>
+        </div>
+      )}
+
+      {/* Add Document Form */}
+      {(isAdding || editingId) && !readOnly && (
+        <div className="mb-6 p-4 border border-brand-200 rounded-lg bg-white">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-brand-700 mb-1">Document Type *</label>
+              <input
+                type="text"
+                value={formData.documentType}
+                onChange={(e) => handleInputChange('documentType', e.target.value)}
+                className="w-full px-3 py-2 border border-brand-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
+                placeholder="Enter document type"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-brand-700 mb-1">File Name *</label>
+              <input
+                type="text"
+                value={formData.fileName}
+                onChange={(e) => handleInputChange('fileName', e.target.value)}
+                className="w-full px-3 py-2 border border-brand-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
+                placeholder="Enter file name"
+              />
+            </div>
+          </div>
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-brand-700 mb-1">Storage File Path *</label>
+            <input
+              type="text"
+              value={formData.storageFilePath}
+              onChange={(e) => handleInputChange('storageFilePath', e.target.value)}
+              className="w-full px-3 py-2 border border-brand-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
+              placeholder="Enter storage file path"
+            />
+          </div>
+          <div className="mt-4">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={formData.isMandatory}
+                onChange={(e) => handleInputChange('isMandatory', e.target.checked)}
+                className="mr-2"
+              />
+              <span className="text-sm font-medium text-brand-700">Is Mandatory</span>
+            </label>
+          </div>
+          <div className="mt-4 flex gap-2">
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="flex items-center px-4 py-2 text-sm font-semibold text-white rounded-lg shadow-md border border-transparent bg-brand-500 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all duration-200 ease-in-out transform hover:scale-[1.03] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 disabled:hover:bg-brand-500"
+            >
+              {isSaving ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  {editingId ? 'Update' : 'Save'}
+                </>
+              )}
+            </button>
+            <button
+              onClick={cancelEdit}
+              className="flex items-center px-4 py-2 text-sm font-semibold text-brand-700 bg-white border border-brand-300 rounded-lg shadow-sm hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all duration-200 ease-in-out"
+            >
+              <X className="mr-2 h-4 w-4" />
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Documents List */}
+      {documents.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-brand-600">No documents uploaded yet.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {documents.map((document) => (
+            <div key={document.legalDocumentId} className="flex items-center justify-between p-3 border border-brand-200 rounded-lg bg-white">
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-medium text-brand-900">{document.documentType}</h4>
+                  {document.isMandatory && (
+                    <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">Mandatory</span>
+                  )}
+                </div>
+                <p className="text-sm text-brand-600 mt-1">{document.fileName}</p>
+                <p className="text-xs text-brand-500 mt-1">
+                  Uploaded: {document.createdDateTime ? new Date(document.createdDateTime).toLocaleDateString() : 'N/A'}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => downloadFile(document.storageFilePath || '', document.fileName)}
+                  className="p-2 text-brand-600 hover:text-brand-800 hover:bg-brand-100 rounded-md transition-colors"
+                  title="View Document"
+                >
+                  <Eye className="h-4 w-4" />
+                </button>
+                {!readOnly && (
+                  <>
+                    <button
+                      onClick={() => handleEdit(document)}
+                      className="p-2 text-brand-600 hover:text-brand-800 hover:bg-brand-100 rounded-md transition-colors"
+                      title="Edit Document"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(document.legalDocumentId)}
+                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-md transition-colors"
+                      title="Delete Document"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
