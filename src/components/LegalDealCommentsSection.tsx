@@ -130,7 +130,7 @@ const LegalDealCommentsSection: React.FC<LegalDealCommentsSectionProps> = ({
       <div className="px-6 py-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <MessageSquare className="w-5 h-5 mr-2" />
-          Legal Comments (Assignment ID: {assignmentId})
+          Legal Comments
         </h3>
       </div>
       
@@ -140,13 +140,6 @@ const LegalDealCommentsSection: React.FC<LegalDealCommentsSectionProps> = ({
             <p className="text-red-600">{error}</p>
           </div>
         )}
-
-        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-          <p className="text-blue-600 text-sm">
-            <strong>Note:</strong> Backend endpoints for Legal Comments are not deployed yet. 
-            The form below will be functional once the backend is updated.
-          </p>
-        </div>
 
         {!readOnly && (
           <div className="mb-6">

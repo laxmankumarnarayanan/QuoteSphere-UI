@@ -633,7 +633,6 @@ const LegalAssignmentDetails: React.FC = () => {
 
         {/* Credit Risk Documents Section (Read Only) */}
         <div className="mb-6">
-          <div className="mb-2 text-sm text-gray-600">Debug: Assignment ID = {assignmentDetails?.assignmentId}</div>
           <CreditDealDocumentsSection 
             dealId={assignmentDetails.dealId}
             assignmentId={assignmentDetails.assignmentId}

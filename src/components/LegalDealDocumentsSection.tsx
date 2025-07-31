@@ -171,7 +171,7 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
       <div className="px-6 py-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <FileText className="w-5 h-5 mr-2" />
-          Legal Documents (Assignment ID: {assignmentId})
+          Legal Documents
         </h3>
       </div>
       
@@ -182,12 +182,7 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
           </div>
         )}
 
-        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-          <p className="text-blue-600 text-sm">
-            <strong>Note:</strong> Backend endpoints for Legal Documents are not deployed yet. 
-            The form below will be functional once the backend is updated.
-          </p>
-        </div>
+
 
         {!readOnly && (
           <div className="mb-6">
