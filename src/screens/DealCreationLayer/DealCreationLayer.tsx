@@ -98,7 +98,7 @@ export const DealCreationLayer = (): JSX.Element => {
      // Special Conditions step - Submit the deal
      if (createdDeal?.dealId) {
        try {
-         await updateDealStatus(createdDeal.dealId, "Submitted");
+         await updateDealStatus(createdDeal.dealId, "In-Progress");
          // Optionally show success message or redirect
          alert("Deal submitted successfully!");
          // You can add navigation logic here if needed

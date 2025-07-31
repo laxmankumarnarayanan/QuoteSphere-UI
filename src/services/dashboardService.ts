@@ -61,7 +61,7 @@ export async function getDealStatusCounts(): Promise<DealStatusCount[]> {
     // Return mock data for now
     return [
       { status: 'Draft', count: 15 },
-      { status: 'Submitted', count: 8 },
+      { status: 'In-Progress', count: 8 },
       { status: 'In Review', count: 12 },
       { status: 'Approved', count: 25 },
       { status: 'Rejected', count: 3 },
@@ -125,7 +125,7 @@ export async function getDealsByStatus(status: string): Promise<DealTableRow[]> 
 // Helper function to generate mock data
 function generateMockDealData(): DealTableRow[] {
   const mockDeals: DealTableRow[] = [];
-  const statuses = ['Draft', 'Submitted', 'In Review', 'Approved', 'Rejected'];
+  const statuses = ['Draft', 'In-Progress', 'In Review', 'Approved', 'Rejected'];
   const stages = ['Initial', 'Under Review', 'Approved', 'Closed'];
   const priorities = ['High', 'Low'];
   

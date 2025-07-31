@@ -78,7 +78,7 @@ const Dashboard: React.FC = () => {
       } else {
         setDealStatusCounts([
           { status: 'Draft', count: 15 },
-          { status: 'Submitted', count: 8 },
+          { status: 'In-Progress', count: 8 },
           { status: 'In Review', count: 12 },
           { status: 'Approved', count: 25 },
           { status: 'Rejected', count: 3 },
@@ -105,7 +105,7 @@ const Dashboard: React.FC = () => {
       console.error('Error loading dashboard data:', error);
       setDealStatusCounts([
         { status: 'Draft', count: 15 },
-        { status: 'Submitted', count: 8 },
+        { status: 'In-Progress', count: 8 },
         { status: 'In Review', count: 12 },
         { status: 'Approved', count: 25 },
         { status: 'Rejected', count: 3 },
@@ -166,7 +166,7 @@ const Dashboard: React.FC = () => {
   // Helper function to generate mock data
   const generateMockDealData = (): DealTableRow[] => {
     const mockDeals: DealTableRow[] = [];
-    const statuses = ['Draft', 'Submitted', 'In Review', 'Approved', 'Rejected'];
+    const statuses = ['Draft', 'In-Progress', 'In Review', 'Approved', 'Rejected'];
     const stages = ['Initial', 'Under Review', 'Approved', 'Closed'];
     const priorities = ['High', 'Low'];
     

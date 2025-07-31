@@ -72,7 +72,7 @@ export async function submitDeal(dealId: string) {
   if (!getRes.ok) throw new Error("Failed to fetch deal");
   const deal = await getRes.json();
 
-  deal.dealStatus = "Submitted";
+  deal.dealStatus = "In-Progress";
 
   const putRes = await fetch(`${API_BASE_URL}/deal/${dealId}`, {
     method: "PUT",

@@ -30,7 +30,7 @@ export interface UnderwriterAssignment {
 export const underwriterService = {
   async getSubmittedDeals(): Promise<UnderwriterDeal[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/dashboard/deal/by-status/Submitted`);
+      const response = await fetch(`${API_BASE_URL}/dashboard/deal/by-status/In-Progress`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch submitted deals');
