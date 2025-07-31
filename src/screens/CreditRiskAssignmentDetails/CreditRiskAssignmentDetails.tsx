@@ -9,6 +9,8 @@ import SpecialConditionsSection from '../DealCreationLayer/sections/SpecialCondi
 import { CustomerDetails, customerService } from '../../services/customerService';
 import { UnderwriterFinancialAnalysisSection } from '../../components/UnderwriterFinancialAnalysisSection';
 import { UnderwriterDocumentsSection } from '../../components/UnderwriterDocumentsSection';
+import { CreditDealDocumentsSection } from '../../components/CreditDealDocumentsSection';
+import { CreditDealCommentsSection } from '../../components/CreditDealCommentsSection';
 
 interface CreditRiskAssignmentDetails {
   assignmentId: string;
@@ -624,6 +626,24 @@ const CreditRiskAssignmentDetails: React.FC = () => {
             dealId={assignmentDetails.dealId}
             assignmentId={assignmentDetails.assignmentId}
             readOnly={true}
+          />
+        </div>
+
+        {/* Credit Risk Documents Section */}
+        <div className="mb-6">
+          <CreditDealDocumentsSection 
+            dealId={assignmentDetails.dealId}
+            assignmentId={assignmentDetails.assignmentId}
+            readOnly={false}
+          />
+        </div>
+
+        {/* Credit Risk Comments Section */}
+        <div className="mb-6">
+          <CreditDealCommentsSection 
+            dealId={assignmentDetails.dealId}
+            assignmentId={assignmentDetails.assignmentId}
+            readOnly={false}
           />
         </div>
 
