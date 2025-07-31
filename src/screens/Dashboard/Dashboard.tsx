@@ -29,13 +29,21 @@ interface DealTableRow {
   status: string;
 }
 
+interface FilterButton {
+  id: string;
+  label: string;
+  active: boolean;
+  status?: string;
+}
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [dealStatusCounts, setDealStatusCounts] = useState<DealStatusCount[]>([]);
   const [dashboardMetrics, setDashboardMetrics] = useState<DashboardMetric[]>([]);
   const [allDeals, setAllDeals] = useState<DealTableRow[]>([]);
   const [filteredDeals, setFilteredDeals] = useState<DealTableRow[]>([]);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'my' | 'review' | 'completed'>('all');
+  const [activeFilter, setActiveFilter] = useState<string>('all');
+  const [filterButtons, setFilterButtons] = useState<FilterButton[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -54,6 +62,19 @@ const Dashboard: React.FC = () => {
       if (statusResponse.ok) {
         const statusData = await statusResponse.json();
         setDealStatusCounts(statusData);
+        
+        // Generate dynamic filter buttons based on status counts
+        const dynamicFilters: FilterButton[] = [
+          { id: 'all', label: 'All Deals', active: activeFilter === 'all' },
+          { id: 'my', label: 'My Deals', active: activeFilter === 'my' },
+          ...statusData.map((statusCount: DealStatusCount) => ({
+            id: `status-${statusCount.status.toLowerCase().replace(/\s+/g, '-')}`,
+            label: statusCount.status,
+            active: activeFilter === `status-${statusCount.status.toLowerCase().replace(/\s+/g, '-')}`,
+            status: statusCount.status
+          }))
+        ];
+        setFilterButtons(dynamicFilters);
       } else {
         setDealStatusCounts([
           { status: 'Draft', count: 15 },
@@ -78,24 +99,16 @@ const Dashboard: React.FC = () => {
         const dealsData = await dealsResponse.json();
         setAllDeals(dealsData);
       } else {
-        // Fallback to mock data
         setAllDeals(generateMockDealData());
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
-      // Set fallback data
       setDealStatusCounts([
         { status: 'Draft', count: 15 },
         { status: 'Submitted', count: 8 },
         { status: 'In Review', count: 12 },
         { status: 'Approved', count: 25 },
         { status: 'Rejected', count: 3 },
-      ]);
-      setDashboardMetrics([
-        { value: '8', label: 'Awaiting Approval' },
-        { value: '12', label: 'Ready for Signature' },
-        { value: '15', label: 'Under Review' },
-        { value: '25', label: 'Closed This Quarter' },
       ]);
       setAllDeals(generateMockDealData());
     } finally {
@@ -118,35 +131,32 @@ const Dashboard: React.FC = () => {
       } catch (error) {
         setFilteredDeals(allDeals.filter(deal => Math.random() > 0.5));
       }
-    } else if (activeFilter === 'review') {
-      try {
-        const response = await fetch('https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/dashboard/deal/by-status/Submitted');
-        if (response.ok) {
-          const data = await response.json();
-          setFilteredDeals(data);
-        } else {
-          setFilteredDeals(allDeals.filter(deal => deal.status === 'Submitted'));
+    } else if (activeFilter.startsWith('status-')) {
+      // Extract status from filter ID
+      const statusFilter = filterButtons.find(btn => btn.id === activeFilter);
+      if (statusFilter?.status) {
+        try {
+          const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/dashboard/deal/by-status/${encodeURIComponent(statusFilter.status)}`);
+          if (response.ok) {
+            const data = await response.json();
+            setFilteredDeals(data);
+          } else {
+            setFilteredDeals(allDeals.filter(deal => deal.status === statusFilter.status));
+          }
+        } catch (error) {
+          setFilteredDeals(allDeals.filter(deal => deal.status === statusFilter.status));
         }
-      } catch (error) {
-        setFilteredDeals(allDeals.filter(deal => deal.status === 'Submitted'));
-      }
-    } else if (activeFilter === 'completed') {
-      try {
-        const response = await fetch('https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/dashboard/deal/by-status/Approved');
-        if (response.ok) {
-          const data = await response.json();
-          setFilteredDeals(data);
-        } else {
-          setFilteredDeals(allDeals.filter(deal => deal.status === 'Approved'));
-        }
-      } catch (error) {
-        setFilteredDeals(allDeals.filter(deal => deal.status === 'Approved'));
       }
     }
   };
 
-  const handleFilterChange = (filter: 'all' | 'my' | 'review' | 'completed') => {
-    setActiveFilter(filter);
+  const handleFilterChange = (filterId: string) => {
+    setActiveFilter(filterId);
+    // Update filter buttons active state
+    setFilterButtons(prev => prev.map(btn => ({
+      ...btn,
+      active: btn.id === filterId
+    })));
   };
 
   const handleCreateDeal = () => {
@@ -234,13 +244,6 @@ const Dashboard: React.FC = () => {
     },
   ];
 
-  const filterButtons = [
-    { id: 'all', label: 'All Deals', active: activeFilter === 'all' },
-    { id: 'my', label: 'My Deals', active: activeFilter === 'my' },
-    { id: 'review', label: 'In Review', active: activeFilter === 'review' },
-    { id: 'completed', label: 'Completed', active: activeFilter === 'completed' },
-  ];
-
   return (
     <Layout currentPath={[{ label: 'Dashboard', href: '/dashboard' }]}>
       <div className="space-y-6">
@@ -283,11 +286,11 @@ const Dashboard: React.FC = () => {
           {/* Table Header with Filters */}
           <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <h2 className="text-xl font-semibold text-slate-800 flex-shrink-0">Deals Overview</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               {filterButtons.map((button) => (
                 <button
                   key={button.id}
-                  onClick={() => handleFilterChange(button.id as any)}
+                  onClick={() => handleFilterChange(button.id)}
                   className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                     button.active
                       ? 'bg-brand-500 text-white'

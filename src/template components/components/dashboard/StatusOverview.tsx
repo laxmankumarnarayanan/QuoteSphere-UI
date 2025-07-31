@@ -6,7 +6,7 @@ import React from 'react';
 import { StatusBadge } from '../';
 
 interface StatusCount {
-  status: 'Active' | 'On Leave' | 'Inactive' | 'Maternity Leave' | 'Remote';
+  status: string;
   count: number;
 }
 
@@ -24,7 +24,7 @@ const StatusOverview: React.FC<StatusOverviewProps> = ({ title, statusCounts }) 
       <div className="space-y-3">
         {statusCounts.map((item, index) => (
           <div key={index} className="flex items-center justify-between">
-            <StatusBadge status={item.status} />
+            <StatusBadge status={item.status as any} />
             <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
               {item.count}
             </span>
