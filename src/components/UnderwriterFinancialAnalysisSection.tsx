@@ -5,11 +5,13 @@ import { underwriterFinancialAnalysisService, UnderwriterDealFinancialAnalysis }
 interface UnderwriterFinancialAnalysisSectionProps {
   dealId: string;
   assignmentId: string;
+  readOnly?: boolean;
 }
 
 export const UnderwriterFinancialAnalysisSection: React.FC<UnderwriterFinancialAnalysisSectionProps> = ({
   dealId,
-  assignmentId
+  assignmentId,
+  readOnly = false
 }) => {
   const [financialAnalysis, setFinancialAnalysis] = useState<UnderwriterDealFinancialAnalysis | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -107,7 +109,7 @@ export const UnderwriterFinancialAnalysisSection: React.FC<UnderwriterFinancialA
     <div className="border border-brand-200 rounded-lg bg-brand-50 p-4">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold text-brand-900">Underwriter Financial Analysis</h3>
-        {!isEditing && (
+        {!isEditing && !readOnly && (
           <button
             onClick={() => setIsEditing(true)}
             className="flex items-center gap-2 px-3 py-1 bg-brand-600 text-white text-sm rounded hover:bg-brand-700 transition-colors"

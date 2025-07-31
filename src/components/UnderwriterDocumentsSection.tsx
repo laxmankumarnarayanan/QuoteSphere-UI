@@ -6,11 +6,13 @@ import { BlobServiceClient } from '@azure/storage-blob';
 interface UnderwriterDocumentsSectionProps {
   dealId: string;
   assignmentId: string;
+  readOnly?: boolean;
 }
 
 export const UnderwriterDocumentsSection: React.FC<UnderwriterDocumentsSectionProps> = ({
   dealId,
-  assignmentId
+  assignmentId,
+  readOnly = false
 }) => {
   const [documents, setDocuments] = useState<UnderwriterDealAnalysisDocuments[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -200,37 +202,24 @@ export const UnderwriterDocumentsSection: React.FC<UnderwriterDocumentsSectionPr
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="border border-brand-200 rounded-lg bg-brand-50 p-4">
-        <h3 className="text-lg font-semibold text-brand-900 mb-4">Underwriter Documents</h3>
-        <div className="text-brand-700">Loading...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="border border-brand-200 rounded-lg bg-brand-50 p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-brand-900">Underwriter Documents</h3>
-        {!isAdding && !editingId && (
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-brand-900">Underwriter Analysis Documents</h3>
+        {!readOnly && (
           <button
             onClick={() => setIsAdding(true)}
-            className="flex items-center gap-2 px-3 py-1 bg-brand-600 text-white text-sm rounded hover:bg-brand-700 transition-colors"
+            className="flex items-center px-3 py-1.5 text-sm font-semibold text-white rounded-lg shadow-md border border-transparent bg-brand-500 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all duration-200 ease-in-out transform hover:scale-[1.03] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 disabled:hover:bg-brand-500"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="mr-2 h-4 w-4" />
             Add Document
           </button>
         )}
       </div>
 
-      {/* Add/Edit Form */}
+      {/* Add Document Form */}
       {(isAdding || editingId) && (
-        <div className="bg-white p-4 rounded border border-brand-200 mb-4">
-          <h4 className="text-md font-medium text-brand-900 mb-3">
-            {editingId ? 'Edit Document' : 'Add New Document'}
-          </h4>
-          
+        <div className="mb-6 p-4 border border-brand-200 rounded-lg bg-white">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-brand-700 mb-1">Document Type *</label>
@@ -242,43 +231,52 @@ export const UnderwriterDocumentsSection: React.FC<UnderwriterDocumentsSectionPr
                 placeholder="Enter document type"
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-brand-700 mb-1">File</label>
+              <label className="block text-sm font-medium text-brand-700 mb-1">File *</label>
               <input
                 type="file"
                 onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
                 className="w-full px-3 py-2 border border-brand-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-                disabled={!!editingId}
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-brand-700 mb-1">Comments</label>
-              <textarea
-                value={formData.comments}
-                onChange={(e) => handleInputChange('comments', e.target.value)}
-                rows={3}
-                className="w-full px-3 py-2 border border-brand-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-                placeholder="Enter comments"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
               />
             </div>
           </div>
-
-          <div className="flex gap-2 mt-4">
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-brand-700 mb-1">Comments</label>
+            <textarea
+              value={formData.comments}
+              onChange={(e) => handleInputChange('comments', e.target.value)}
+              className="w-full px-3 py-2 border border-brand-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
+              rows={3}
+              placeholder="Enter comments"
+            />
+          </div>
+          <div className="mt-4 flex gap-2">
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded hover:bg-brand-700 transition-colors disabled:opacity-50"
+              className="flex items-center px-4 py-2 text-sm font-semibold text-white rounded-lg shadow-md border border-transparent bg-brand-500 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all duration-200 ease-in-out transform hover:scale-[1.03] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 disabled:hover:bg-brand-500"
             >
-              <Save className="w-4 h-4" />
-              {isSaving ? 'Saving...' : 'Save'}
+              {isSaving ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  {editingId ? 'Update' : 'Save'}
+                </>
+              )}
             </button>
             <button
               onClick={cancelEdit}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+              className="flex items-center px-4 py-2 text-sm font-semibold text-brand-700 bg-white border border-brand-300 rounded-lg shadow-sm hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all duration-200 ease-in-out"
             >
-              <X className="w-4 h-4" />
+              <X className="mr-2 h-4 w-4" />
               Cancel
             </button>
           </div>
@@ -286,60 +284,59 @@ export const UnderwriterDocumentsSection: React.FC<UnderwriterDocumentsSectionPr
       )}
 
       {/* Documents List */}
-      <div className="space-y-3">
-        {documents.length === 0 ? (
-          <div className="text-center py-8 text-brand-700">
-            No documents uploaded yet.
-          </div>
-        ) : (
-          documents.map((document) => (
-            <div key={document.uwDocumentId} className="bg-white p-3 rounded border border-brand-200">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-medium text-brand-900">{document.documentType}</span>
-                    {document.isMandatory && (
-                      <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">Mandatory</span>
-                    )}
-                  </div>
-                  {document.comments && (
-                    <p className="text-sm text-brand-700 mb-2">{document.comments}</p>
-                  )}
-                  <div className="text-xs text-brand-600">
-                    Created: {document.createdDateTime ? new Date(document.createdDateTime).toLocaleDateString() : 'N/A'}
-                  </div>
-                </div>
-                
-                <div className="flex gap-2">
-                  {document.storageFilePath && (
+      {isLoading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600 mx-auto mb-4"></div>
+          <p className="text-brand-600">Loading documents...</p>
+        </div>
+      ) : documents.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-brand-600">No documents uploaded yet.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {documents.map((document) => (
+            <div key={document.uwDocumentId} className="flex items-center justify-between p-3 border border-brand-200 rounded-lg bg-white">
+              <div className="flex-1">
+                <h4 className="font-medium text-brand-900">{document.documentType}</h4>
+                {document.comments && (
+                  <p className="text-sm text-brand-600 mt-1">{document.comments}</p>
+                )}
+                <p className="text-xs text-brand-500 mt-1">
+                  Uploaded: {document.createdDateTime ? new Date(document.createdDateTime).toLocaleDateString() : 'N/A'}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => downloadFile(document.storageFilePath || '', document.documentType || 'document')}
+                  className="p-2 text-brand-600 hover:text-brand-800 hover:bg-brand-100 rounded-md transition-colors"
+                  title="View Document"
+                >
+                  <Eye className="h-4 w-4" />
+                </button>
+                {!readOnly && (
+                  <>
                     <button
-                      onClick={() => downloadFile(document.storageFilePath!, document.documentType || 'document')}
-                      className="flex items-center gap-1 px-2 py-1 bg-brand-600 text-white text-xs rounded hover:bg-brand-700 transition-colors"
+                      onClick={() => handleEdit(document)}
+                      className="p-2 text-brand-600 hover:text-brand-800 hover:bg-brand-100 rounded-md transition-colors"
+                      title="Edit Document"
                     >
-                      <Eye className="w-3 h-3" />
-                      View
+                      <Edit className="h-4 w-4" />
                     </button>
-                  )}
-                  <button
-                    onClick={() => handleEdit(document)}
-                    className="flex items-center gap-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
-                  >
-                    <Edit className="w-3 h-3" />
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(document.uwDocumentId)}
-                    className="flex items-center gap-1 px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    Delete
-                  </button>
-                </div>
+                    <button
+                      onClick={() => handleDelete(document.uwDocumentId)}
+                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-md transition-colors"
+                      title="Delete Document"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }; 

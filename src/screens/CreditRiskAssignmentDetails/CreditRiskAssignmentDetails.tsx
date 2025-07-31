@@ -6,8 +6,6 @@ import { ArrowLeft, Clock, User, FileText, CheckCircle, Building, Package, Shiel
 // Import sections from DealCreationLayer with correct paths
 import { CustomerDetailsSection } from '../DealCreationLayer/sections/CustomerDetailsSection/CustomerDetailsSection';
 import SpecialConditionsSection from '../DealCreationLayer/sections/SpecialConditionsSection';
-import ProductSelectionDropdowns from '../DealCreationLayer/ProductSelectionDropdowns';
-import DealCollateralForm from '../../components/DealCollateralForm';
 import { CustomerDetails, customerService } from '../../services/customerService';
 import { UnderwriterFinancialAnalysisSection } from '../../components/UnderwriterFinancialAnalysisSection';
 import { UnderwriterDocumentsSection } from '../../components/UnderwriterDocumentsSection';
@@ -616,6 +614,7 @@ const CreditRiskAssignmentDetails: React.FC = () => {
           <UnderwriterFinancialAnalysisSection 
             dealId={assignmentDetails.dealId}
             assignmentId={assignmentDetails.assignmentId}
+            readOnly={true}
           />
         </div>
 
@@ -624,6 +623,7 @@ const CreditRiskAssignmentDetails: React.FC = () => {
           <UnderwriterDocumentsSection 
             dealId={assignmentDetails.dealId}
             assignmentId={assignmentDetails.assignmentId}
+            readOnly={true}
           />
         </div>
 
