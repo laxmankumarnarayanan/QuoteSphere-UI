@@ -38,22 +38,31 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
   });
 
   useEffect(() => {
+    console.log('LegalDealDocumentsSection: assignmentId =', assignmentId);
     fetchDocuments();
   }, [assignmentId]);
 
   const fetchDocuments = async () => {
     try {
       setLoading(true);
+      console.log('Fetching documents for assignment:', assignmentId);
       const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/legal-deal-documents/assignment/${assignmentId}`);
+      console.log('Response status:', response.status);
       if (response.ok) {
         const data = await response.json();
+        console.log('Documents data:', data);
         setDocuments(data);
       } else {
-        setError('Failed to fetch documents');
+        console.error('Failed to fetch documents, status:', response.status);
+        // Don't set error for 404, just show empty state
+        if (response.status !== 404) {
+          setError('Failed to fetch documents');
+        }
       }
     } catch (error) {
       console.error('Error fetching documents:', error);
-      setError('Error fetching documents');
+      // Don't set error for network issues, just show empty state
+      setError(null);
     } finally {
       setLoading(false);
     }
@@ -162,7 +171,7 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
       <div className="px-6 py-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <FileText className="w-5 h-5 mr-2" />
-          Legal Documents
+          Legal Documents (Assignment ID: {assignmentId})
         </h3>
       </div>
       
@@ -172,6 +181,13 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
             <p className="text-red-600">{error}</p>
           </div>
         )}
+
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+          <p className="text-blue-600 text-sm">
+            <strong>Note:</strong> Backend endpoints for Legal Documents are not deployed yet. 
+            The form below will be functional once the backend is updated.
+          </p>
+        </div>
 
         {!readOnly && (
           <div className="mb-6">

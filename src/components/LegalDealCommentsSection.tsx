@@ -30,22 +30,31 @@ const LegalDealCommentsSection: React.FC<LegalDealCommentsSectionProps> = ({
   const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
+    console.log('LegalDealCommentsSection: assignmentId =', assignmentId);
     fetchComments();
   }, [assignmentId]);
 
   const fetchComments = async () => {
     try {
       setLoading(true);
+      console.log('Fetching comments for assignment:', assignmentId);
       const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/legal-deal-comments/assignment/${assignmentId}`);
+      console.log('Response status:', response.status);
       if (response.ok) {
         const data = await response.json();
+        console.log('Comments data:', data);
         setComments(data);
       } else {
-        setError('Failed to fetch comments');
+        console.error('Failed to fetch comments, status:', response.status);
+        // Don't set error for 404, just show empty state
+        if (response.status !== 404) {
+          setError('Failed to fetch comments');
+        }
       }
     } catch (error) {
       console.error('Error fetching comments:', error);
-      setError('Error fetching comments');
+      // Don't set error for network issues, just show empty state
+      setError(null);
     } finally {
       setLoading(false);
     }
@@ -121,7 +130,7 @@ const LegalDealCommentsSection: React.FC<LegalDealCommentsSectionProps> = ({
       <div className="px-6 py-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center">
           <MessageSquare className="w-5 h-5 mr-2" />
-          Legal Comments
+          Legal Comments (Assignment ID: {assignmentId})
         </h3>
       </div>
       
@@ -131,6 +140,13 @@ const LegalDealCommentsSection: React.FC<LegalDealCommentsSectionProps> = ({
             <p className="text-red-600">{error}</p>
           </div>
         )}
+
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
+          <p className="text-blue-600 text-sm">
+            <strong>Note:</strong> Backend endpoints for Legal Comments are not deployed yet. 
+            The form below will be functional once the backend is updated.
+          </p>
+        </div>
 
         {!readOnly && (
           <div className="mb-6">
