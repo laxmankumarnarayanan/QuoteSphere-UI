@@ -23,12 +23,26 @@ class LegalService {
 
   async getSubmittedDeals(): Promise<LegalDeal[]> {
     try {
-      // For now, we'll use the same endpoint as credit risk since we want to see the same deals
-      const response = await fetch(`${this.baseUrl}/deals/submitted-for-credit-risk`);
+      // Use the same endpoint as credit risk since we want to see the same deals
+      const response = await fetch(`${this.baseUrl}/dashboard/deal/by-status/In-Progress`);
+      
       if (!response.ok) {
         throw new Error('Failed to fetch submitted deals');
       }
-      return await response.json();
+      
+      const data = await response.json();
+      
+      // Transform the data to match our interface
+      return data.map((deal: any) => ({
+        id: deal.id,
+        dealId: deal.dealId,
+        customerId: deal.customerId || 'N/A',
+        customerName: deal.customerName,
+        initiator: deal.initiator || 'N/A',
+        totalCommitmentAmount: deal.commitmentAmount || 'N/A',
+        dealPhase: deal.stage || 'Initial',
+        status: deal.status
+      }));
     } catch (error) {
       console.error('Error fetching submitted deals:', error);
       throw error;
