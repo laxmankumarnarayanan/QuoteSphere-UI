@@ -6,7 +6,6 @@ export { default as Checkbox } from './form/Checkbox';
 export { default as RadioGroup } from './form/RadioGroup';
 export { default as SelectInput } from './form/SelectInput';
 export { default as Slider } from './form/Slider';
-export { default as TextInput } from './form/TextInput';
 export { default as TextareaInput } from './form/TextareaInput';
 export { default as ThemeToggle } from './ThemeToggle';
 export { default as Table } from './form/Table';
