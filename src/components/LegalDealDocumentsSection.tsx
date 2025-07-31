@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Upload, Eye, Trash2, Plus, Save, X, Edit } from 'lucide-react';
+import { BlobServiceClient } from '@azure/storage-blob';
 
 interface LegalDocument {
   legalDocumentId: string;
@@ -35,8 +36,8 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
   const [formData, setFormData] = useState({
     documentType: '',
     fileName: '',
-    storageFilePath: '',
-    isMandatory: false
+    isMandatory: false,
+    file: null as File | null
   });
 
   useEffect(() => {
@@ -77,24 +78,61 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
     }));
   };
 
+  const handleFileChange = (file: File | null) => {
+    setFormData(prev => ({
+      ...prev,
+      file
+    }));
+  };
+
+  const uploadFileToAzure = async (file: File): Promise<string> => {
+    try {
+      // Generate a unique blob name
+      const fileName = `${dealId}_${Date.now()}_${file.name}`;
+      
+      // Get SAS token for upload
+      const response = await fetch(`https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/azure-sas?blobName=${encodeURIComponent(fileName)}`);
+      if (!response.ok) {
+        throw new Error('Failed to get SAS token for upload');
+      }
+      const sasToken = await response.text();
+      
+      // Upload file to Azure Blob Storage
+      const blobServiceClient = new BlobServiceClient(`https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer?${sasToken}`);
+      const containerClient = blobServiceClient.getContainerClient("");
+      const blockBlobClient = containerClient.getBlockBlobClient(fileName);
+      
+      await blockBlobClient.uploadBrowserData(file, {
+        blobHTTPHeaders: { blobContentType: file.type }
+      });
+      
+      // Return the storage path
+      return `https://dealdeskdocumentstorage.blob.core.windows.net/dealdeskdocumentscontainer/${fileName}`;
+    } catch (error) {
+      console.error('Error uploading file to Azure:', error);
+      throw new Error('Failed to upload file to Azure');
+    }
+  };
+
   const handleSave = async () => {
     if (!formData.documentType.trim()) {
       alert('Please enter a document type');
       return;
     }
 
-    if (!formData.fileName.trim()) {
-      alert('Please enter a file name');
-      return;
-    }
-
-    if (!formData.storageFilePath.trim()) {
-      alert('Please enter a storage file path');
+    if (!formData.file && !editingId) {
+      alert('Please select a file');
       return;
     }
 
     try {
       setIsSaving(true);
+      let storageFilePath = '';
+
+      if (formData.file) {
+        storageFilePath = await uploadFileToAzure(formData.file);
+      }
+
       const response = await fetch('https://dealdesk-web-app-fqfnfrezdefbb0g5.centralindia-01.azurewebsites.net/api/legal-deal-documents', {
         method: 'POST',
         headers: {
@@ -104,8 +142,8 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
           assignmentId: assignmentId,
           dealId: dealId,
           documentType: formData.documentType,
-          fileName: formData.fileName,
-          storageFilePath: formData.storageFilePath,
+          fileName: formData.file ? formData.file.name : formData.fileName,
+          storageFilePath: storageFilePath,
           isMandatory: formData.isMandatory,
           createdBy: 'laxman.narayanan@fractalhive.com',
           lastUpdatedBy: 'laxman.narayanan@fractalhive.com'
@@ -118,8 +156,8 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
         setFormData({
           documentType: '',
           fileName: '',
-          storageFilePath: '',
-          isMandatory: false
+          isMandatory: false,
+          file: null
         });
         setIsAdding(false);
       } else {
@@ -138,8 +176,8 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
     setFormData({
       documentType: document.documentType,
       fileName: document.fileName,
-      storageFilePath: document.storageFilePath,
-      isMandatory: document.isMandatory
+      isMandatory: document.isMandatory,
+      file: null
     });
   };
 
@@ -197,8 +235,8 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
     setFormData({
       documentType: '',
       fileName: '',
-      storageFilePath: '',
-      isMandatory: false
+      isMandatory: false,
+      file: null
     });
   };
 
@@ -249,25 +287,14 @@ const LegalDealDocumentsSection: React.FC<LegalDealDocumentsSectionProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-brand-700 mb-1">File Name *</label>
+              <label className="block text-sm font-medium text-brand-700 mb-1">File *</label>
               <input
-                type="text"
-                value={formData.fileName}
-                onChange={(e) => handleInputChange('fileName', e.target.value)}
+                type="file"
+                onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
                 className="w-full px-3 py-2 border border-brand-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-                placeholder="Enter file name"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
               />
             </div>
-          </div>
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-brand-700 mb-1">Storage File Path *</label>
-            <input
-              type="text"
-              value={formData.storageFilePath}
-              onChange={(e) => handleInputChange('storageFilePath', e.target.value)}
-              className="w-full px-3 py-2 border border-brand-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-              placeholder="Enter storage file path"
-            />
           </div>
           <div className="mt-4">
             <label className="flex items-center">
