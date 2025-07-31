@@ -11,6 +11,8 @@ import { UnderwriterFinancialAnalysisSection } from '../../components/Underwrite
 import { UnderwriterDocumentsSection } from '../../components/UnderwriterDocumentsSection';
 import { CreditDealDocumentsSection } from '../../components/CreditDealDocumentsSection';
 import { CreditDealCommentsSection } from '../../components/CreditDealCommentsSection';
+import { LegalDealDocumentsSection } from '../../components/LegalDealDocumentsSection';
+import { LegalDealCommentsSection } from '../../components/LegalDealCommentsSection';
 
 interface LegalAssignmentDetails {
   assignmentId: string;
@@ -644,6 +646,24 @@ const LegalAssignmentDetails: React.FC = () => {
             dealId={assignmentDetails.dealId}
             assignmentId={assignmentDetails.assignmentId}
             readOnly={true}
+          />
+        </div>
+
+        {/* Legal Documents Section */}
+        <div className="mb-6">
+          <LegalDealDocumentsSection 
+            dealId={assignmentDetails.dealId}
+            assignmentId={assignmentDetails.assignmentId}
+            readOnly={false}
+          />
+        </div>
+
+        {/* Legal Comments Section */}
+        <div className="mb-6">
+          <LegalDealCommentsSection 
+            dealId={assignmentDetails.dealId}
+            assignmentId={assignmentDetails.assignmentId}
+            readOnly={false}
           />
         </div>
 
