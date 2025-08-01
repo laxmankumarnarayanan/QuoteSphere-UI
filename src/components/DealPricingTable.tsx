@@ -27,9 +27,11 @@ export interface DealPricingRow {
 
 interface DealPricingTableProps {
   dealId: string;
+  productId?: string;
+  subProductId?: string;
 }
 
-const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
+const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId, productId, subProductId }) => {
   const [rows, setRows] = useState<DealPricingRow[]>([]);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [editValues, setEditValues] = useState<{ 
@@ -65,8 +67,16 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
       try {
         const res = await fetch(`${API_BASE_URL}/deal-pricing`);
         const data = await res.json();
-        // Filter for this dealId
-        setRows(data.filter((row: DealPricingRow) => row.id.dealId === dealId));
+        // Filter for this dealId and specific product/subproduct if provided
+        let filteredData = data.filter((row: DealPricingRow) => row.id.dealId === dealId);
+        
+        if (productId && subProductId) {
+          filteredData = filteredData.filter((row: DealPricingRow) => 
+            row.id.productId === productId && row.id.subProductId === subProductId
+          );
+        }
+        
+        setRows(filteredData);
       } catch (e) {
         setError("Failed to load pricing details.");
       } finally {
@@ -74,7 +84,7 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
       }
     }
     if (dealId) fetchRows();
-  }, [dealId]);
+  }, [dealId, productId, subProductId]);
 
   const handleEdit = (idx: number) => {
     setEditIdx(idx);
@@ -129,6 +139,11 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
       setLoading(false);
     }
   };
+
+  // Don't render anything if no rows found
+  if (rows.length === 0 && !loading) {
+    return null;
+  }
 
   return (
     <div className="w-full border border-brand-200 rounded-lg bg-brand-50 p-6 mt-0">
@@ -231,11 +246,6 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId }) => {
               </table>
             </div>
           ))}
-          {rows.length === 0 && !loading && (
-            <tr>
-              <td colSpan={10} className="text-center text-slate-500 py-4">No pricing details found for this deal.</td>
-            </tr>
-          )}
         </div>
       </div>
     </div>

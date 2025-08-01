@@ -503,9 +503,13 @@ export const DealCreationLayer = (): JSX.Element => {
                                </div>
                              </div>
                            )}
-                           {/* Pricing and Fees Details within each combination */}
+                           {/* Pricing and Fees Details within each combination - only show if matching data exists */}
                            <div className="mt-4">
-                             <DealPricingTable dealId={createdDeal?.dealId || ''} />
+                             <DealPricingTable 
+                               dealId={createdDeal?.dealId || ''} 
+                               productId={combo.productId}
+                               subProductId={combo.subProductId}
+                             />
                            </div>
                          </div>
                        )}
@@ -651,9 +655,13 @@ export const DealCreationLayer = (): JSX.Element => {
                                </div>
                              </div>
                            )}
-                           {/* Pricing and Fees Details within each combination */}
+                           {/* Pricing and Fees Details within each combination - only show if matching data exists */}
                            <div className="mt-4">
-                             <DealPricingTable dealId={createdDeal?.dealId || ''} />
+                             <DealPricingTable 
+                               dealId={createdDeal?.dealId || ''} 
+                               productId={combo.productId}
+                               subProductId={combo.subProductId}
+                             />
                            </div>
                          </div>
                        )}
