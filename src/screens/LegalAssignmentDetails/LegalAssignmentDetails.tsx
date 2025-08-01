@@ -9,10 +9,10 @@ import SpecialConditionsSection from '../DealCreationLayer/sections/SpecialCondi
 import { CustomerDetails, customerService } from '../../services/customerService';
 import { UnderwriterFinancialAnalysisSection } from '../../components/UnderwriterFinancialAnalysisSection';
 import { UnderwriterDocumentsSection } from '../../components/UnderwriterDocumentsSection';
-import { CreditDealDocumentsSection } from '../../components/CreditDealDocumentsSection';
-import { CreditDealCommentsSection } from '../../components/CreditDealCommentsSection';
 import { LegalDealDocumentsSection } from '../../components/LegalDealDocumentsSection';
 import { LegalDealCommentsSection } from '../../components/LegalDealCommentsSection';
+import DealPricingTable from '../../components/DealPricingTable';
+import DealRatesTable from '../../components/DealRatesTable';
 
 interface LegalAssignmentDetails {
   assignmentId: string;
@@ -306,7 +306,10 @@ const LegalAssignmentDetails: React.FC = () => {
   }
 
   return (
-    <Layout currentPath={[{ label: 'Legal Assignment Details', href: `/legal-assignment/${assignmentId}` }]}>
+    <Layout currentPath={[
+      { label: 'Legal', href: '/legal' },
+      { label: 'Assignment Details', href: `/legal-assignment/${assignmentId}` }
+    ]}>
       <div className="p-6">
         {/* Header */}
         <div className="mb-6">
@@ -458,6 +461,24 @@ const LegalAssignmentDetails: React.FC = () => {
                                 </div>
                               </div>
                             )}
+
+                            {/* Pricing and Fees Details within each combination */}
+                            <div className="mt-4">
+                              <DealPricingTable 
+                                dealId={assignmentDetails?.dealId || ''} 
+                                productId={product.productId}
+                                subProductId={subProduct.subProductId}
+                              />
+                            </div>
+
+                            {/* Rate Details within each combination */}
+                            <div className="mt-4">
+                              <DealRatesTable 
+                                dealId={assignmentDetails?.dealId || ''} 
+                                productId={product.productId}
+                                subProductId={subProduct.subProductId}
+                              />
+                            </div>
                           </div>
                         ))}
                       </div>

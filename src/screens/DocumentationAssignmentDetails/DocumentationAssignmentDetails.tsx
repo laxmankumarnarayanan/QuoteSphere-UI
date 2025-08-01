@@ -9,12 +9,10 @@ import SpecialConditionsSection from '../DealCreationLayer/sections/SpecialCondi
 import { CustomerDetails, customerService } from '../../services/customerService';
 import { UnderwriterFinancialAnalysisSection } from '../../components/UnderwriterFinancialAnalysisSection';
 import { UnderwriterDocumentsSection } from '../../components/UnderwriterDocumentsSection';
-import { CreditDealDocumentsSection } from '../../components/CreditDealDocumentsSection';
-import { CreditDealCommentsSection } from '../../components/CreditDealCommentsSection';
-import { LegalDealDocumentsSection } from '../../components/LegalDealDocumentsSection';
-import { LegalDealCommentsSection } from '../../components/LegalDealCommentsSection';
 import { DocumentationDealDocumentsSection } from '../../components/DocumentationDealDocumentsSection';
 import { DocumentationDealCommentsSection } from '../../components/DocumentationDealCommentsSection';
+import DealPricingTable from '../../components/DealPricingTable';
+import DealRatesTable from '../../components/DealRatesTable';
 
 interface DocumentationAssignmentDetails {
   assignmentId: string;
@@ -308,7 +306,10 @@ const DocumentationAssignmentDetails: React.FC = () => {
   }
 
   return (
-    <Layout currentPath={[{ label: 'Documentation Assignment Details', href: `/documentation-assignment/${assignmentId}` }]}>
+    <Layout currentPath={[
+      { label: 'Documentation', href: '/documentation' },
+      { label: 'Assignment Details', href: `/documentation-assignment/${assignmentId}` }
+    ]}>
       <div className="p-6">
         {/* Header */}
         <div className="mb-6">
@@ -460,6 +461,24 @@ const DocumentationAssignmentDetails: React.FC = () => {
                                 </div>
                               </div>
                             )}
+
+                            {/* Pricing and Fees Details within each combination */}
+                            <div className="mt-4">
+                              <DealPricingTable 
+                                dealId={assignmentDetails?.dealId || ''} 
+                                productId={product.productId}
+                                subProductId={subProduct.subProductId}
+                              />
+                            </div>
+
+                            {/* Rate Details within each combination */}
+                            <div className="mt-4">
+                              <DealRatesTable 
+                                dealId={assignmentDetails?.dealId || ''} 
+                                productId={product.productId}
+                                subProductId={subProduct.subProductId}
+                              />
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -552,55 +571,6 @@ const DocumentationAssignmentDetails: React.FC = () => {
             </div>
           ) : (
             <p className="text-gray-500 text-center py-4">No documents found</p>
-          )}
-        </div>
-
-        {/* Pricing & Fees Section */}
-        <div className="mb-6 border border-brand-200 rounded-lg bg-brand-50 p-4">
-          <div className="font-semibold text-brand-800 mb-2">Pricing & Fees:</div>
-          {dealPricing.length > 0 ? (
-            <div className="space-y-4">
-              {dealPricing.map((pricing, index) => (
-                <div key={index} className="bg-white p-3 rounded border">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Description: </span>
-                      <span className="text-sm text-slate-800">{pricing.priceDescription}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Currency: </span>
-                      <span className="text-sm text-slate-800">{pricing.currency}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Standard Price: </span>
-                      <span className="text-sm text-slate-800">{pricing.standardPrice}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Final Price: </span>
-                      <span className="text-sm text-slate-800">{pricing.finalPrice}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Fee Type: </span>
-                      <span className="text-sm text-slate-800">{pricing.feeType}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Fee Percentage: </span>
-                      <span className="text-sm text-slate-800">{pricing.feePercentage}%</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Flat Fee Amount: </span>
-                      <span className="text-sm text-slate-800">{pricing.flatFeeAmount}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Calculated Fee: </span>
-                      <span className="text-sm text-slate-800">{pricing.calculatedFeeAmount}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center py-4">No pricing information found</p>
           )}
         </div>
 

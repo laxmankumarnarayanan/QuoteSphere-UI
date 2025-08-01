@@ -11,6 +11,8 @@ import DealCollateralForm from '../../components/DealCollateralForm';
 import { CustomerDetails, customerService } from '../../services/customerService';
 import { UnderwriterFinancialAnalysisSection } from '../../components/UnderwriterFinancialAnalysisSection';
 import { UnderwriterDocumentsSection } from '../../components/UnderwriterDocumentsSection';
+import DealPricingTable from '../../components/DealPricingTable';
+import DealRatesTable from '../../components/DealRatesTable';
 
 interface AssignmentDetails {
   assignmentId: string;
@@ -303,7 +305,10 @@ const AssignmentDetails: React.FC = () => {
   }
 
   return (
-    <Layout currentPath={[{ label: 'Assignment Details', href: `/assignment/${assignmentId}` }]}>
+    <Layout currentPath={[
+      { label: 'Underwriter', href: '/underwriter' },
+      { label: 'Assignment Details', href: `/assignment/${assignmentId}` }
+    ]}>
       <div className="p-6">
         {/* Header */}
         <div className="mb-6">
@@ -456,6 +461,24 @@ const AssignmentDetails: React.FC = () => {
                                 </div>
                               </div>
                             )}
+
+                            {/* Pricing and Fees Details within each combination */}
+                            <div className="mt-4">
+                              <DealPricingTable 
+                                dealId={assignmentDetails?.dealId || ''} 
+                                productId={product.productId}
+                                subProductId={subProduct.subProductId}
+                              />
+                            </div>
+
+                            {/* Rate Details within each combination */}
+                            <div className="mt-4">
+                              <DealRatesTable 
+                                dealId={assignmentDetails?.dealId || ''} 
+                                productId={product.productId}
+                                subProductId={subProduct.subProductId}
+                              />
+                            </div>
                           </div>
                         ))}
                       </div>

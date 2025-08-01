@@ -11,6 +11,8 @@ import { UnderwriterFinancialAnalysisSection } from '../../components/Underwrite
 import { UnderwriterDocumentsSection } from '../../components/UnderwriterDocumentsSection';
 import { CreditDealDocumentsSection } from '../../components/CreditDealDocumentsSection';
 import { CreditDealCommentsSection } from '../../components/CreditDealCommentsSection';
+import DealPricingTable from '../../components/DealPricingTable';
+import DealRatesTable from '../../components/DealRatesTable';
 
 interface CreditRiskAssignmentDetails {
   assignmentId: string;
@@ -303,7 +305,10 @@ const CreditRiskAssignmentDetails: React.FC = () => {
   }
 
   return (
-    <Layout currentPath={[{ label: 'Credit Risk Assignment Details', href: `/credit-risk-assignment/${assignmentId}` }]}>
+    <Layout currentPath={[
+      { label: 'Credit Risk', href: '/credit-risk' },
+      { label: 'Assignment Details', href: `/credit-risk-assignment/${assignmentId}` }
+    ]}>
       <div className="p-6">
         {/* Header */}
         <div className="mb-6">
@@ -456,6 +461,24 @@ const CreditRiskAssignmentDetails: React.FC = () => {
                                 </div>
                               </div>
                             )}
+
+                            {/* Pricing and Fees Details within each combination */}
+                            <div className="mt-4">
+                              <DealPricingTable 
+                                dealId={assignmentDetails?.dealId || ''} 
+                                productId={product.productId}
+                                subProductId={subProduct.subProductId}
+                              />
+                            </div>
+
+                            {/* Rate Details within each combination */}
+                            <div className="mt-4">
+                              <DealRatesTable 
+                                dealId={assignmentDetails?.dealId || ''} 
+                                productId={product.productId}
+                                subProductId={subProduct.subProductId}
+                              />
+                            </div>
                           </div>
                         ))}
                       </div>
