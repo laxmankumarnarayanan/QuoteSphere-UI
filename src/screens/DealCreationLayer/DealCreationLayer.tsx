@@ -483,21 +483,29 @@ export const DealCreationLayer = (): JSX.Element => {
                          </div>
                          <span className={`transition-transform duration-200 ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
                        </div>
-                       {!isCollapsed && comboCommitments.length > 0 && (
-                         <div className="mt-3 pl-4 border-l-2 border-brand-200">
-                           <div className="font-medium text-brand-700 mb-1">Deal Commitments:</div>
-                           <div className="space-y-1">
-                             {comboCommitments.map((commitment, index) => (
-                               <div key={commitment.commitmentNumber} className="flex gap-4 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
-                                 <span>Commitment #{commitment.commitmentNumber}:</span>
-                                 <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
-                                 <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
-                                 <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
-                                 {commitment.description && (
-                                   <span>Description: <span className="font-medium">{commitment.description}</span></span>
-                                 )}
+                       {!isCollapsed && (
+                         <div className="space-y-4">
+                           {comboCommitments.length > 0 && (
+                             <div className="mt-3 pl-4 border-l-2 border-brand-200">
+                               <div className="font-medium text-brand-700 mb-1">Deal Commitments:</div>
+                               <div className="space-y-1">
+                                 {comboCommitments.map((commitment, index) => (
+                                   <div key={commitment.commitmentNumber} className="flex gap-4 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
+                                     <span>Commitment #{commitment.commitmentNumber}:</span>
+                                     <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
+                                     <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
+                                     <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
+                                     {commitment.description && (
+                                       <span>Description: <span className="font-medium">{commitment.description}</span></span>
+                                     )}
+                                   </div>
+                                 ))}
                                </div>
-                             ))}
+                             </div>
+                           )}
+                           {/* Pricing and Fees Details within each combination */}
+                           <div className="mt-4">
+                             <DealPricingTable dealId={createdDeal?.dealId || ''} />
                            </div>
                          </div>
                        )}
@@ -547,8 +555,6 @@ export const DealCreationLayer = (): JSX.Element => {
                <DealCollateralForm dealId={createdDeal?.dealId || ''} showForms={false} showCollaterals={false} showDocuments={true} />
              )}
            </div>
-           {/* Pricing & Fees Table */}
-           <DealPricingTable dealId={createdDeal?.dealId || ''} />
            {/* Navigation Buttons for Pricing and Fees */}
            <div className="flex justify-end gap-4 mt-8">
              <SecondaryButton onClick={handleBack}>
@@ -625,21 +631,29 @@ export const DealCreationLayer = (): JSX.Element => {
                          </div>
                          <span className={`transition-transform duration-200 ${isCollapsed ? 'rotate-90' : ''}`}>▶</span>
                        </div>
-                       {!isCollapsed && comboCommitments.length > 0 && (
-                         <div className="mt-3 pl-4 border-l-2 border-brand-200">
-                           <div className="font-medium text-brand-700 mb-1">Deal Commitments:</div>
-                           <div className="space-y-1">
-                             {comboCommitments.map((commitment, index) => (
-                               <div key={commitment.commitmentNumber} className="flex gap-4 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
-                                 <span>Commitment #{commitment.commitmentNumber}:</span>
-                                 <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
-                                 <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
-                                 <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
-                                 {commitment.description && (
-                                   <span>Description: <span className="font-medium">{commitment.description}</span></span>
-                                 )}
+                       {!isCollapsed && (
+                         <div className="space-y-4">
+                           {comboCommitments.length > 0 && (
+                             <div className="mt-3 pl-4 border-l-2 border-brand-200">
+                               <div className="font-medium text-brand-700 mb-1">Deal Commitments:</div>
+                               <div className="space-y-1">
+                                 {comboCommitments.map((commitment, index) => (
+                                   <div key={commitment.commitmentNumber} className="flex gap-4 items-center text-sm text-slate-800 bg-gray-50 p-2 rounded">
+                                     <span>Commitment #{commitment.commitmentNumber}:</span>
+                                     <span>Currency: <span className="font-medium">{commitment.currency}</span></span>
+                                     <span>Amount: <span className="font-medium">{commitment.commitmentAmount}</span></span>
+                                     <span>Tenure: <span className="font-medium">{commitment.tenure}</span></span>
+                                     {commitment.description && (
+                                       <span>Description: <span className="font-medium">{commitment.description}</span></span>
+                                     )}
+                                   </div>
+                                 ))}
                                </div>
-                             ))}
+                             </div>
+                           )}
+                           {/* Pricing and Fees Details within each combination */}
+                           <div className="mt-4">
+                             <DealPricingTable dealId={createdDeal?.dealId || ''} />
                            </div>
                          </div>
                        )}
@@ -687,26 +701,6 @@ export const DealCreationLayer = (): JSX.Element => {
              </div>
              {!documentsCollapsedSpecial && (
                <DealCollateralForm dealId={createdDeal?.dealId || ''} showForms={false} showCollaterals={false} showDocuments={true} />
-             )}
-           </div>
-           {/* Collapsible Pricing & Fees */}
-           <div className="mb-4">
-             <div
-               className="flex items-center justify-between cursor-pointer border border-brand-200 rounded-lg bg-brand-50 px-4 py-3 select-none"
-               onClick={() => setPricingCollapsedSpecial((prev) => !prev)}
-             >
-               <div className="font-semibold text-brand-800 text-base font-['Archivo',Helvetica]">
-                 Pricing & Fees
-               </div>
-               <div className="flex items-center gap-2">
-                 {pricingCollapsedSpecial && createdDeal?.dealId ? (
-                   <span className="text-sm text-gray-700">Deal ID: <span className="font-semibold">{createdDeal.dealId}</span></span>
-                 ) : null}
-                 <span className={`transition-transform duration-200 ${pricingCollapsedSpecial ? 'rotate-90' : ''}`}>▶</span>
-               </div>
-             </div>
-             {!pricingCollapsedSpecial && (
-               <DealPricingTable dealId={createdDeal?.dealId || ''} />
              )}
            </div>
            {/* Special Conditions Section */}
