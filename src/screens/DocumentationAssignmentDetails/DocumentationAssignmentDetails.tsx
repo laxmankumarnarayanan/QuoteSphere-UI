@@ -9,6 +9,10 @@ import SpecialConditionsSection from '../DealCreationLayer/sections/SpecialCondi
 import { CustomerDetails, customerService } from '../../services/customerService';
 import { UnderwriterFinancialAnalysisSection } from '../../components/UnderwriterFinancialAnalysisSection';
 import { UnderwriterDocumentsSection } from '../../components/UnderwriterDocumentsSection';
+import { CreditDealDocumentsSection } from '../../components/CreditDealDocumentsSection';
+import { CreditDealCommentsSection } from '../../components/CreditDealCommentsSection';
+import { LegalDealDocumentsSection } from '../../components/LegalDealDocumentsSection';
+import { LegalDealCommentsSection } from '../../components/LegalDealCommentsSection';
 import { DocumentationDealDocumentsSection } from '../../components/DocumentationDealDocumentsSection';
 import { DocumentationDealCommentsSection } from '../../components/DocumentationDealCommentsSection';
 import DealPricingTable from '../../components/DealPricingTable';
@@ -597,6 +601,42 @@ const DocumentationAssignmentDetails: React.FC = () => {
         {/* Underwriter Documents Section (Read Only) */}
         <div className="mb-6">
           <UnderwriterDocumentsSection 
+            dealId={assignmentDetails.dealId}
+            assignmentId={assignmentDetails.assignmentId}
+            readOnly={true}
+          />
+        </div>
+
+        {/* Credit Risk Documents Section (Read Only) */}
+        <div className="mb-6">
+          <CreditDealDocumentsSection 
+            dealId={assignmentDetails.dealId}
+            assignmentId={assignmentDetails.assignmentId}
+            readOnly={true}
+          />
+        </div>
+
+        {/* Credit Risk Comments Section (Read Only) */}
+        <div className="mb-6">
+          <CreditDealCommentsSection 
+            dealId={assignmentDetails.dealId}
+            assignmentId={assignmentDetails.assignmentId}
+            readOnly={true}
+          />
+        </div>
+
+        {/* Legal Documents Section (Read Only) */}
+        <div className="mb-6">
+          <LegalDealDocumentsSection 
+            dealId={assignmentDetails.dealId}
+            assignmentId={assignmentDetails.assignmentId}
+            readOnly={true}
+          />
+        </div>
+
+        {/* Legal Comments Section (Read Only) */}
+        <div className="mb-6">
+          <LegalDealCommentsSection 
             dealId={assignmentDetails.dealId}
             assignmentId={assignmentDetails.assignmentId}
             readOnly={true}
