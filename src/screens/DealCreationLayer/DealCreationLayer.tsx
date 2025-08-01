@@ -15,6 +15,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/ca
 import SpecialConditionsSection from "./sections/SpecialConditionsSection";
 import { DealCommitment, getDealCommitmentsByDealId } from '../../services/dealCommitmentService';
 import DealPricingTable from '../../components/DealPricingTable';
+import DealRatesTable from '../../components/DealRatesTable';
 
 // Step data for the progress stepper
 const stepsData = [
@@ -511,6 +512,14 @@ export const DealCreationLayer = (): JSX.Element => {
                                subProductId={combo.subProductId}
                              />
                            </div>
+                           {/* Rate Details within each combination - only show if matching data exists */}
+                           <div className="mt-4">
+                             <DealRatesTable 
+                               dealId={createdDeal?.dealId || ''} 
+                               productId={combo.productId}
+                               subProductId={combo.subProductId}
+                             />
+                           </div>
                          </div>
                        )}
                      </div>
@@ -658,6 +667,14 @@ export const DealCreationLayer = (): JSX.Element => {
                            {/* Pricing and Fees Details within each combination - only show if matching data exists */}
                            <div className="mt-4">
                              <DealPricingTable 
+                               dealId={createdDeal?.dealId || ''} 
+                               productId={combo.productId}
+                               subProductId={combo.subProductId}
+                             />
+                           </div>
+                           {/* Rate Details within each combination - only show if matching data exists */}
+                           <div className="mt-4">
+                             <DealRatesTable 
                                dealId={createdDeal?.dealId || ''} 
                                productId={combo.productId}
                                subProductId={combo.subProductId}
