@@ -574,55 +574,6 @@ const CreditRiskAssignmentDetails: React.FC = () => {
           )}
         </div>
 
-        {/* Pricing & Fees Section */}
-        <div className="mb-6 border border-brand-200 rounded-lg bg-brand-50 p-4">
-          <div className="font-semibold text-brand-800 mb-2">Pricing & Fees:</div>
-          {dealPricing.length > 0 ? (
-            <div className="space-y-4">
-              {dealPricing.map((pricing, index) => (
-                <div key={index} className="bg-white p-3 rounded border">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Description: </span>
-                      <span className="text-sm text-slate-800">{pricing.priceDescription}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Currency: </span>
-                      <span className="text-sm text-slate-800">{pricing.currency}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Standard Price: </span>
-                      <span className="text-sm text-slate-800">{pricing.standardPrice}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Final Price: </span>
-                      <span className="text-sm text-slate-800">{pricing.finalPrice}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Fee Type: </span>
-                      <span className="text-sm text-slate-800">{pricing.feeType}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Fee Percentage: </span>
-                      <span className="text-sm text-slate-800">{pricing.feePercentage}%</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Flat Fee Amount: </span>
-                      <span className="text-sm text-slate-800">{pricing.flatFeeAmount}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-brand-900">Calculated Fee: </span>
-                      <span className="text-sm text-slate-800">{pricing.calculatedFeeAmount}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center py-4">No pricing information found</p>
-          )}
-        </div>
-
         {/* Special Conditions Section */}
         <div className="mb-6 border border-brand-200 rounded-lg bg-brand-50 p-4">
           <div className="font-semibold text-brand-800 mb-2">Special Conditions:</div>
