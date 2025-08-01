@@ -10,7 +10,8 @@ import {
   LayoutDashboard,
   Shield,
   AlertTriangle,
-  Scale
+  Scale,
+  FileText
 } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -45,6 +46,11 @@ const navigation: NavItem[] = [
     icon: <Scale className="w-4 h-4" />,
     label: 'Legal',
     href: '/legal'
+  },
+  {
+    icon: <FileText className="w-4 h-4" />,
+    label: 'Documentation',
+    href: '/documentation'
   },
   {
     icon: '/Exclusive Product.png',

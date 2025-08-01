@@ -9,6 +9,8 @@ import CreditRisk from './screens/CreditRisk/CreditRisk';
 import CreditRiskAssignmentDetails from './screens/CreditRiskAssignmentDetails/CreditRiskAssignmentDetails';
 import Legal from './screens/Legal/Legal';
 import LegalAssignmentDetails from './screens/LegalAssignmentDetails/LegalAssignmentDetails';
+import Documentation from './screens/Documentation/Documentation';
+import DocumentationAssignmentDetails from './screens/DocumentationAssignmentDetails/DocumentationAssignmentDetails';
 
 // Simple test component wrapped in Layout
 const TestPage = () => (
@@ -39,6 +41,8 @@ function App() {
         <Route path="/credit-risk-assignment/:assignmentId" element={<CreditRiskAssignmentDetails />} />
         <Route path="/legal" element={<Legal />} />
         <Route path="/legal-assignment/:assignmentId" element={<LegalAssignmentDetails />} />
+        <Route path="/documentation" element={<Documentation />} />
+        <Route path="/documentation-assignment/:assignmentId" element={<DocumentationAssignmentDetails />} />
         <Route path="/test" element={<TestPage />} />
         <Route path="/*" element={<TestPage />} />
       </Routes>
