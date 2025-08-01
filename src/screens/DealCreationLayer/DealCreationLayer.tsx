@@ -119,7 +119,14 @@ export const DealCreationLayer = (): JSX.Element => {
              productId: combo.productId,
              subProductId: combo.subProductId,
            };
+           // Populate DealPricing from Fees
            await fetch(`${API_BASE_URL}/deal-pricing/populate`, {
+             method: "POST",
+             headers: { "Content-Type": "application/json" },
+             body: JSON.stringify(body),
+           });
+           // Populate DealRates from Rates
+           await fetch(`${API_BASE_URL}/deal-rates/populate`, {
              method: "POST",
              headers: { "Content-Type": "application/json" },
              body: JSON.stringify(body),
@@ -128,7 +135,7 @@ export const DealCreationLayer = (): JSX.Element => {
        );
        setCurrentStep((prevStep) => Math.min(prevStep + 1, stepsData.length));
      } catch (error) {
-       alert("Failed to populate pricing details. Please try again.");
+       alert("Failed to populate pricing and rate details. Please try again.");
        return;
      }
    } else if (currentStep === 1 && selectedCustomer) {
