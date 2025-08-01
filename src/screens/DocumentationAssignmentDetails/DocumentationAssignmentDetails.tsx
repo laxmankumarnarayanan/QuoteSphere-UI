@@ -13,6 +13,8 @@ import { CreditDealDocumentsSection } from '../../components/CreditDealDocuments
 import { CreditDealCommentsSection } from '../../components/CreditDealCommentsSection';
 import { LegalDealDocumentsSection } from '../../components/LegalDealDocumentsSection';
 import { LegalDealCommentsSection } from '../../components/LegalDealCommentsSection';
+import { DocumentationDealDocumentsSection } from '../../components/DocumentationDealDocumentsSection';
+import { DocumentationDealCommentsSection } from '../../components/DocumentationDealCommentsSection';
 
 interface DocumentationAssignmentDetails {
   assignmentId: string;
@@ -664,6 +666,24 @@ const DocumentationAssignmentDetails: React.FC = () => {
             dealId={assignmentDetails.dealId}
             assignmentId={assignmentDetails.assignmentId}
             readOnly={true}
+          />
+        </div>
+
+        {/* Documentation Documents Section */}
+        <div className="mb-6">
+          <DocumentationDealDocumentsSection 
+            dealId={assignmentDetails.dealId}
+            assignmentId={assignmentDetails.assignmentId}
+            readOnly={false}
+          />
+        </div>
+
+        {/* Documentation Comments Section */}
+        <div className="mb-6">
+          <DocumentationDealCommentsSection 
+            dealId={assignmentDetails.dealId}
+            assignmentId={assignmentDetails.assignmentId}
+            readOnly={false}
           />
         </div>
 
