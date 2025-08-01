@@ -33,9 +33,10 @@ interface DealRatesTableProps {
   dealId: string;
   productId?: string;
   subProductId?: string;
+  readOnly?: boolean;
 }
 
-const DealRatesTable: React.FC<DealRatesTableProps> = ({ dealId, productId, subProductId }) => {
+const DealRatesTable: React.FC<DealRatesTableProps> = ({ dealId, productId, subProductId, readOnly = false }) => {
   const [rows, setRows] = useState<DealRatesRow[]>([]);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [editValues, setEditValues] = useState<{ 
@@ -75,6 +76,7 @@ const DealRatesTable: React.FC<DealRatesTableProps> = ({ dealId, productId, subP
   }, [dealId, productId, subProductId]);
 
   const handleEdit = (idx: number) => {
+    if (readOnly) return; // Don't allow editing in read-only mode
     setEditIdx(idx);
     setEditValues({
       requestedSpread: rows[idx].requestedSpread || '',
@@ -153,14 +155,14 @@ const DealRatesTable: React.FC<DealRatesTableProps> = ({ dealId, productId, subP
                       <span className="ml-2 text-xs text-brand-500 font-normal">(Rate Description)</span>
                     </td>
                     <td className="px-4 py-3 text-right" style={{ width: "1%" }}>
-                      {editIdx === idx ? (
+                      {!readOnly && editIdx === idx ? (
                         <>
                           <PrimaryButton onClick={() => handleSave(idx)} className="mr-2">
                             Save
                           </PrimaryButton>
                           <SecondaryButton onClick={handleCancel}>Cancel</SecondaryButton>
                         </>
-                      ) : (
+                      ) : !readOnly ? (
                         <SecondaryButton 
                           onClick={() => handleEdit(idx)}
                           disabled={!row.allowUpdates}
@@ -168,7 +170,7 @@ const DealRatesTable: React.FC<DealRatesTableProps> = ({ dealId, productId, subP
                         >
                           Edit
                         </SecondaryButton>
-                      )}
+                      ) : null}
                     </td>
                   </tr>
                   {/* Second line: Other fields */}
@@ -184,7 +186,7 @@ const DealRatesTable: React.FC<DealRatesTableProps> = ({ dealId, productId, subP
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-800">
                       <span className="font-medium text-brand-700">Requested Spread:</span>{" "}
-                      {editIdx === idx ? (
+                      {!readOnly && editIdx === idx ? (
                         <TextInput
                           id={`requestedSpread-${idx}`}
                           label=""
@@ -198,7 +200,7 @@ const DealRatesTable: React.FC<DealRatesTableProps> = ({ dealId, productId, subP
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-800">
                       <span className="font-medium text-brand-700">Requested Margin:</span>{" "}
-                      {editIdx === idx ? (
+                      {!readOnly && editIdx === idx ? (
                         <TextInput
                           id={`requestedMargin-${idx}`}
                           label=""

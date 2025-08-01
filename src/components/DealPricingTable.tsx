@@ -29,9 +29,10 @@ interface DealPricingTableProps {
   dealId: string;
   productId?: string;
   subProductId?: string;
+  readOnly?: boolean;
 }
 
-const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId, productId, subProductId }) => {
+const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId, productId, subProductId, readOnly = false }) => {
   const [rows, setRows] = useState<DealPricingRow[]>([]);
   const [editIdx, setEditIdx] = useState<number | null>(null);
   const [editValues, setEditValues] = useState<{ 
@@ -87,6 +88,7 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId, productId, 
   }, [dealId, productId, subProductId]);
 
   const handleEdit = (idx: number) => {
+    if (readOnly) return; // Don't allow editing in read-only mode
     setEditIdx(idx);
     setEditValues({
       preferentialType: rows[idx].preferentialType || '',
@@ -169,16 +171,16 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId, productId, 
                       <span className="ml-2 text-xs text-brand-500 font-normal">(Fee Description)</span>
                     </td>
                     <td className="px-4 py-3 text-right" style={{ width: "1%" }}>
-                      {editIdx === idx ? (
+                      {!readOnly && editIdx === idx ? (
                         <>
                           <PrimaryButton onClick={() => handleSave(idx)} className="mr-2">
                             Save
                           </PrimaryButton>
                           <SecondaryButton onClick={handleCancel}>Cancel</SecondaryButton>
                         </>
-                      ) : (
+                      ) : !readOnly ? (
                         <SecondaryButton onClick={() => handleEdit(idx)}>Edit</SecondaryButton>
-                      )}
+                      ) : null}
                     </td>
                   </tr>
                   {/* Second line: Other fields */}
@@ -197,7 +199,7 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId, productId, 
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-800">
                       <span className="font-medium text-brand-700">Preferential Type:</span>{" "}
-                      {editIdx === idx ? (
+                      {!readOnly && editIdx === idx ? (
                         <SelectInput
                           id={`preferentialType-${idx}`}
                           label=""
@@ -213,7 +215,7 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId, productId, 
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-800">
                       <span className="font-medium text-brand-700">Standard Price:</span>{" "}
-                      {editIdx === idx ? (
+                      {!readOnly && editIdx === idx ? (
                         <TextInput
                           id={`standardPrice-${idx}`}
                           label=""
@@ -227,7 +229,7 @@ const DealPricingTable: React.FC<DealPricingTableProps> = ({ dealId, productId, 
                     </td>
                     <td className="px-4 py-2 text-sm text-slate-800">
                       <span className="font-medium text-brand-700">Discount %:</span>{" "}
-                      {editIdx === idx ? (
+                      {!readOnly && editIdx === idx ? (
                         <TextInput
                           id={`discountPercentage-${idx}`}
                           label=""

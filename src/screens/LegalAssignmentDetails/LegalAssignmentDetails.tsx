@@ -470,6 +470,7 @@ const LegalAssignmentDetails: React.FC = () => {
                                 dealId={assignmentDetails?.dealId || ''} 
                                 productId={product.productId}
                                 subProductId={subProduct.subProductId}
+                                readOnly={true}
                               />
                             </div>
 
@@ -479,6 +480,7 @@ const LegalAssignmentDetails: React.FC = () => {
                                 dealId={assignmentDetails?.dealId || ''} 
                                 productId={product.productId}
                                 subProductId={subProduct.subProductId}
+                                readOnly={true}
                               />
                             </div>
                           </div>
